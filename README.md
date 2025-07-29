@@ -4,19 +4,19 @@ This project explores age estimation from Hebrew handwriting samples using deep 
 
 ## 📂 Project Structure
 
-### 🔹 `Age_Recognition_Handwriting_Regression_V2.5 (1).ipynb`
+### 🔹 `Age_Recognition_Handwriting_Regression_V2.5.ipynb`
 Initial experiment using CNNs like ResNet50 and InceptionV3 on the HHD dataset. This served as a baseline for performance evaluation.
 
 ### 🔹 `Age_Recognition_Handwriting_Regression_V2.5_Expanded.ipynb`
 Introduces an expanded version of the dataset with 166 new handwriting samples, increasing diversity across age groups. This experiment evaluates the impact of data diversity on model accuracy.
 
-### 🔹 `Age_Recognition_Handwriting_Regression_V2_5_Grad_CAM (3).ipynb`
+### 🔹 `Age_Recognition_Handwriting_Regression_V2_5_Grad_CAM.ipynb`
 Implements Grad-CAM visualizations for interpretability. Provides insight into which regions of handwriting images influenced the model’s age predictions.
 
-### 🔹 `Age_Recognition_Handwriting_Regression_V4_Cross_Validation (2).ipynb`
+### 🔹 `Age_Recognition_Handwriting_Regression_V4_Cross_Validation.ipynb`
 Applies stratified k-fold cross-validation to better assess model robustness across the dataset. Includes evaluation metrics such as MAE, RMSE, R², and error distributions.
 
-### 🔹 `Age_Recognition_Handwriting_Regression_V5_ViT (3).ipynb`
+### 🔹 `Age_Recognition_Handwriting_Regression_V5_ViT.ipynb`
 First implementation of Vision Transformers (ViTs) such as SwinV2, MobileViT, and BEiT for age regression, without cross-validation.
 
 ### 🔹 `Age_Recognition_Handwriting_Regression_V6_ViT_No-CV.ipynb`
