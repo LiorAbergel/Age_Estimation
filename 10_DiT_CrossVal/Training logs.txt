@@ -1,0 +1,1078 @@
+[microsoft__dit-base | Fold 1 | Frozen 1/15] MAE 9.308
+[microsoft__dit-base | Fold 1 | Frozen 2/15] MAE 8.871
+[microsoft__dit-base | Fold 1 | Frozen 3/15] MAE 9.068
+[microsoft__dit-base | Fold 1 | Frozen 4/15] MAE 9.029
+[microsoft__dit-base | Fold 1 | Frozen 5/15] MAE 9.037
+[microsoft__dit-base | Fold 1 | Frozen 6/15] MAE 8.803
+[microsoft__dit-base | Fold 1 | Frozen 7/15] MAE 8.935
+[microsoft__dit-base | Fold 1 | Frozen 8/15] MAE 8.781
+[microsoft__dit-base | Fold 1 | Frozen 9/15] MAE 9.032
+[microsoft__dit-base | Fold 1 | Frozen 10/15] MAE 8.760
+[microsoft__dit-base | Fold 1 | Frozen 11/15] MAE 8.842
+[microsoft__dit-base | Fold 1 | Frozen 12/15] MAE 9.080
+[microsoft__dit-base | Fold 1 | Frozen 13/15] MAE 8.860
+[microsoft__dit-base | Fold 1 | Frozen 14/15] MAE 8.906
+[microsoft__dit-base | Fold 1 | Frozen 15/15] MAE 8.949
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | Fold 1 | FT 1/30] MAE 9.083
+[microsoft__dit-base | Fold 1 | FT 2/30] MAE 8.588
+[microsoft__dit-base | Fold 1 | FT 3/30] MAE 8.515
+[microsoft__dit-base | Fold 1 | FT 4/30] MAE 8.754
+[microsoft__dit-base | Fold 1 | FT 5/30] MAE 8.293
+[microsoft__dit-base | Fold 1 | FT 6/30] MAE 8.311
+[microsoft__dit-base | Fold 1 | FT 7/30] MAE 8.044
+[microsoft__dit-base | Fold 1 | FT 8/30] MAE 8.118
+[microsoft__dit-base | Fold 1 | FT 9/30] MAE 8.198
+[microsoft__dit-base | Fold 1 | FT 10/30] MAE 9.449
+[microsoft__dit-base | Fold 1 | FT 11/30] MAE 9.210
+[microsoft__dit-base | Fold 1 | FT 12/30] MAE 8.705
+[microsoft__dit-base | Fold 1 | FT 13/30] MAE 8.393
+[microsoft__dit-base | Fold 1 | FT 14/30] MAE 8.562
+[microsoft__dit-base | Fold 1 | FT 15/30] MAE 9.146
+[microsoft__dit-base | Fold 1 | FT 16/30] MAE 9.051
+[microsoft__dit-base | Fold 1 | FT 17/30] MAE 10.476
+[microsoft__dit-base | Fold 1 | FT 18/30] MAE 10.439
+[microsoft__dit-base | Fold 1 | FT 19/30] MAE 8.372
+[microsoft__dit-base | Fold 1 | FT 20/30] MAE 9.941
+[microsoft__dit-base | Fold 1 | FT 21/30] MAE 7.804
+[microsoft__dit-base | Fold 1 | FT 22/30] MAE 10.746
+[microsoft__dit-base | Fold 1 | FT 23/30] MAE 7.705
+[microsoft__dit-base | Fold 1 | FT 24/30] MAE 9.046
+[microsoft__dit-base | Fold 1 | FT 25/30] MAE 8.726
+[microsoft__dit-base | Fold 1 | FT 26/30] MAE 7.688
+[microsoft__dit-base | Fold 1 | FT 27/30] MAE 9.700
+[microsoft__dit-base | Fold 1 | FT 28/30] MAE 9.984
+[microsoft__dit-base | Fold 1 | FT 29/30] MAE 9.736
+[microsoft__dit-base | Fold 1 | FT 30/30] MAE 10.465
+[microsoft__dit-base] Evaluating best checkpoint on fold 1 …
+
+===== microsoft__dit-base | Fold 2/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-base and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-base | Fold 2 | Frozen 1/15] MAE 17.449
+[microsoft__dit-base | Fold 2 | Frozen 2/15] MAE 9.803
+[microsoft__dit-base | Fold 2 | Frozen 3/15] MAE 7.957
+[microsoft__dit-base | Fold 2 | Frozen 4/15] MAE 11.858
+[microsoft__dit-base | Fold 2 | Frozen 5/15] MAE 10.218
+[microsoft__dit-base | Fold 2 | Frozen 6/15] MAE 9.044
+[microsoft__dit-base | Fold 2 | Frozen 7/15] MAE 9.160
+[microsoft__dit-base | Fold 2 | Frozen 8/15] MAE 9.618
+[microsoft__dit-base | Fold 2 | Frozen 9/15] MAE 8.953
+[microsoft__dit-base | Fold 2 | Frozen 10/15] MAE 9.059
+[microsoft__dit-base | Fold 2 | Frozen 11/15] MAE 8.696
+[microsoft__dit-base | Fold 2 | Frozen 12/15] MAE 9.159
+[microsoft__dit-base | Fold 2 | Frozen 13/15] MAE 8.657
+[microsoft__dit-base | Fold 2 | Frozen 14/15] MAE 8.722
+[microsoft__dit-base | Fold 2 | Frozen 15/15] MAE 8.841
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | Fold 2 | FT 1/30] MAE 9.361
+[microsoft__dit-base | Fold 2 | FT 2/30] MAE 7.551
+[microsoft__dit-base | Fold 2 | FT 3/30] MAE 7.651
+[microsoft__dit-base | Fold 2 | FT 4/30] MAE 7.627
+[microsoft__dit-base | Fold 2 | FT 5/30] MAE 7.484
+[microsoft__dit-base | Fold 2 | FT 6/30] MAE 7.312
+[microsoft__dit-base | Fold 2 | FT 7/30] MAE 7.195
+[microsoft__dit-base | Fold 2 | FT 8/30] MAE 7.690
+[microsoft__dit-base | Fold 2 | FT 9/30] MAE 6.904
+[microsoft__dit-base | Fold 2 | FT 10/30] MAE 8.931
+[microsoft__dit-base | Fold 2 | FT 11/30] MAE 6.713
+[microsoft__dit-base | Fold 2 | FT 12/30] MAE 6.553
+[microsoft__dit-base | Fold 2 | FT 13/30] MAE 6.687
+[microsoft__dit-base | Fold 2 | FT 14/30] MAE 6.734
+[microsoft__dit-base | Fold 2 | FT 15/30] MAE 7.415
+[microsoft__dit-base | Fold 2 | FT 16/30] MAE 6.471
+[microsoft__dit-base | Fold 2 | FT 17/30] MAE 6.674
+[microsoft__dit-base | Fold 2 | FT 18/30] MAE 6.265
+[microsoft__dit-base | Fold 2 | FT 19/30] MAE 7.274
+[microsoft__dit-base | Fold 2 | FT 20/30] MAE 6.033
+[microsoft__dit-base | Fold 2 | FT 21/30] MAE 7.795
+[microsoft__dit-base | Fold 2 | FT 22/30] MAE 6.354
+[microsoft__dit-base | Fold 2 | FT 23/30] MAE 6.844
+[microsoft__dit-base | Fold 2 | FT 24/30] MAE 6.825
+[microsoft__dit-base | Fold 2 | FT 25/30] MAE 6.783
+[microsoft__dit-base | Fold 2 | FT 26/30] MAE 6.227
+[microsoft__dit-base | Fold 2 | FT 27/30] MAE 8.011
+[microsoft__dit-base | Fold 2 | FT 28/30] MAE 6.320
+[microsoft__dit-base | Fold 2 | FT 29/30] MAE 6.139
+[microsoft__dit-base | Fold 2 | FT 30/30] MAE 8.319
+[microsoft__dit-base] Evaluating best checkpoint on fold 2 …
+
+===== microsoft__dit-base | Fold 3/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-base and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-base | Fold 3 | Frozen 1/15] MAE 50.462
+[microsoft__dit-base | Fold 3 | Frozen 2/15] MAE 38.430
+[microsoft__dit-base | Fold 3 | Frozen 3/15] MAE 26.445
+[microsoft__dit-base | Fold 3 | Frozen 4/15] MAE 14.435
+[microsoft__dit-base | Fold 3 | Frozen 5/15] MAE 8.614
+[microsoft__dit-base | Fold 3 | Frozen 6/15] MAE 10.179
+[microsoft__dit-base | Fold 3 | Frozen 7/15] MAE 9.945
+[microsoft__dit-base | Fold 3 | Frozen 8/15] MAE 9.370
+[microsoft__dit-base | Fold 3 | Frozen 9/15] MAE 9.298
+[microsoft__dit-base | Fold 3 | Frozen 10/15] MAE 9.292
+[microsoft__dit-base | Fold 3 | Frozen 11/15] MAE 9.227
+[microsoft__dit-base | Fold 3 | Frozen 12/15] MAE 9.326
+[microsoft__dit-base | Fold 3 | Frozen 13/15] MAE 9.209
+[microsoft__dit-base | Fold 3 | Frozen 14/15] MAE 9.024
+[microsoft__dit-base | Fold 3 | Frozen 15/15] MAE 9.190
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | Fold 3 | FT 1/30] MAE 8.659
+[microsoft__dit-base | Fold 3 | FT 2/30] MAE 8.353
+[microsoft__dit-base | Fold 3 | FT 3/30] MAE 8.385
+[microsoft__dit-base | Fold 3 | FT 4/30] MAE 8.234
+[microsoft__dit-base | Fold 3 | FT 5/30] MAE 8.105
+[microsoft__dit-base | Fold 3 | FT 6/30] MAE 8.438
+[microsoft__dit-base | Fold 3 | FT 7/30] MAE 8.097
+[microsoft__dit-base | Fold 3 | FT 8/30] MAE 8.023
+[microsoft__dit-base | Fold 3 | FT 9/30] MAE 8.343
+[microsoft__dit-base | Fold 3 | FT 10/30] MAE 7.859
+[microsoft__dit-base | Fold 3 | FT 11/30] MAE 8.245
+[microsoft__dit-base | Fold 3 | FT 12/30] MAE 7.808
+[microsoft__dit-base | Fold 3 | FT 13/30] MAE 7.962
+[microsoft__dit-base | Fold 3 | FT 14/30] MAE 7.976
+[microsoft__dit-base | Fold 3 | FT 15/30] MAE 7.832
+[microsoft__dit-base | Fold 3 | FT 16/30] MAE 7.761
+[microsoft__dit-base | Fold 3 | FT 17/30] MAE 7.727
+[microsoft__dit-base | Fold 3 | FT 18/30] MAE 8.513
+[microsoft__dit-base | Fold 3 | FT 19/30] MAE 7.631
+[microsoft__dit-base | Fold 3 | FT 20/30] MAE 7.749
+[microsoft__dit-base | Fold 3 | FT 21/30] MAE 7.628
+[microsoft__dit-base | Fold 3 | FT 22/30] MAE 8.382
+[microsoft__dit-base | Fold 3 | FT 23/30] MAE 7.543
+[microsoft__dit-base | Fold 3 | FT 24/30] MAE 8.482
+[microsoft__dit-base | Fold 3 | FT 25/30] MAE 8.436
+[microsoft__dit-base | Fold 3 | FT 26/30] MAE 7.519
+[microsoft__dit-base | Fold 3 | FT 27/30] MAE 7.620
+[microsoft__dit-base | Fold 3 | FT 28/30] MAE 7.592
+[microsoft__dit-base | Fold 3 | FT 29/30] MAE 8.053
+[microsoft__dit-base | Fold 3 | FT 30/30] MAE 7.395
+[microsoft__dit-base] Evaluating best checkpoint on fold 3 …
+
+===== microsoft__dit-base | Fold 4/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-base and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-base | Fold 4 | Frozen 1/15] MAE 7.096
+[microsoft__dit-base | Fold 4 | Frozen 2/15] MAE 6.953
+[microsoft__dit-base | Fold 4 | Frozen 3/15] MAE 6.884
+[microsoft__dit-base | Fold 4 | Frozen 4/15] MAE 7.063
+[microsoft__dit-base | Fold 4 | Frozen 5/15] MAE 6.866
+[microsoft__dit-base | Fold 4 | Frozen 6/15] MAE 6.912
+[microsoft__dit-base | Fold 4 | Frozen 7/15] MAE 6.947
+[microsoft__dit-base | Fold 4 | Frozen 8/15] MAE 6.887
+[microsoft__dit-base | Fold 4 | Frozen 9/15] MAE 6.893
+[microsoft__dit-base | Fold 4 | Frozen 10/15] MAE 6.927
+[microsoft__dit-base | Fold 4 | Frozen 11/15] MAE 6.899
+[microsoft__dit-base | Fold 4 | Frozen 12/15] MAE 6.883
+[microsoft__dit-base | Fold 4 | Frozen 13/15] MAE 6.878
+[microsoft__dit-base | Fold 4 | Frozen 14/15] MAE 6.931
+[microsoft__dit-base | Fold 4 | Frozen 15/15] MAE 6.825
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | Fold 4 | FT 1/30] MAE 6.662
+[microsoft__dit-base | Fold 4 | FT 2/30] MAE 6.793
+[microsoft__dit-base | Fold 4 | FT 3/30] MAE 6.422
+[microsoft__dit-base | Fold 4 | FT 4/30] MAE 6.897
+[microsoft__dit-base | Fold 4 | FT 5/30] MAE 6.111
+[microsoft__dit-base | Fold 4 | FT 6/30] MAE 6.170
+[microsoft__dit-base | Fold 4 | FT 7/30] MAE 7.439
+[microsoft__dit-base | Fold 4 | FT 8/30] MAE 7.134
+[microsoft__dit-base | Fold 4 | FT 9/30] MAE 6.397
+[microsoft__dit-base | Fold 4 | FT 10/30] MAE 6.370
+[microsoft__dit-base | Fold 4 | FT 11/30] MAE 5.991
+[microsoft__dit-base | Fold 4 | FT 12/30] MAE 6.223
+[microsoft__dit-base | Fold 4 | FT 13/30] MAE 5.876
+[microsoft__dit-base | Fold 4 | FT 14/30] MAE 6.861
+[microsoft__dit-base | Fold 4 | FT 15/30] MAE 5.937
+[microsoft__dit-base | Fold 4 | FT 16/30] MAE 6.131
+[microsoft__dit-base | Fold 4 | FT 17/30] MAE 5.775
+[microsoft__dit-base | Fold 4 | FT 18/30] MAE 6.798
+[microsoft__dit-base | Fold 4 | FT 19/30] MAE 6.010
+[microsoft__dit-base | Fold 4 | FT 20/30] MAE 6.057
+[microsoft__dit-base | Fold 4 | FT 21/30] MAE 6.346
+[microsoft__dit-base | Fold 4 | FT 22/30] MAE 6.475
+[microsoft__dit-base | Fold 4 | FT 23/30] MAE 6.468
+[microsoft__dit-base | Fold 4 | FT 24/30] MAE 6.747
+[microsoft__dit-base | Fold 4 | FT 25/30] MAE 6.239
+[microsoft__dit-base | Fold 4 | FT 26/30] MAE 6.626
+[microsoft__dit-base | Fold 4 | FT 27/30] MAE 5.983
+[microsoft__dit-base | Fold 4 | FT 28/30] MAE 6.240
+[microsoft__dit-base | Fold 4 | FT 29/30] MAE 6.446
+[microsoft__dit-base | Fold 4 | FT 30/30] MAE 6.979
+[microsoft__dit-base] Evaluating best checkpoint on fold 4 …
+
+===== microsoft__dit-base | Fold 5/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-base and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-base | Fold 5 | Frozen 1/15] MAE 12.925
+[microsoft__dit-base | Fold 5 | Frozen 2/15] MAE 7.392
+[microsoft__dit-base | Fold 5 | Frozen 3/15] MAE 7.703
+[microsoft__dit-base | Fold 5 | Frozen 4/15] MAE 7.242
+[microsoft__dit-base | Fold 5 | Frozen 5/15] MAE 7.281
+[microsoft__dit-base | Fold 5 | Frozen 6/15] MAE 7.232
+[microsoft__dit-base | Fold 5 | Frozen 7/15] MAE 7.228
+[microsoft__dit-base | Fold 5 | Frozen 8/15] MAE 7.222
+[microsoft__dit-base | Fold 5 | Frozen 9/15] MAE 7.215
+[microsoft__dit-base | Fold 5 | Frozen 10/15] MAE 7.211
+[microsoft__dit-base | Fold 5 | Frozen 11/15] MAE 7.205
+[microsoft__dit-base | Fold 5 | Frozen 12/15] MAE 7.223
+[microsoft__dit-base | Fold 5 | Frozen 13/15] MAE 7.228
+[microsoft__dit-base | Fold 5 | Frozen 14/15] MAE 7.234
+[microsoft__dit-base | Fold 5 | Frozen 15/15] MAE 7.190
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | Fold 5 | FT 1/30] MAE 7.031
+[microsoft__dit-base | Fold 5 | FT 2/30] MAE 6.844
+[microsoft__dit-base | Fold 5 | FT 3/30] MAE 6.832
+[microsoft__dit-base | Fold 5 | FT 4/30] MAE 6.898
+[microsoft__dit-base | Fold 5 | FT 5/30] MAE 7.452
+[microsoft__dit-base | Fold 5 | FT 6/30] MAE 7.289
+[microsoft__dit-base | Fold 5 | FT 7/30] MAE 7.375
+[microsoft__dit-base | Fold 5 | FT 8/30] MAE 5.972
+[microsoft__dit-base | Fold 5 | FT 9/30] MAE 6.249
+[microsoft__dit-base | Fold 5 | FT 10/30] MAE 8.893
+[microsoft__dit-base | Fold 5 | FT 11/30] MAE 6.997
+[microsoft__dit-base | Fold 5 | FT 12/30] MAE 6.400
+[microsoft__dit-base | Fold 5 | FT 13/30] MAE 6.913
+[microsoft__dit-base | Fold 5 | FT 14/30] MAE 5.665
+[microsoft__dit-base | Fold 5 | FT 15/30] MAE 6.077
+[microsoft__dit-base | Fold 5 | FT 16/30] MAE 6.633
+[microsoft__dit-base | Fold 5 | FT 17/30] MAE 5.588
+[microsoft__dit-base | Fold 5 | FT 18/30] MAE 5.903
+[microsoft__dit-base | Fold 5 | FT 19/30] MAE 5.829
+[microsoft__dit-base | Fold 5 | FT 20/30] MAE 5.918
+[microsoft__dit-base | Fold 5 | FT 21/30] MAE 6.545
+[microsoft__dit-base | Fold 5 | FT 22/30] MAE 5.864
+[microsoft__dit-base | Fold 5 | FT 23/30] MAE 6.061
+[microsoft__dit-base | Fold 5 | FT 24/30] MAE 5.687
+[microsoft__dit-base | Fold 5 | FT 25/30] MAE 6.020
+[microsoft__dit-base | Fold 5 | FT 26/30] MAE 7.206
+[microsoft__dit-base | Fold 5 | FT 27/30] MAE 5.739
+[microsoft__dit-base | Fold 5 | FT 28/30] MAE 6.735
+[microsoft__dit-base | Fold 5 | FT 29/30] MAE 5.723
+[microsoft__dit-base | Fold 5 | FT 30/30] MAE 6.942
+[microsoft__dit-base] Evaluating best checkpoint on fold 5 …
+
+══════ CV SUMMARY ══════
+MAE       : 6.496 ± 0.870
+RMSE      : 11.344 ± 1.159
+R2        : 0.112 ± 0.067
+MAPE      : 22.850 ± 4.080
+Within2   : 39.631 ± 6.535
+Within5   : 65.448 ± 7.166
+Within10  : 82.847 ± 3.946
+MaxErr    : 57.588 ± 7.173
+MedianErr : 2.950 ± 0.765
+MinErr    : 0.019 ± 0.012
+
+===== microsoft__dit-large | Fold 1/5 =====
+pytorch_model.bin: 100%
+ 1.25G/1.25G [00:01<00:00, 1.16GB/s]
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+model.safetensors: 100%
+ 1.25G/1.25G [00:05<00:00, 403MB/s]
+[microsoft__dit-large | Fold 1 | Frozen 1/15] MAE 33.219
+[microsoft__dit-large | Fold 1 | Frozen 2/15] MAE 10.111
+[microsoft__dit-large | Fold 1 | Frozen 3/15] MAE 16.209
+[microsoft__dit-large | Fold 1 | Frozen 4/15] MAE 9.424
+[microsoft__dit-large | Fold 1 | Frozen 5/15] MAE 12.503
+[microsoft__dit-large | Fold 1 | Frozen 6/15] MAE 11.411
+[microsoft__dit-large | Fold 1 | Frozen 7/15] MAE 10.505
+[microsoft__dit-large | Fold 1 | Frozen 8/15] MAE 10.529
+[microsoft__dit-large | Fold 1 | Frozen 9/15] MAE 11.165
+[microsoft__dit-large | Fold 1 | Frozen 10/15] MAE 11.169
+[microsoft__dit-large | Fold 1 | Frozen 11/15] MAE 11.114
+[microsoft__dit-large | Fold 1 | Frozen 12/15] MAE 10.245
+[microsoft__dit-large | Fold 1 | Frozen 13/15] MAE 12.864
+[microsoft__dit-large | Fold 1 | Frozen 14/15] MAE 11.188
+[microsoft__dit-large | Fold 1 | Frozen 15/15] MAE 9.974
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | Fold 1 | FT 1/30] MAE 9.573
+[microsoft__dit-large | Fold 1 | FT 2/30] MAE 10.040
+[microsoft__dit-large | Fold 1 | FT 3/30] MAE 9.647
+[microsoft__dit-large | Fold 1 | FT 4/30] MAE 9.675
+[microsoft__dit-large | Fold 1 | FT 5/30] MAE 9.899
+[microsoft__dit-large | Fold 1 | FT 6/30] MAE 8.801
+[microsoft__dit-large | Fold 1 | FT 7/30] MAE 8.401
+[microsoft__dit-large | Fold 1 | FT 8/30] MAE 8.124
+[microsoft__dit-large | Fold 1 | FT 9/30] MAE 8.298
+[microsoft__dit-large | Fold 1 | FT 10/30] MAE 8.306
+[microsoft__dit-large | Fold 1 | FT 11/30] MAE 9.731
+[microsoft__dit-large | Fold 1 | FT 12/30] MAE 7.889
+[microsoft__dit-large | Fold 1 | FT 13/30] MAE 9.094
+[microsoft__dit-large | Fold 1 | FT 14/30] MAE 9.774
+[microsoft__dit-large | Fold 1 | FT 15/30] MAE 8.375
+[microsoft__dit-large | Fold 1 | FT 16/30] MAE 9.304
+[microsoft__dit-large | Fold 1 | FT 17/30] MAE 8.136
+[microsoft__dit-large | Fold 1 | FT 18/30] MAE 7.755
+[microsoft__dit-large | Fold 1 | FT 19/30] MAE 9.636
+[microsoft__dit-large | Fold 1 | FT 20/30] MAE 8.238
+[microsoft__dit-large | Fold 1 | FT 21/30] MAE 8.133
+[microsoft__dit-large | Fold 1 | FT 22/30] MAE 9.284
+[microsoft__dit-large | Fold 1 | FT 23/30] MAE 8.715
+[microsoft__dit-large | Fold 1 | FT 24/30] MAE 8.732
+[microsoft__dit-large | Fold 1 | FT 25/30] MAE 8.359
+[microsoft__dit-large | Fold 1 | FT 26/30] MAE 7.534
+[microsoft__dit-large | Fold 1 | FT 27/30] MAE 8.067
+[microsoft__dit-large | Fold 1 | FT 28/30] MAE 7.689
+[microsoft__dit-large | Fold 1 | FT 29/30] MAE 9.330
+[microsoft__dit-large | Fold 1 | FT 30/30] MAE 9.895
+[microsoft__dit-large] Evaluating best checkpoint on fold 1 …
+
+===== microsoft__dit-large | Fold 2/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-large | Fold 2 | Frozen 1/15] MAE 83.027
+[microsoft__dit-large | Fold 2 | Frozen 2/15] MAE 42.400
+[microsoft__dit-large | Fold 2 | Frozen 3/15] MAE 7.821
+[microsoft__dit-large | Fold 2 | Frozen 4/15] MAE 16.602
+[microsoft__dit-large | Fold 2 | Frozen 5/15] MAE 10.394
+[microsoft__dit-large | Fold 2 | Frozen 6/15] MAE 8.829
+[microsoft__dit-large | Fold 2 | Frozen 7/15] MAE 10.874
+[microsoft__dit-large | Fold 2 | Frozen 8/15] MAE 9.827
+[microsoft__dit-large | Fold 2 | Frozen 9/15] MAE 9.352
+[microsoft__dit-large | Fold 2 | Frozen 10/15] MAE 9.728
+[microsoft__dit-large | Fold 2 | Frozen 11/15] MAE 9.949
+[microsoft__dit-large | Fold 2 | Frozen 12/15] MAE 9.474
+[microsoft__dit-large | Fold 2 | Frozen 13/15] MAE 10.340
+[microsoft__dit-large | Fold 2 | Frozen 14/15] MAE 9.542
+[microsoft__dit-large | Fold 2 | Frozen 15/15] MAE 9.564
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | Fold 2 | FT 1/30] MAE 9.159
+[microsoft__dit-large | Fold 2 | FT 2/30] MAE 8.351
+[microsoft__dit-large | Fold 2 | FT 3/30] MAE 7.504
+[microsoft__dit-large | Fold 2 | FT 4/30] MAE 8.036
+[microsoft__dit-large | Fold 2 | FT 5/30] MAE 7.328
+[microsoft__dit-large | Fold 2 | FT 6/30] MAE 6.819
+[microsoft__dit-large | Fold 2 | FT 7/30] MAE 7.262
+[microsoft__dit-large | Fold 2 | FT 8/30] MAE 6.850
+[microsoft__dit-large | Fold 2 | FT 9/30] MAE 6.587
+[microsoft__dit-large | Fold 2 | FT 10/30] MAE 6.598
+[microsoft__dit-large | Fold 2 | FT 11/30] MAE 6.557
+[microsoft__dit-large | Fold 2 | FT 12/30] MAE 7.203
+[microsoft__dit-large | Fold 2 | FT 13/30] MAE 6.587
+[microsoft__dit-large | Fold 2 | FT 14/30] MAE 7.362
+[microsoft__dit-large | Fold 2 | FT 15/30] MAE 7.122
+[microsoft__dit-large | Fold 2 | FT 16/30] MAE 8.380
+[microsoft__dit-large | Fold 2 | FT 17/30] MAE 6.343
+[microsoft__dit-large | Fold 2 | FT 18/30] MAE 6.597
+[microsoft__dit-large | Fold 2 | FT 19/30] MAE 6.816
+[microsoft__dit-large | Fold 2 | FT 20/30] MAE 6.183
+[microsoft__dit-large | Fold 2 | FT 21/30] MAE 8.799
+[microsoft__dit-large | Fold 2 | FT 22/30] MAE 6.153
+[microsoft__dit-large | Fold 2 | FT 23/30] MAE 6.439
+[microsoft__dit-large | Fold 2 | FT 24/30] MAE 6.644
+[microsoft__dit-large | Fold 2 | FT 25/30] MAE 7.037
+[microsoft__dit-large | Fold 2 | FT 26/30] MAE 6.065
+[microsoft__dit-large | Fold 2 | FT 27/30] MAE 7.366
+[microsoft__dit-large | Fold 2 | FT 28/30] MAE 6.225
+[microsoft__dit-large | Fold 2 | FT 29/30] MAE 6.233
+[microsoft__dit-large | Fold 2 | FT 30/30] MAE 6.138
+[microsoft__dit-large] Evaluating best checkpoint on fold 2 …
+
+===== microsoft__dit-large | Fold 3/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-large | Fold 3 | Frozen 1/15] MAE 24.118
+[microsoft__dit-large | Fold 3 | Frozen 2/15] MAE 11.860
+[microsoft__dit-large | Fold 3 | Frozen 3/15] MAE 10.444
+[microsoft__dit-large | Fold 3 | Frozen 4/15] MAE 8.265
+[microsoft__dit-large | Fold 3 | Frozen 5/15] MAE 9.494
+[microsoft__dit-large | Fold 3 | Frozen 6/15] MAE 8.905
+[microsoft__dit-large | Fold 3 | Frozen 7/15] MAE 8.420
+[microsoft__dit-large | Fold 3 | Frozen 8/15] MAE 8.275
+[microsoft__dit-large | Fold 3 | Frozen 9/15] MAE 8.871
+[microsoft__dit-large | Fold 3 | Frozen 10/15] MAE 8.311
+[microsoft__dit-large | Fold 3 | Frozen 11/15] MAE 8.827
+[microsoft__dit-large | Fold 3 | Frozen 12/15] MAE 8.322
+[microsoft__dit-large | Fold 3 | Frozen 13/15] MAE 8.351
+[microsoft__dit-large | Fold 3 | Frozen 14/15] MAE 8.293
+[microsoft__dit-large | Fold 3 | Frozen 15/15] MAE 8.578
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | Fold 3 | FT 1/30] MAE 10.403
+[microsoft__dit-large | Fold 3 | FT 2/30] MAE 10.796
+[microsoft__dit-large | Fold 3 | FT 3/30] MAE 8.825
+[microsoft__dit-large | Fold 3 | FT 4/30] MAE 8.372
+[microsoft__dit-large | Fold 3 | FT 5/30] MAE 8.540
+[microsoft__dit-large | Fold 3 | FT 6/30] MAE 8.192
+[microsoft__dit-large | Fold 3 | FT 7/30] MAE 8.083
+[microsoft__dit-large | Fold 3 | FT 8/30] MAE 8.575
+[microsoft__dit-large | Fold 3 | FT 9/30] MAE 8.258
+[microsoft__dit-large | Fold 3 | FT 10/30] MAE 8.633
+[microsoft__dit-large | Fold 3 | FT 11/30] MAE 7.935
+[microsoft__dit-large | Fold 3 | FT 12/30] MAE 8.228
+[microsoft__dit-large | Fold 3 | FT 13/30] MAE 8.024
+[microsoft__dit-large | Fold 3 | FT 14/30] MAE 8.028
+[microsoft__dit-large | Fold 3 | FT 15/30] MAE 7.960
+[microsoft__dit-large | Fold 3 | FT 16/30] MAE 8.915
+[microsoft__dit-large | Fold 3 | FT 17/30] MAE 8.050
+[microsoft__dit-large | Fold 3 | FT 18/30] MAE 8.384
+[microsoft__dit-large | Fold 3 | FT 19/30] MAE 8.354
+[microsoft__dit-large | Fold 3 | FT 20/30] MAE 9.103
+[microsoft__dit-large | Fold 3 | FT 21/30] MAE 7.724
+[microsoft__dit-large | Fold 3 | FT 22/30] MAE 7.873
+[microsoft__dit-large | Fold 3 | FT 23/30] MAE 8.100
+[microsoft__dit-large | Fold 3 | FT 24/30] MAE 8.040
+[microsoft__dit-large | Fold 3 | FT 25/30] MAE 8.352
+[microsoft__dit-large | Fold 3 | FT 26/30] MAE 9.835
+[microsoft__dit-large | Fold 3 | FT 27/30] MAE 7.860
+[microsoft__dit-large | Fold 3 | FT 28/30] MAE 8.705
+[microsoft__dit-large | Fold 3 | FT 29/30] MAE 7.604
+[microsoft__dit-large | Fold 3 | FT 30/30] MAE 7.730
+[microsoft__dit-large] Evaluating best checkpoint on fold 3 …
+
+===== microsoft__dit-large | Fold 4/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-large | Fold 4 | Frozen 1/15] MAE 70.540
+[microsoft__dit-large | Fold 4 | Frozen 2/15] MAE 29.575
+[microsoft__dit-large | Fold 4 | Frozen 3/15] MAE 6.888
+[microsoft__dit-large | Fold 4 | Frozen 4/15] MAE 15.279
+[microsoft__dit-large | Fold 4 | Frozen 5/15] MAE 7.636
+[microsoft__dit-large | Fold 4 | Frozen 6/15] MAE 7.907
+[microsoft__dit-large | Fold 4 | Frozen 7/15] MAE 9.345
+[microsoft__dit-large | Fold 4 | Frozen 8/15] MAE 8.917
+[microsoft__dit-large | Fold 4 | Frozen 9/15] MAE 7.663
+[microsoft__dit-large | Fold 4 | Frozen 10/15] MAE 9.704
+[microsoft__dit-large | Fold 4 | Frozen 11/15] MAE 7.801
+[microsoft__dit-large | Fold 4 | Frozen 12/15] MAE 7.845
+[microsoft__dit-large | Fold 4 | Frozen 13/15] MAE 7.307
+[microsoft__dit-large | Fold 4 | Frozen 14/15] MAE 8.308
+[microsoft__dit-large | Fold 4 | Frozen 15/15] MAE 8.189
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | Fold 4 | FT 1/30] MAE 7.660
+[microsoft__dit-large | Fold 4 | FT 2/30] MAE 7.328
+[microsoft__dit-large | Fold 4 | FT 3/30] MAE 7.253
+[microsoft__dit-large | Fold 4 | FT 4/30] MAE 6.742
+[microsoft__dit-large | Fold 4 | FT 5/30] MAE 6.376
+[microsoft__dit-large | Fold 4 | FT 6/30] MAE 6.261
+[microsoft__dit-large | Fold 4 | FT 7/30] MAE 7.790
+[microsoft__dit-large | Fold 4 | FT 8/30] MAE 6.340
+[microsoft__dit-large | Fold 4 | FT 9/30] MAE 7.452
+[microsoft__dit-large | Fold 4 | FT 10/30] MAE 6.074
+[microsoft__dit-large | Fold 4 | FT 11/30] MAE 5.965
+[microsoft__dit-large | Fold 4 | FT 12/30] MAE 6.397
+[microsoft__dit-large | Fold 4 | FT 13/30] MAE 7.241
+[microsoft__dit-large | Fold 4 | FT 14/30] MAE 6.290
+[microsoft__dit-large | Fold 4 | FT 15/30] MAE 5.926
+[microsoft__dit-large | Fold 4 | FT 16/30] MAE 5.884
+[microsoft__dit-large | Fold 4 | FT 17/30] MAE 6.513
+[microsoft__dit-large | Fold 4 | FT 18/30] MAE 7.365
+[microsoft__dit-large | Fold 4 | FT 19/30] MAE 6.305
+[microsoft__dit-large | Fold 4 | FT 20/30] MAE 6.465
+[microsoft__dit-large | Fold 4 | FT 21/30] MAE 6.701
+[microsoft__dit-large | Fold 4 | FT 22/30] MAE 7.384
+[microsoft__dit-large | Fold 4 | FT 23/30] MAE 5.805
+[microsoft__dit-large | Fold 4 | FT 24/30] MAE 5.807
+[microsoft__dit-large | Fold 4 | FT 25/30] MAE 6.354
+[microsoft__dit-large | Fold 4 | FT 26/30] MAE 5.915
+[microsoft__dit-large | Fold 4 | FT 27/30] MAE 6.072
+[microsoft__dit-large | Fold 4 | FT 28/30] MAE 6.684
+[microsoft__dit-large | Fold 4 | FT 29/30] MAE 5.803
+[microsoft__dit-large | Fold 4 | FT 30/30] MAE 5.563
+[microsoft__dit-large] Evaluating best checkpoint on fold 4 …
+
+===== microsoft__dit-large | Fold 5/5 =====
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-large | Fold 5 | Frozen 1/15] MAE 63.814
+[microsoft__dit-large | Fold 5 | Frozen 2/15] MAE 20.977
+[microsoft__dit-large | Fold 5 | Frozen 3/15] MAE 12.497
+[microsoft__dit-large | Fold 5 | Frozen 4/15] MAE 7.993
+[microsoft__dit-large | Fold 5 | Frozen 5/15] MAE 7.028
+[microsoft__dit-large | Fold 5 | Frozen 6/15] MAE 8.168
+[microsoft__dit-large | Fold 5 | Frozen 7/15] MAE 7.431
+[microsoft__dit-large | Fold 5 | Frozen 8/15] MAE 7.383
+[microsoft__dit-large | Fold 5 | Frozen 9/15] MAE 7.608
+[microsoft__dit-large | Fold 5 | Frozen 10/15] MAE 7.435
+[microsoft__dit-large | Fold 5 | Frozen 11/15] MAE 7.435
+[microsoft__dit-large | Fold 5 | Frozen 12/15] MAE 7.518
+[microsoft__dit-large | Fold 5 | Frozen 13/15] MAE 7.434
+[microsoft__dit-large | Fold 5 | Frozen 14/15] MAE 7.359
+[microsoft__dit-large | Fold 5 | Frozen 15/15] MAE 7.376
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | Fold 5 | FT 1/30] MAE 8.140
+[microsoft__dit-large | Fold 5 | FT 2/30] MAE 6.984
+[microsoft__dit-large | Fold 5 | FT 3/30] MAE 6.950
+[microsoft__dit-large | Fold 5 | FT 4/30] MAE 7.027
+[microsoft__dit-large | Fold 5 | FT 5/30] MAE 7.237
+[microsoft__dit-large | Fold 5 | FT 6/30] MAE 7.036
+[microsoft__dit-large | Fold 5 | FT 7/30] MAE 6.822
+[microsoft__dit-large | Fold 5 | FT 8/30] MAE 6.427
+[microsoft__dit-large | Fold 5 | FT 9/30] MAE 6.395
+[microsoft__dit-large | Fold 5 | FT 10/30] MAE 6.168
+[microsoft__dit-large | Fold 5 | FT 11/30] MAE 6.295
+[microsoft__dit-large | Fold 5 | FT 12/30] MAE 5.942
+[microsoft__dit-large | Fold 5 | FT 13/30] MAE 6.707
+[microsoft__dit-large | Fold 5 | FT 14/30] MAE 5.799
+[microsoft__dit-large | Fold 5 | FT 15/30] MAE 6.792
+[microsoft__dit-large | Fold 5 | FT 16/30] MAE 5.567
+[microsoft__dit-large | Fold 5 | FT 17/30] MAE 6.196
+[microsoft__dit-large | Fold 5 | FT 18/30] MAE 5.561
+[microsoft__dit-large | Fold 5 | FT 19/30] MAE 5.580
+[microsoft__dit-large | Fold 5 | FT 20/30] MAE 5.517
+[microsoft__dit-large | Fold 5 | FT 21/30] MAE 5.662
+[microsoft__dit-large | Fold 5 | FT 22/30] MAE 5.579
+[microsoft__dit-large | Fold 5 | FT 23/30] MAE 5.767
+[microsoft__dit-large | Fold 5 | FT 24/30] MAE 5.688
+[microsoft__dit-large | Fold 5 | FT 25/30] MAE 6.424
+[microsoft__dit-large | Fold 5 | FT 26/30] MAE 6.740
+[microsoft__dit-large | Fold 5 | FT 27/30] MAE 5.849
+[microsoft__dit-large | Fold 5 | FT 28/30] MAE 5.558
+[microsoft__dit-large | Fold 5 | FT 29/30] MAE 6.176
+[microsoft__dit-large | Fold 5 | FT 30/30] MAE 6.260
+[microsoft__dit-large] Evaluating best checkpoint on fold 5 …
+
+══════ CV SUMMARY ══════
+MAE       : 6.457 ± 0.929
+RMSE      : 11.184 ± 1.029
+R2        : 0.136 ± 0.043
+MAPE      : 23.376 ± 5.290
+Within2   : 36.993 ± 5.874
+Within5   : 65.699 ± 7.989
+Within10  : 82.950 ± 3.657
+MaxErr    : 56.380 ± 7.291
+MedianErr : 3.029 ± 0.778
+MinErr    : 0.038 ± 0.037
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 38.3kB/s]
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:412: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== microsoft__dit-base-finetuned-rvlcdip | Fold 1/5 =====
+config.json: 
+ 1.79k/? [00:00<00:00, 203kB/s]
+pytorch_model.bin: 100%
+ 343M/343M [00:01<00:00, 243MB/s]
+model.safetensors: 100%
+ 343M/343M [00:01<00:00, 449MB/s]
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 1/15] MAE 9.271
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 2/15] MAE 9.435
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 3/15] MAE 8.945
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 4/15] MAE 9.033
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 5/15] MAE 8.893
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 6/15] MAE 8.884
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 7/15] MAE 8.981
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 8/15] MAE 9.070
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 9/15] MAE 8.566
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 10/15] MAE 8.994
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 11/15] MAE 8.638
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 12/15] MAE 8.798
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 13/15] MAE 8.517
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 14/15] MAE 8.460
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | Frozen 15/15] MAE 8.389
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 1/30] MAE 8.548
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 2/30] MAE 7.503
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 3/30] MAE 7.363
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 4/30] MAE 7.878
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 5/30] MAE 7.700
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 6/30] MAE 7.643
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 7/30] MAE 7.735
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 8/30] MAE 7.747
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 9/30] MAE 7.183
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 10/30] MAE 7.367
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 11/30] MAE 7.311
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 12/30] MAE 7.028
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 13/30] MAE 7.144
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 14/30] MAE 7.160
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 15/30] MAE 6.851
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 16/30] MAE 6.941
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 17/30] MAE 7.805
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 18/30] MAE 7.251
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 19/30] MAE 9.363
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 20/30] MAE 6.881
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 21/30] MAE 7.040
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 22/30] MAE 7.666
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 23/30] MAE 7.006
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 24/30] MAE 7.058
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 25/30] MAE 6.743
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 26/30] MAE 6.887
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 27/30] MAE 6.796
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 28/30] MAE 6.638
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 29/30] MAE 6.722
+[microsoft__dit-base-finetuned-rvlcdip | Fold 1 | FT 30/30] MAE 7.627
+[microsoft__dit-base-finetuned-rvlcdip] Evaluating best checkpoint on fold 1 …
+
+===== microsoft__dit-base-finetuned-rvlcdip | Fold 2/5 =====
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 1/15] MAE 7.881
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 2/15] MAE 7.419
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 3/15] MAE 7.396
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 4/15] MAE 7.381
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 5/15] MAE 7.521
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 6/15] MAE 7.513
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 7/15] MAE 7.399
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 8/15] MAE 7.349
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 9/15] MAE 7.410
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 10/15] MAE 7.360
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 11/15] MAE 7.439
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 12/15] MAE 7.285
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 13/15] MAE 7.333
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 14/15] MAE 7.318
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | Frozen 15/15] MAE 7.241
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 1/30] MAE 6.996
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 2/30] MAE 6.386
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 3/30] MAE 6.054
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 4/30] MAE 6.023
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 5/30] MAE 6.158
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 6/30] MAE 6.026
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 7/30] MAE 5.867
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 8/30] MAE 6.241
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 9/30] MAE 6.411
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 10/30] MAE 5.957
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 11/30] MAE 5.757
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 12/30] MAE 5.808
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 13/30] MAE 5.609
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 14/30] MAE 5.712
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 15/30] MAE 5.528
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 16/30] MAE 5.791
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 17/30] MAE 5.743
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 18/30] MAE 5.795
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 19/30] MAE 5.556
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 20/30] MAE 5.757
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 21/30] MAE 5.579
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 22/30] MAE 5.537
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 23/30] MAE 5.496
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 24/30] MAE 5.461
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 25/30] MAE 5.733
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 26/30] MAE 6.043
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 27/30] MAE 6.258
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 28/30] MAE 5.532
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 29/30] MAE 5.622
+[microsoft__dit-base-finetuned-rvlcdip | Fold 2 | FT 30/30] MAE 5.721
+[microsoft__dit-base-finetuned-rvlcdip] Evaluating best checkpoint on fold 2 …
+
+===== microsoft__dit-base-finetuned-rvlcdip | Fold 3/5 =====
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 1/15] MAE 45.558
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 2/15] MAE 25.791
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 3/15] MAE 10.406
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 4/15] MAE 9.544
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 5/15] MAE 9.218
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 6/15] MAE 9.209
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 7/15] MAE 8.998
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 8/15] MAE 8.890
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 9/15] MAE 8.780
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 10/15] MAE 8.645
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 11/15] MAE 8.531
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 12/15] MAE 8.436
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 13/15] MAE 8.343
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 14/15] MAE 8.264
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | Frozen 15/15] MAE 8.204
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 1/30] MAE 7.651
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 2/30] MAE 8.040
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 3/30] MAE 7.392
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 4/30] MAE 8.286
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 5/30] MAE 7.903
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 6/30] MAE 8.036
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 7/30] MAE 7.455
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 8/30] MAE 7.191
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 9/30] MAE 7.037
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 10/30] MAE 7.381
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 11/30] MAE 7.059
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 12/30] MAE 7.349
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 13/30] MAE 7.415
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 14/30] MAE 7.579
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 15/30] MAE 7.419
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 16/30] MAE 7.445
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 17/30] MAE 7.684
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 18/30] MAE 7.253
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 19/30] MAE 7.404
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 20/30] MAE 7.563
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 21/30] MAE 7.459
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 22/30] MAE 7.445
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 23/30] MAE 7.562
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 24/30] MAE 7.405
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 25/30] MAE 7.541
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 26/30] MAE 7.677
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 27/30] MAE 7.698
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 28/30] MAE 7.581
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 29/30] MAE 7.359
+[microsoft__dit-base-finetuned-rvlcdip | Fold 3 | FT 30/30] MAE 7.596
+[microsoft__dit-base-finetuned-rvlcdip] Evaluating best checkpoint on fold 3 …
+
+===== microsoft__dit-base-finetuned-rvlcdip | Fold 4/5 =====
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 1/15] MAE 23.593
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 2/15] MAE 8.314
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 3/15] MAE 9.551
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 4/15] MAE 7.436
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 5/15] MAE 6.771
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 6/15] MAE 7.923
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 7/15] MAE 7.262
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 8/15] MAE 7.282
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 9/15] MAE 6.809
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 10/15] MAE 6.900
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 11/15] MAE 7.310
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 12/15] MAE 6.745
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 13/15] MAE 6.981
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 14/15] MAE 6.566
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | Frozen 15/15] MAE 7.107
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 1/30] MAE 6.018
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 2/30] MAE 5.979
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 3/30] MAE 6.226
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 4/30] MAE 6.404
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 5/30] MAE 6.844
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 6/30] MAE 7.089
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 7/30] MAE 6.045
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 8/30] MAE 5.910
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 9/30] MAE 5.742
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 10/30] MAE 5.371
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 11/30] MAE 5.487
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 12/30] MAE 6.318
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 13/30] MAE 5.647
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 14/30] MAE 5.907
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 15/30] MAE 5.579
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 16/30] MAE 5.417
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 17/30] MAE 5.289
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 18/30] MAE 5.011
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 19/30] MAE 5.584
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 20/30] MAE 5.241
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 21/30] MAE 5.796
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 22/30] MAE 6.026
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 23/30] MAE 5.171
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 24/30] MAE 5.099
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 25/30] MAE 5.156
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 26/30] MAE 5.157
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 27/30] MAE 4.911
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 28/30] MAE 5.035
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 29/30] MAE 5.102
+[microsoft__dit-base-finetuned-rvlcdip | Fold 4 | FT 30/30] MAE 4.837
+[microsoft__dit-base-finetuned-rvlcdip] Evaluating best checkpoint on fold 4 …
+
+===== microsoft__dit-base-finetuned-rvlcdip | Fold 5/5 =====
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 1/15] MAE 7.703
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 2/15] MAE 7.394
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 3/15] MAE 7.176
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 4/15] MAE 7.255
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 5/15] MAE 7.082
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 6/15] MAE 7.120
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 7/15] MAE 7.006
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 8/15] MAE 7.100
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 9/15] MAE 6.930
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 10/15] MAE 6.911
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 11/15] MAE 6.887
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 12/15] MAE 6.830
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 13/15] MAE 6.794
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 14/15] MAE 6.769
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | Frozen 15/15] MAE 6.746
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 1/30] MAE 6.045
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 2/30] MAE 6.056
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 3/30] MAE 5.913
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 4/30] MAE 6.060
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 5/30] MAE 5.724
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 6/30] MAE 5.770
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 7/30] MAE 5.661
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 8/30] MAE 5.505
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 9/30] MAE 5.599
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 10/30] MAE 5.648
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 11/30] MAE 5.648
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 12/30] MAE 5.737
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 13/30] MAE 5.631
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 14/30] MAE 5.591
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 15/30] MAE 5.550
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 16/30] MAE 5.825
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 17/30] MAE 5.533
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 18/30] MAE 5.409
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 19/30] MAE 5.483
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 20/30] MAE 5.675
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 21/30] MAE 5.581
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 22/30] MAE 5.515
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 23/30] MAE 5.478
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 24/30] MAE 5.503
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 25/30] MAE 5.554
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 26/30] MAE 5.670
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 27/30] MAE 5.311
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 28/30] MAE 5.388
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 29/30] MAE 5.299
+[microsoft__dit-base-finetuned-rvlcdip | Fold 5 | FT 30/30] MAE 5.917
+[microsoft__dit-base-finetuned-rvlcdip] Evaluating best checkpoint on fold 5 …
+
+══════ CV SUMMARY ══════
+MAE       : 5.854 ± 0.838
+RMSE      : 9.956 ± 1.422
+R2        : 0.315 ± 0.116
+MAPE      : 22.296 ± 3.935
+Within2   : 39.007 ± 4.852
+Within5   : 65.001 ± 4.638
+Within10  : 83.935 ± 3.388
+MaxErr    : 52.672 ± 13.696
+MedianErr : 2.900 ± 0.550
+MinErr    : 0.019 ± 0.022
+
+Mounted at /content/drive
+/usr/local/lib/python3.12/dist-packages/huggingface_hub/utils/_auth.py:94: UserWarning: 
+The secret `HF_TOKEN` does not exist in your Colab secrets.
+To authenticate with the Hugging Face Hub, create a token in your settings tab (https://huggingface.co/settings/tokens), set it as secret in your Google Colab and restart your session.
+You will be able to reuse this secret in all of your notebooks.
+Please note that authentication is recommended but still optional to access public models or datasets.
+  warnings.warn(
+Fetching 1 files: 100%
+ 1/1 [00:00<00:00,  5.46it/s]
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 34.4kB/s]
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:410: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== microsoft__dit-large-finetuned-rvlcdip | Fold 1/5 =====
+config.json: 
+ 1.79k/? [00:00<00:00, 218kB/s]
+pytorch_model.bin: 100%
+ 1.21G/1.21G [00:06<00:00, 332MB/s]
+model.safetensors: 100%
+ 1.21G/1.21G [00:06<00:00, 337MB/s]
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 1/15] MAE 38.115
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 2/15] MAE 18.483
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 3/15] MAE 9.611
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 4/15] MAE 19.120
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 5/15] MAE 13.740
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 6/15] MAE 12.401
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 7/15] MAE 13.892
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 8/15] MAE 13.804
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 9/15] MAE 13.559
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 10/15] MAE 13.128
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 11/15] MAE 12.615
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 12/15] MAE 13.497
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 13/15] MAE 13.214
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 14/15] MAE 13.478
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | Frozen 15/15] MAE 11.702
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 1/30] MAE 11.335
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 2/30] MAE 14.076
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 3/30] MAE 13.516
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 4/30] MAE 12.739
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 5/30] MAE 13.492
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 6/30] MAE 12.414
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 7/30] MAE 11.067
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 8/30] MAE 12.123
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 9/30] MAE 10.740
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 10/30] MAE 9.293
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 11/30] MAE 11.029
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 12/30] MAE 9.303
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 13/30] MAE 8.790
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 14/30] MAE 11.467
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 15/30] MAE 9.197
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 16/30] MAE 7.521
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 17/30] MAE 8.131
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 18/30] MAE 8.017
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 19/30] MAE 8.125
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 20/30] MAE 9.659
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 21/30] MAE 7.373
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 22/30] MAE 10.052
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 23/30] MAE 8.521
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 24/30] MAE 8.091
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 25/30] MAE 9.323
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 26/30] MAE 7.510
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 27/30] MAE 8.373
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 28/30] MAE 8.131
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 29/30] MAE 8.582
+[microsoft__dit-large-finetuned-rvlcdip | Fold 1 | FT 30/30] MAE 7.242
+[microsoft__dit-large-finetuned-rvlcdip] Evaluating best checkpoint on fold 1 …
+
+===== microsoft__dit-large-finetuned-rvlcdip | Fold 2/5 =====
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 1/15] MAE 133.478
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 2/15] MAE 111.873
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 3/15] MAE 90.474
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 4/15] MAE 69.307
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 5/15] MAE 48.111
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 6/15] MAE 26.817
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 7/15] MAE 7.894
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 8/15] MAE 13.346
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 9/15] MAE 13.802
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 10/15] MAE 10.687
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 11/15] MAE 9.722
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 12/15] MAE 10.407
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 13/15] MAE 11.248
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 14/15] MAE 10.865
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | Frozen 15/15] MAE 10.981
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 1/30] MAE 9.646
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 2/30] MAE 8.198
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 3/30] MAE 7.697
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 4/30] MAE 9.010
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 5/30] MAE 7.819
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 6/30] MAE 6.690
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 7/30] MAE 6.292
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 8/30] MAE 6.497
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 9/30] MAE 6.209
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 10/30] MAE 6.256
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 11/30] MAE 6.319
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 12/30] MAE 5.877
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 13/30] MAE 5.613
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 14/30] MAE 5.549
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 15/30] MAE 5.582
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 16/30] MAE 7.652
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 17/30] MAE 6.064
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 18/30] MAE 5.659
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 19/30] MAE 6.107
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 20/30] MAE 6.484
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 21/30] MAE 6.032
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 22/30] MAE 5.777
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 23/30] MAE 6.910
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 24/30] MAE 6.175
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 25/30] MAE 7.082
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 26/30] MAE 6.343
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 27/30] MAE 6.552
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 28/30] MAE 7.493
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 29/30] MAE 5.406
+[microsoft__dit-large-finetuned-rvlcdip | Fold 2 | FT 30/30] MAE 5.994
+[microsoft__dit-large-finetuned-rvlcdip] Evaluating best checkpoint on fold 2 …
+
+===== microsoft__dit-large-finetuned-rvlcdip | Fold 3/5 =====
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 1/15] MAE 57.696
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 2/15] MAE 36.386
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 3/15] MAE 18.739
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 4/15] MAE 9.627
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 5/15] MAE 14.428
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 6/15] MAE 11.554
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 7/15] MAE 10.083
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 8/15] MAE 10.859
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 9/15] MAE 10.762
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 10/15] MAE 10.794
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 11/15] MAE 10.954
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 12/15] MAE 11.102
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 13/15] MAE 10.455
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 14/15] MAE 10.490
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | Frozen 15/15] MAE 11.131
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 1/30] MAE 11.046
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 2/30] MAE 12.932
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 3/30] MAE 12.951
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 4/30] MAE 11.651
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 5/30] MAE 10.313
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 6/30] MAE 9.061
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 7/30] MAE 9.778
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 8/30] MAE 10.823
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 9/30] MAE 9.001
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 10/30] MAE 9.251
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 11/30] MAE 9.308
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 12/30] MAE 8.542
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 13/30] MAE 8.971
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 14/30] MAE 7.968
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 15/30] MAE 7.741
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 16/30] MAE 7.687
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 17/30] MAE 9.072
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 18/30] MAE 9.212
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 19/30] MAE 8.339
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 20/30] MAE 8.185
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 21/30] MAE 8.268
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 22/30] MAE 9.070
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 23/30] MAE 7.689
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 24/30] MAE 7.899
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 25/30] MAE 8.519
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 26/30] MAE 8.727
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 27/30] MAE 8.221
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 28/30] MAE 8.160
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 29/30] MAE 7.598
+[microsoft__dit-large-finetuned-rvlcdip | Fold 3 | FT 30/30] MAE 8.317
+[microsoft__dit-large-finetuned-rvlcdip] Evaluating best checkpoint on fold 3 …
+
+===== microsoft__dit-large-finetuned-rvlcdip | Fold 4/5 =====
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 1/15] MAE 73.466
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 2/15] MAE 50.274
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 3/15] MAE 29.242
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 4/15] MAE 11.848
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 5/15] MAE 9.573
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 6/15] MAE 12.683
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 7/15] MAE 9.552
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 8/15] MAE 10.146
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 9/15] MAE 9.254
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 10/15] MAE 9.746
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 11/15] MAE 10.261
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 12/15] MAE 9.808
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 13/15] MAE 9.194
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 14/15] MAE 9.300
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | Frozen 15/15] MAE 9.103
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 1/30] MAE 8.856
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 2/30] MAE 8.174
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 3/30] MAE 7.936
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 4/30] MAE 8.307
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 5/30] MAE 10.534
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 6/30] MAE 10.126
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 7/30] MAE 9.589
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 8/30] MAE 7.735
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 9/30] MAE 8.473
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 10/30] MAE 6.084
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 11/30] MAE 7.461
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 12/30] MAE 6.216
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 13/30] MAE 4.968
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 14/30] MAE 5.698
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 15/30] MAE 5.368
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 16/30] MAE 5.856
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 17/30] MAE 5.364
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 18/30] MAE 5.683
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 19/30] MAE 5.448
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 20/30] MAE 5.882
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 21/30] MAE 9.235
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 22/30] MAE 7.111
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 23/30] MAE 6.130
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 24/30] MAE 5.791
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 25/30] MAE 7.346
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 26/30] MAE 5.125
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 27/30] MAE 5.219
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 28/30] MAE 5.302
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 29/30] MAE 5.191
+[microsoft__dit-large-finetuned-rvlcdip | Fold 4 | FT 30/30] MAE 5.125
+[microsoft__dit-large-finetuned-rvlcdip] Evaluating best checkpoint on fold 4 …
+
+===== microsoft__dit-large-finetuned-rvlcdip | Fold 5/5 =====
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 1/15] MAE 76.118
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 2/15] MAE 52.515
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 3/15] MAE 29.454
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 4/15] MAE 9.094
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 5/15] MAE 10.047
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 6/15] MAE 9.031
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 7/15] MAE 7.618
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 8/15] MAE 7.389
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 9/15] MAE 7.836
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 10/15] MAE 7.459
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 11/15] MAE 7.129
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 12/15] MAE 7.600
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 13/15] MAE 7.318
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 14/15] MAE 7.328
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | Frozen 15/15] MAE 7.180
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 1/30] MAE 6.512
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 2/30] MAE 6.169
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 3/30] MAE 6.072
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 4/30] MAE 5.782
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 5/30] MAE 5.985
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 6/30] MAE 5.986
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 7/30] MAE 5.708
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 8/30] MAE 5.583
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 9/30] MAE 5.745
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 10/30] MAE 5.641
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 11/30] MAE 5.813
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 12/30] MAE 6.180
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 13/30] MAE 6.246
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 14/30] MAE 5.483
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 15/30] MAE 5.501
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 16/30] MAE 5.560
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 17/30] MAE 5.588
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 18/30] MAE 5.398
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 19/30] MAE 5.453
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 20/30] MAE 5.521
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 21/30] MAE 5.525
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 22/30] MAE 5.496
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 23/30] MAE 5.429
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 24/30] MAE 5.981
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 25/30] MAE 5.238
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 26/30] MAE 5.316
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 27/30] MAE 5.222
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 28/30] MAE 5.328
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 29/30] MAE 5.825
+[microsoft__dit-large-finetuned-rvlcdip | Fold 5 | FT 30/30] MAE 6.146
+[microsoft__dit-large-finetuned-rvlcdip] Evaluating best checkpoint on fold 5 …
+
+══════ CV SUMMARY ══════
+MAE       : 6.087 ± 1.103
+RMSE      : 10.379 ± 1.649
+R2        : 0.256 ± 0.146
+MAPE      : 22.526 ± 4.190
+Within2   : 38.415 ± 7.282
+Within5   : 64.030 ± 7.516
+Within10  : 83.781 ± 5.085
+MaxErr    : 53.907 ± 12.690
+MedianErr : 3.149 ± 0.876
+MinErr    : 0.023 ± 0.012

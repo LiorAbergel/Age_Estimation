@@ -1,0 +1,280 @@
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:412: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== Building dataloaders for microsoft/dit-base … =====
+{'train': 786, 'val': 146, 'test': 116}
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-base and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[microsoft__dit-base | Frozen 1/15] MAE 8.923
+[microsoft__dit-base | Frozen 2/15] MAE 8.586
+[microsoft__dit-base | Frozen 3/15] MAE 8.947
+[microsoft__dit-base | Frozen 4/15] MAE 8.806
+[microsoft__dit-base | Frozen 5/15] MAE 8.634
+[microsoft__dit-base | Frozen 6/15] MAE 8.679
+[microsoft__dit-base | Frozen 7/15] MAE 9.011
+[microsoft__dit-base | Frozen 8/15] MAE 8.906
+[microsoft__dit-base | Frozen 9/15] MAE 8.863
+[microsoft__dit-base | Frozen 10/15] MAE 9.133
+[microsoft__dit-base | Frozen 11/15] MAE 9.156
+[microsoft__dit-base | Frozen 12/15] MAE 9.249
+[microsoft__dit-base | Frozen 13/15] MAE 8.839
+[microsoft__dit-base | Frozen 14/15] MAE 9.303
+[microsoft__dit-base | Frozen 15/15] MAE 8.833
+
+[microsoft__dit-base] Unfreezing backbone …
+[microsoft__dit-base | FT 1/30] MAE 9.379
+[microsoft__dit-base | FT 2/30] MAE 7.722
+[microsoft__dit-base | FT 3/30] MAE 7.670
+[microsoft__dit-base | FT 4/30] MAE 8.962
+[microsoft__dit-base | FT 5/30] MAE 8.807
+[microsoft__dit-base | FT 6/30] MAE 7.791
+[microsoft__dit-base | FT 7/30] MAE 7.470
+[microsoft__dit-base | FT 8/30] MAE 7.409
+[microsoft__dit-base | FT 9/30] MAE 7.245
+[microsoft__dit-base | FT 10/30] MAE 7.755
+[microsoft__dit-base | FT 11/30] MAE 7.220
+[microsoft__dit-base | FT 12/30] MAE 6.702
+[microsoft__dit-base | FT 13/30] MAE 6.530
+[microsoft__dit-base | FT 14/30] MAE 7.099
+[microsoft__dit-base | FT 15/30] MAE 6.850
+[microsoft__dit-base | FT 16/30] MAE 6.405
+[microsoft__dit-base | FT 17/30] MAE 7.570
+[microsoft__dit-base | FT 18/30] MAE 6.738
+[microsoft__dit-base | FT 19/30] MAE 6.769
+[microsoft__dit-base | FT 20/30] MAE 9.048
+[microsoft__dit-base | FT 21/30] MAE 6.168
+[microsoft__dit-base | FT 22/30] MAE 6.113
+[microsoft__dit-base | FT 23/30] MAE 6.649
+[microsoft__dit-base | FT 24/30] MAE 6.135
+[microsoft__dit-base | FT 25/30] MAE 6.242
+[microsoft__dit-base | FT 26/30] MAE 7.095
+[microsoft__dit-base | FT 27/30] MAE 7.118
+[microsoft__dit-base | FT 28/30] MAE 6.703
+[microsoft__dit-base | FT 29/30] MAE 8.476
+[microsoft__dit-base | FT 30/30] MAE 6.650
+
+[microsoft__dit-base] Testing best model …
+[microsoft__dit-base] MAE: 2.784
+[microsoft__dit-base] RMSE: 5.063
+[microsoft__dit-base] R2: 0.359
+[microsoft__dit-base] MAPE: 14.960
+[microsoft__dit-base] Within2: 58.621
+[microsoft__dit-base] Within5: 89.655
+[microsoft__dit-base] Within10: 95.690
+[microsoft__dit-base] MaxErr: 32.343
+[microsoft__dit-base] MedianErr: 1.681
+[microsoft__dit-base] MinErr: 0.011
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:412: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== Building dataloaders for microsoft/dit-large … =====
+{'train': 786, 'val': 146, 'test': 116}
+config.json: 
+ 1.03k/? [00:00<00:00, 103kB/s]
+pytorch_model.bin: 100%
+ 1.25G/1.25G [00:10<00:00, 355MB/s]
+Some weights of BeitModel were not initialized from the model checkpoint at microsoft/dit-large and are newly initialized: ['pooler.layernorm.bias', 'pooler.layernorm.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+model.safetensors: 100%
+ 1.25G/1.25G [00:11<00:00, 206MB/s]
+[microsoft__dit-large | Frozen 1/15] MAE 132.753
+[microsoft__dit-large | Frozen 2/15] MAE 92.678
+[microsoft__dit-large | Frozen 3/15] MAE 53.926
+[microsoft__dit-large | Frozen 4/15] MAE 17.380
+[microsoft__dit-large | Frozen 5/15] MAE 17.001
+[microsoft__dit-large | Frozen 6/15] MAE 16.020
+[microsoft__dit-large | Frozen 7/15] MAE 10.228
+[microsoft__dit-large | Frozen 8/15] MAE 11.229
+[microsoft__dit-large | Frozen 9/15] MAE 13.834
+[microsoft__dit-large | Frozen 10/15] MAE 12.156
+[microsoft__dit-large | Frozen 11/15] MAE 11.841
+[microsoft__dit-large | Frozen 12/15] MAE 12.471
+[microsoft__dit-large | Frozen 13/15] MAE 12.024
+[microsoft__dit-large | Frozen 14/15] MAE 11.697
+[microsoft__dit-large | Frozen 15/15] MAE 10.666
+
+[microsoft__dit-large] Unfreezing backbone …
+[microsoft__dit-large | FT 1/30] MAE 16.237
+[microsoft__dit-large | FT 2/30] MAE 11.642
+[microsoft__dit-large | FT 3/30] MAE 8.118
+[microsoft__dit-large | FT 4/30] MAE 10.278
+[microsoft__dit-large | FT 5/30] MAE 9.832
+[microsoft__dit-large | FT 6/30] MAE 7.723
+[microsoft__dit-large | FT 7/30] MAE 7.963
+[microsoft__dit-large | FT 8/30] MAE 8.657
+[microsoft__dit-large | FT 9/30] MAE 8.054
+[microsoft__dit-large | FT 10/30] MAE 9.223
+[microsoft__dit-large | FT 11/30] MAE 8.665
+[microsoft__dit-large | FT 12/30] MAE 7.197
+[microsoft__dit-large | FT 13/30] MAE 7.295
+[microsoft__dit-large | FT 14/30] MAE 6.879
+[microsoft__dit-large | FT 15/30] MAE 6.825
+[microsoft__dit-large | FT 16/30] MAE 6.840
+[microsoft__dit-large | FT 17/30] MAE 7.332
+[microsoft__dit-large | FT 18/30] MAE 7.194
+[microsoft__dit-large | FT 19/30] MAE 9.235
+[microsoft__dit-large | FT 20/30] MAE 6.777
+[microsoft__dit-large | FT 21/30] MAE 6.630
+[microsoft__dit-large | FT 22/30] MAE 7.046
+[microsoft__dit-large | FT 23/30] MAE 7.492
+[microsoft__dit-large | FT 24/30] MAE 6.633
+[microsoft__dit-large | FT 25/30] MAE 8.692
+[microsoft__dit-large | FT 26/30] MAE 7.147
+[microsoft__dit-large | FT 27/30] MAE 6.825
+[microsoft__dit-large | FT 28/30] MAE 6.393
+[microsoft__dit-large | FT 29/30] MAE 8.075
+[microsoft__dit-large | FT 30/30] MAE 6.525
+
+[microsoft__dit-large] Testing best model …
+[microsoft__dit-large] MAE: 3.379
+[microsoft__dit-large] RMSE: 5.653
+[microsoft__dit-large] R2: 0.201
+[microsoft__dit-large] MAPE: 18.330
+[microsoft__dit-large] Within2: 45.690
+[microsoft__dit-large] Within5: 86.207
+[microsoft__dit-large] Within10: 94.828
+[microsoft__dit-large] MaxErr: 32.807
+[microsoft__dit-large] MedianErr: 2.288
+[microsoft__dit-large] MinErr: 0.053
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:412: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== Building dataloaders for microsoft/dit-base-finetuned-rvlcdip … =====
+{'train': 786, 'val': 146, 'test': 116}
+config.json: 
+ 1.79k/? [00:00<00:00, 196kB/s]
+pytorch_model.bin: 100%
+ 343M/343M [00:03<00:00, 183MB/s]
+model.safetensors: 100%
+ 343M/343M [00:02<00:00, 217MB/s]
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 1/15] MAE 8.370
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 2/15] MAE 9.076
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 3/15] MAE 8.492
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 4/15] MAE 8.961
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 5/15] MAE 8.468
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 6/15] MAE 9.050
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 7/15] MAE 8.386
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 8/15] MAE 8.532
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 9/15] MAE 8.289
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 10/15] MAE 8.801
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 11/15] MAE 8.508
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 12/15] MAE 8.434
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 13/15] MAE 8.638
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 14/15] MAE 8.175
+[microsoft__dit-base-finetuned-rvlcdip | Frozen 15/15] MAE 8.420
+
+[microsoft__dit-base-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-base-finetuned-rvlcdip | FT 1/30] MAE 7.590
+[microsoft__dit-base-finetuned-rvlcdip | FT 2/30] MAE 7.119
+[microsoft__dit-base-finetuned-rvlcdip | FT 3/30] MAE 6.818
+[microsoft__dit-base-finetuned-rvlcdip | FT 4/30] MAE 6.656
+[microsoft__dit-base-finetuned-rvlcdip | FT 5/30] MAE 6.746
+[microsoft__dit-base-finetuned-rvlcdip | FT 6/30] MAE 6.563
+[microsoft__dit-base-finetuned-rvlcdip | FT 7/30] MAE 6.579
+[microsoft__dit-base-finetuned-rvlcdip | FT 8/30] MAE 6.269
+[microsoft__dit-base-finetuned-rvlcdip | FT 9/30] MAE 6.352
+[microsoft__dit-base-finetuned-rvlcdip | FT 10/30] MAE 6.250
+[microsoft__dit-base-finetuned-rvlcdip | FT 11/30] MAE 6.422
+[microsoft__dit-base-finetuned-rvlcdip | FT 12/30] MAE 6.435
+[microsoft__dit-base-finetuned-rvlcdip | FT 13/30] MAE 6.558
+[microsoft__dit-base-finetuned-rvlcdip | FT 14/30] MAE 6.964
+[microsoft__dit-base-finetuned-rvlcdip | FT 15/30] MAE 6.595
+[microsoft__dit-base-finetuned-rvlcdip | FT 16/30] MAE 6.903
+[microsoft__dit-base-finetuned-rvlcdip | FT 17/30] MAE 6.419
+[microsoft__dit-base-finetuned-rvlcdip | FT 18/30] MAE 6.483
+[microsoft__dit-base-finetuned-rvlcdip | FT 19/30] MAE 6.302
+[microsoft__dit-base-finetuned-rvlcdip | FT 20/30] MAE 6.422
+[microsoft__dit-base-finetuned-rvlcdip | FT 21/30] MAE 6.901
+[microsoft__dit-base-finetuned-rvlcdip | FT 22/30] MAE 6.712
+[microsoft__dit-base-finetuned-rvlcdip | FT 23/30] MAE 6.589
+[microsoft__dit-base-finetuned-rvlcdip | FT 24/30] MAE 6.437
+[microsoft__dit-base-finetuned-rvlcdip | FT 25/30] MAE 6.038
+[microsoft__dit-base-finetuned-rvlcdip | FT 26/30] MAE 6.076
+[microsoft__dit-base-finetuned-rvlcdip | FT 27/30] MAE 6.069
+[microsoft__dit-base-finetuned-rvlcdip | FT 28/30] MAE 6.103
+[microsoft__dit-base-finetuned-rvlcdip | FT 29/30] MAE 6.042
+[microsoft__dit-base-finetuned-rvlcdip | FT 30/30] MAE 6.575
+
+[microsoft__dit-base-finetuned-rvlcdip] Testing best model …
+[microsoft__dit-base-finetuned-rvlcdip] MAE: 2.345
+[microsoft__dit-base-finetuned-rvlcdip] RMSE: 4.432
+[microsoft__dit-base-finetuned-rvlcdip] R2: 0.509
+[microsoft__dit-base-finetuned-rvlcdip] MAPE: 13.229
+[microsoft__dit-base-finetuned-rvlcdip] Within2: 64.655
+[microsoft__dit-base-finetuned-rvlcdip] Within5: 91.379
+[microsoft__dit-base-finetuned-rvlcdip] Within10: 97.414
+[microsoft__dit-base-finetuned-rvlcdip] MaxErr: 31.618
+[microsoft__dit-base-finetuned-rvlcdip] MedianErr: 1.465
+[microsoft__dit-base-finetuned-rvlcdip] MinErr: 0.016
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 35.5kB/s]
+/usr/local/lib/python3.12/dist-packages/transformers/image_processing_base.py:412: UserWarning: The following named arguments are not valid for `BeitImageProcessor.__init__` and were ignored: 'feature_extractor_type', 'reduce_labels'
+  image_processor = cls(**image_processor_dict)
+
+===== Building dataloaders for microsoft/dit-large-finetuned-rvlcdip … =====
+{'train': 786, 'val': 146, 'test': 116}
+config.json: 
+ 1.79k/? [00:00<00:00, 171kB/s]
+pytorch_model.bin: 100%
+ 1.21G/1.21G [00:06<00:00, 334MB/s]
+model.safetensors: 100%
+ 1.21G/1.21G [00:07<00:00, 186MB/s]
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 1/15] MAE 43.521
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 2/15] MAE 24.916
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 3/15] MAE 10.950
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 4/15] MAE 10.826
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 5/15] MAE 9.083
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 6/15] MAE 8.576
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 7/15] MAE 8.705
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 8/15] MAE 8.549
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 9/15] MAE 8.342
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 10/15] MAE 8.234
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 11/15] MAE 8.372
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 12/15] MAE 8.646
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 13/15] MAE 8.144
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 14/15] MAE 8.090
+[microsoft__dit-large-finetuned-rvlcdip | Frozen 15/15] MAE 8.854
+
+[microsoft__dit-large-finetuned-rvlcdip] Unfreezing backbone …
+[microsoft__dit-large-finetuned-rvlcdip | FT 1/30] MAE 7.475
+[microsoft__dit-large-finetuned-rvlcdip | FT 2/30] MAE 8.569
+[microsoft__dit-large-finetuned-rvlcdip | FT 3/30] MAE 8.933
+[microsoft__dit-large-finetuned-rvlcdip | FT 4/30] MAE 8.099
+[microsoft__dit-large-finetuned-rvlcdip | FT 5/30] MAE 6.916
+[microsoft__dit-large-finetuned-rvlcdip | FT 6/30] MAE 8.471
+[microsoft__dit-large-finetuned-rvlcdip | FT 7/30] MAE 8.605
+[microsoft__dit-large-finetuned-rvlcdip | FT 8/30] MAE 8.892
+[microsoft__dit-large-finetuned-rvlcdip | FT 9/30] MAE 8.071
+[microsoft__dit-large-finetuned-rvlcdip | FT 10/30] MAE 9.038
+[microsoft__dit-large-finetuned-rvlcdip | FT 11/30] MAE 6.321
+[microsoft__dit-large-finetuned-rvlcdip | FT 12/30] MAE 8.314
+[microsoft__dit-large-finetuned-rvlcdip | FT 13/30] MAE 9.457
+[microsoft__dit-large-finetuned-rvlcdip | FT 14/30] MAE 6.964
+[microsoft__dit-large-finetuned-rvlcdip | FT 15/30] MAE 6.332
+[microsoft__dit-large-finetuned-rvlcdip | FT 16/30] MAE 6.647
+[microsoft__dit-large-finetuned-rvlcdip | FT 17/30] MAE 6.577
+[microsoft__dit-large-finetuned-rvlcdip | FT 18/30] MAE 6.472
+[microsoft__dit-large-finetuned-rvlcdip | FT 19/30] MAE 6.502
+[microsoft__dit-large-finetuned-rvlcdip | FT 20/30] MAE 7.708
+[microsoft__dit-large-finetuned-rvlcdip | FT 21/30] MAE 6.875
+[microsoft__dit-large-finetuned-rvlcdip | FT 22/30] MAE 6.851
+[microsoft__dit-large-finetuned-rvlcdip | FT 23/30] MAE 6.977
+[microsoft__dit-large-finetuned-rvlcdip | FT 24/30] MAE 6.963
+[microsoft__dit-large-finetuned-rvlcdip | FT 25/30] MAE 7.103
+[microsoft__dit-large-finetuned-rvlcdip | FT 26/30] MAE 6.932
+[microsoft__dit-large-finetuned-rvlcdip | FT 27/30] MAE 7.232
+[microsoft__dit-large-finetuned-rvlcdip | FT 28/30] MAE 6.657
+[microsoft__dit-large-finetuned-rvlcdip | FT 29/30] MAE 7.307
+[microsoft__dit-large-finetuned-rvlcdip | FT 30/30] MAE 6.203
+
+[microsoft__dit-large-finetuned-rvlcdip] Testing best model …
+[microsoft__dit-large-finetuned-rvlcdip] MAE: 3.124
+[microsoft__dit-large-finetuned-rvlcdip] RMSE: 5.141
+[microsoft__dit-large-finetuned-rvlcdip] R2: 0.339
+[microsoft__dit-large-finetuned-rvlcdip] MAPE: 17.324
+[microsoft__dit-large-finetuned-rvlcdip] Within2: 51.724
+[microsoft__dit-large-finetuned-rvlcdip] Within5: 86.207
+[microsoft__dit-large-finetuned-rvlcdip] Within10: 94.828
+[microsoft__dit-large-finetuned-rvlcdip] MaxErr: 33.642
+[microsoft__dit-large-finetuned-rvlcdip] MedianErr: 1.919
+[microsoft__dit-large-finetuned-rvlcdip] MinErr: 0.029
