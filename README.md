@@ -17,9 +17,9 @@ This repository documents a sequential research path for estimating writer age f
 
 * **Input:** 128x128 RGB images.  
 * **Structure:** A Sequential model consisting of 3 Convolutional blocks.  
-  * Block 1: Conv2D (16 filters, 3x3) \+ MaxPooling.  
-  * Block 2: Conv2D (32 filters, 3x3) \+ MaxPooling.  
-  * Block 3: Conv2D (64 filters, 3x3) \+ MaxPooling.  
+  * Block 1: Conv2D (32 filters, 3x3) \+ MaxPooling.  
+  * Block 2: Conv2D (64 filters, 3x3) \+ MaxPooling.  
+  * Block 3: Conv2D (128 filters, 3x3) \+ MaxPooling.  
 * **Head:** Flatten \-\> Dense (128, ReLU) \-\> Dense (1, Linear).
 
 **Methodology:**
