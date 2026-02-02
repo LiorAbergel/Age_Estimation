@@ -1,0 +1,27 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Virtual Environments
+env/
+venv/
+.venv/
+
+# Data
+/data
+
+# IDE files
+.vscode/
+
+# Training outputs
+01_Baseline_CNN/results
+02_SOTA_CNN_Ensemble/results
+03_SOTA_CNN_Ensemble_Augmented/results
+03_SOTA_CNN_Ensemble_Augmented_Grad_CAM/results
+04_SOTA_Scaling_Scheduler/results
+05_SOTA_CNN_CrossVal/results
+06_ViT/results
+07_ViT_CrossVal/results
+08_CNN_Tuning_Augmented/results
+09_DiT/results
+10_DiT_CrossVal/results
