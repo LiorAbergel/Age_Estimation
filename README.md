@@ -17,9 +17,9 @@ This repository documents a sequential research path for estimating writer age f
 
 * **Input:** 128x128 RGB images.  
 * **Structure:** A Sequential model consisting of 3 Convolutional blocks.  
-  * Block 1: Conv2D (16 filters, 3x3) \+ MaxPooling.  
-  * Block 2: Conv2D (32 filters, 3x3) \+ MaxPooling.  
-  * Block 3: Conv2D (64 filters, 3x3) \+ MaxPooling.  
+  * Block 1: Conv2D (32 filters, 3x3) \+ MaxPooling.  
+  * Block 2: Conv2D (64 filters, 3x3) \+ MaxPooling.  
+  * Block 3: Conv2D (128 filters, 3x3) \+ MaxPooling.  
 * **Head:** Flatten \-\> Dense (128, ReLU) \-\> Dense (1, Linear).
 
 **Methodology:**
@@ -284,17 +284,5 @@ This repository documents a sequential research path for estimating writer age f
 
 * MAE: 5.85 ± 0.84 years  
 * R²: 0.32 ± 0.12
-
-## **Installation**
-
-\# Core DL Frameworks  
-pip install tensorflow torch torchvision
-
-\# Transformer Libraries  
-pip install keras-cv-attention-models transformers tf-keras
-
-\# Data & Utilities  
-pip install pandas numpy matplotlib scikit-learn tqdm  
-
 
 [image1]: <data:image/png;base64,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>
