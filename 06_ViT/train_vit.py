@@ -18,6 +18,10 @@ Requirements:
 
 import os
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- CRITICAL SETUP ---
 # keras-cv-attention-models requires legacy tf-keras behavior in newer TF versions
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
@@ -373,4 +377,5 @@ def main():
 
 import gc
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()

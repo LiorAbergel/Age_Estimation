@@ -28,6 +28,10 @@ from tqdm import tqdm
 np.random.seed(42)
 tf.random.set_seed(42)
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- Configuration ---
 CONFIG = {
     "IMG_SIZE": (128, 128),
@@ -241,4 +245,5 @@ def main():
     print(f"Predictions saved to: {pred_save_path}")
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()

@@ -29,6 +29,10 @@ from PIL import Image
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- CRITICAL: Legacy Keras for compatibility ---
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
 
@@ -411,4 +415,5 @@ def main():
     evaluate_models(df_full)
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()

@@ -1,14 +1,31 @@
-# Python cache files
+# Python
 __pycache__/
 *.pyc
 
-# Virtual Environments
+# Virtual environments
 env/
 venv/
 .venv/
 
-# Data
-/data
+# Dataset (download via download_dataset.py - see README)
+/data/
 
-# IDE files
+# Model weights
+*.keras
+*.pt
+*.h5
+models/
+
+# IDE
 .vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Claude Code
+.claude/

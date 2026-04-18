@@ -24,6 +24,7 @@ import shutil
 import random
 import json
 import gc
+from collections import defaultdict
 import numpy as np
 import pandas as pd
 import torch
@@ -39,6 +40,10 @@ from PIL import Image
 from tqdm.auto import tqdm
 from torch.cuda.amp import GradScaler, autocast
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- Configuration ---
 CONFIG = {
     "PATCH_SIZE": 400,
@@ -51,6 +56,7 @@ CONFIG = {
     "EPOCHS_STAGE1": 15,
     "EPOCHS_STAGE2": 30,
     "DATA_DIR": "./data",
+    "CSV_PATH": os.path.join("data", "NewAgeSplit.csv"),
     "MODELS_DIR": "./models/dit_cv",
     "RESULTS_DIR": "./results/dit_cv"
 }
@@ -292,4 +298,5 @@ def run_full_cv():
             gc.collect()
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     run_full_cv()

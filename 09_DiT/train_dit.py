@@ -43,6 +43,10 @@ def set_seed(seed):
 
 set_seed(SEED)
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- Configuration ---
 CONFIG = {
     "PATCH_SIZE": 400,
@@ -389,4 +393,5 @@ def main():
         print(f"✅ Saved predictions to {safe_name}_preds.csv")
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()

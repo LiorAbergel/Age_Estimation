@@ -37,6 +37,10 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 np.random.seed(42)
 tf.random.set_seed(42)
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from download_dataset import ensure_dataset
+
 # --- Configuration ---
 CONFIG = {
     "PATCH_SIZE": (400, 400),
@@ -328,4 +332,5 @@ def main():
         print(f"MAE: {mae:.2f} years")
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()
