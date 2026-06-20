@@ -29,3 +29,9 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Generated reproduction artifacts (downloaded weights + recomputed outputs)
+**/reproduction_output/
+01_CNN_Ensemble/weights/
+
+paper/

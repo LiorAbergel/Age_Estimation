@@ -11,10 +11,47 @@ On first run, you will be prompted to authenticate with your Kaggle credentials.
 """
 
 import os
+import re
 import shutil
 
+import pandas as pd
+
 KAGGLE_DATASET = "liorabergel/hhd-age"
+KAGGLE_CSV_NAME = "AgeAnnotations_and_Split.csv"
+TARGET_CSV_NAME = "NewAgeSplit.csv"
 DEFAULT_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+
+def _prepare_csv(data_dir):
+    """Rename the Kaggle CSV and add the WriterNumber column if missing."""
+    target_csv = os.path.join(data_dir, TARGET_CSV_NAME)
+    source_csv = os.path.join(data_dir, KAGGLE_CSV_NAME)
+
+    # If target already exists with WriterNumber, nothing to do
+    if os.path.isfile(target_csv):
+        df = pd.read_csv(target_csv, nrows=1)
+        if "WriterNumber" in df.columns:
+            return
+
+    # Determine which CSV to read
+    if os.path.isfile(source_csv):
+        df = pd.read_csv(source_csv)
+    elif os.path.isfile(target_csv):
+        df = pd.read_csv(target_csv)
+    else:
+        return
+
+    # Add WriterNumber derived from filename (e.g. w11_F_2_form1.tif -> 11)
+    if "WriterNumber" not in df.columns:
+        df["WriterNumber"] = df["File"].apply(
+            lambda f: int(re.match(r"w(\d+)", f).group(1))
+        )
+
+    df.to_csv(target_csv, index=False)
+
+    # Remove the original if it was renamed
+    if os.path.isfile(source_csv) and source_csv != target_csv:
+        os.remove(source_csv)
 
 
 def ensure_dataset(data_dir=None):
@@ -31,10 +68,12 @@ def ensure_dataset(data_dir=None):
     if not os.path.isabs(data_dir):
         data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), data_dir)
 
-    csv_path = os.path.join(data_dir, "NewAgeSplit.csv")
+    csv_path = os.path.join(data_dir, TARGET_CSV_NAME)
     train_dir = os.path.join(data_dir, "train")
 
     if os.path.isfile(csv_path) and os.path.isdir(train_dir):
+        # Ensure WriterNumber column exists even if data was already downloaded
+        _prepare_csv(data_dir)
         return data_dir
 
     print(f"Dataset not found at {data_dir}. Downloading from Kaggle...")
@@ -62,6 +101,9 @@ def ensure_dataset(data_dir=None):
             shutil.copytree(src, dst)
         else:
             shutil.copy2(src, dst)
+
+    # Post-process: rename CSV and add WriterNumber column
+    _prepare_csv(data_dir)
 
     print(f"Dataset ready at {data_dir}")
     return data_dir

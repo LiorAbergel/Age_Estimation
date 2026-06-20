@@ -1,6 +1,7 @@
 tensorflow>=2.13,<2.16
 tf-keras
 keras-cv-attention-models
+kagglehub
 numpy
 pandas
 scikit-learn
