@@ -283,6 +283,53 @@ class BestModelLogger(tf.keras.callbacks.Callback):
             self.best = current
 
 
+class EpochCSVLogger(tf.keras.callbacks.Callback):
+    """Append one row per epoch to a CSV, flushing immediately.
+
+    Saved alongside the trained model so the curves travel with the weights
+    (e.g. to Google Drive on Colab) and survive a mid-training crash. Columns:
+    ``model, phase, epoch`` followed by every Keras log metric. Set
+    ``overwrite=True`` for the first phase and ``False`` to append later phases.
+    """
+
+    def __init__(self, log_path, model_name, phase, overwrite):
+        super().__init__()
+        self.log_path = str(log_path)
+        self.model_name = model_name
+        self.phase = phase
+        self.overwrite = overwrite
+        self._fieldnames = None
+        self._fh = None
+        self._writer = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        row = {"model": self.model_name, "phase": self.phase, "epoch": epoch + 1}
+        row.update({key: float(value) for key, value in logs.items()})
+
+        if self._writer is None:
+            if not self.overwrite and os.path.exists(self.log_path):
+                with open(self.log_path, newline="") as fh:
+                    self._fieldnames = next(csv.reader(fh), None) or list(row.keys())
+                mode, write_header = "a", False
+            else:
+                self._fieldnames = list(row.keys())
+                mode, write_header = "w", True
+            self._fh = open(self.log_path, mode, newline="")
+            self._writer = csv.DictWriter(self._fh, fieldnames=self._fieldnames,
+                                          extrasaction="ignore", restval="")
+            if write_header:
+                self._writer.writeheader()
+
+        self._writer.writerow(row)
+        self._fh.flush()
+
+    def on_train_end(self, logs=None):
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = self._writer = None
+
+
 def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) -> dict:
     """Train (or load) each backbone: a frozen phase followed by fine-tuning."""
     models_dir = Path(models_dir)
@@ -298,6 +345,7 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
             continue
 
         model, base_model = build_sota_model(architecture)
+        log_path = models_dir / f"{name}_training_log.csv"
         callbacks = [
             ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=0),
             BestModelLogger(save_path, monitor="val_mae"),
@@ -307,12 +355,15 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
 
         print("Phase 1: frozen backbone")
         model.compile(optimizer=tf.keras.optimizers.Adam(FROZEN_LR), loss="mse", metrics=["mae"])
-        model.fit(train_ds, validation_data=val_ds, epochs=epochs_frozen, callbacks=callbacks)
+        model.fit(train_ds, validation_data=val_ds, epochs=epochs_frozen,
+                  callbacks=callbacks + [EpochCSVLogger(log_path, name, "frozen", overwrite=True)])
 
         print("Phase 2: fine-tuning")
         base_model.trainable = True
         model.compile(optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR), loss="mse", metrics=["mae"])
-        model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune, callbacks=callbacks)
+        model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune,
+                  callbacks=callbacks + [EpochCSVLogger(log_path, name, "fine_tune", overwrite=False)])
+        print(f"Saved training log to {log_path}")
 
         trained[name] = model
     return trained
