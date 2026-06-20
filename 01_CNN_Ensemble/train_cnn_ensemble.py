@@ -31,6 +31,7 @@ import csv
 import itertools
 import os
 import sys
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -56,6 +57,12 @@ from download_dataset import ensure_dataset
 SEED = 42
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
+
+# Benign Keras 3 false-positive: with an unknown-cardinality tf.data pipeline
+# (flat_map yields a variable number of patches per image), Keras cannot
+# pre-compute steps and warns at end-of-dataset even though every epoch runs to
+# completion. Silence just this message to keep the training log readable.
+warnings.filterwarnings("ignore", message="Your input ran out of data")
 
 # ===========================================================================
 # Configuration (defaults; override on the command line)
@@ -251,6 +258,31 @@ def compute_metrics(y_true, y_pred) -> dict:
 # ===========================================================================
 # Training
 # ===========================================================================
+class BestModelLogger(tf.keras.callbacks.Callback):
+    """Print a single line whenever the monitored metric improves and is saved.
+
+    Mirrors ModelCheckpoint's improvement criterion (strictly lower ``val_mae``)
+    so the message aligns with the actual save, without Keras 3's duplicated
+    "improved ... saving" / "finished saving" output.
+    """
+
+    def __init__(self, save_path, monitor="val_mae"):
+        super().__init__()
+        self.save_path = str(save_path)
+        self.monitor = monitor
+        self.best = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        current = (logs or {}).get(self.monitor)
+        if current is None:
+            return
+        if self.best is None or current < self.best:
+            prev = "inf" if self.best is None else f"{self.best:.5f}"
+            print(f"Epoch {epoch + 1}: {self.monitor} improved from {prev} to "
+                  f"{current:.5f}; saved model to {self.save_path}")
+            self.best = current
+
+
 def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) -> dict:
     """Train (or load) each backbone: a frozen phase followed by fine-tuning."""
     models_dir = Path(models_dir)
@@ -267,7 +299,8 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
 
         model, base_model = build_sota_model(architecture)
         callbacks = [
-            ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=1),
+            ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=0),
+            BestModelLogger(save_path, monitor="val_mae"),
             ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
             EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
         ]
