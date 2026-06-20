@@ -94,9 +94,8 @@ FINE_TUNE_LR = 1e-4
 DROPOUT_RATE = 0.5
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"
-# Legacy tag "experiment_03_augmented" kept so 02_CNN_GradCAM can locate these weights.
-DEFAULT_MODELS_DIR = REPO_ROOT / "models" / "experiment_03_augmented"
-DEFAULT_RESULTS_DIR = REPO_ROOT / "results" / "experiment_03_augmented"
+DEFAULT_MODELS_DIR = REPO_ROOT / "models" / "experiment_01"
+DEFAULT_RESULTS_DIR = REPO_ROOT / "results" / "experiment_01"
 
 # Backbones, ordered as trained.
 ARCHITECTURES = {

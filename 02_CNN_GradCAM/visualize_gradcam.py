@@ -36,8 +36,8 @@ CONFIG = {
     "BATCH_SIZE": 32,
     "DATA_DIR": "./data",  
     "CSV_PATH": "./data/NewAgeSplit.csv",
-    # Pointing to models from Experiment 03
-    "MODELS_DIR": "./models/experiment_03_augmented",
+    # Pointing to models from Experiment 01 (CNN ensemble)
+    "MODELS_DIR": "./models/experiment_01",
     "OUTPUT_DIR": "./results/gradcam_analysis"
 }
 
