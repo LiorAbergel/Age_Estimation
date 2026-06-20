@@ -41,6 +41,33 @@ CONFIG = {
     "OUTPUT_DIR": "./results/gradcam_analysis"
 }
 
+
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
+    try:
+        import google.colab  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+# On Colab, 01_CNN_Ensemble/train_cnn_ensemble.py persists weights to Google
+# Drive, so load them (and write outputs) from there instead of ephemeral disk.
+if _in_colab():
+    from pathlib import Path
+    _drive_root = Path("/content/drive")
+    try:
+        if not (_drive_root / "MyDrive").exists():
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to load trained models...")
+            drive.mount(str(_drive_root))
+    except Exception as exc:
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    _persist_base = _drive_root / "MyDrive" / "Age_Estimation" / "01_CNN_Ensemble"
+    CONFIG["MODELS_DIR"] = str(_persist_base / "models")
+    CONFIG["OUTPUT_DIR"] = str(_persist_base / "gradcam_analysis")
+    print(f"Loading models from Google Drive: {CONFIG['MODELS_DIR']}")
+
 # --- Layer Targets for SOTA Architectures ---
 # These are the standard last convolutional layers for Keras applications
 LAYER_NAMES = {

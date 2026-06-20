@@ -47,31 +47,8 @@ from tensorflow.keras.applications import ResNet50, InceptionV3, InceptionResNet
 from tensorflow.keras.applications.efficientnet_v2 import EfficientNetV2M
 
 EXPERIMENT_DIRNAME = "01_CNN_Ensemble"
-
-
-def _resolve_paths():
-    """Return (SCRIPT_DIR, REPO_ROOT), working both as a script and in Colab.
-
-    In notebooks/Colab ``__file__`` is undefined, so we locate the repository
-    root by searching the working directory and its parents for the marker
-    file ``download_dataset.py``.
-    """
-    try:
-        script_dir = Path(__file__).resolve().parent
-        return script_dir, script_dir.parent
-    except NameError:
-        pass
-    cwd = Path.cwd().resolve()
-    for base in (cwd, *cwd.parents):
-        if (base / "download_dataset.py").exists():
-            return base / EXPERIMENT_DIRNAME, base
-        candidate = base / "Age_Estimation"
-        if (candidate / "download_dataset.py").exists():
-            return candidate / EXPERIMENT_DIRNAME, candidate
-    return cwd / EXPERIMENT_DIRNAME, cwd
-
-
-SCRIPT_DIR, REPO_ROOT = _resolve_paths()
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))  # allow `import download_dataset`
 from download_dataset import ensure_dataset
 
@@ -433,26 +410,75 @@ def report_against_results_md(summary) -> None:
 # ===========================================================================
 # CLI
 # ===========================================================================
-def _in_notebook():
-    """True when running inside a Jupyter/Colab kernel (no real CLI argv)."""
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
     try:
-        from IPython import get_ipython
-        ip = get_ipython()
-        return ip is not None and "IPKernelApp" in ip.config
+        import google.colab  # noqa: F401
+        return True
     except Exception:
         return False
 
 
+# On Colab, persist trained models/results here so they survive runtime crashes.
+COLAB_DRIVE_ROOT = Path("/content/drive")
+COLAB_PERSIST_BASE = COLAB_DRIVE_ROOT / "MyDrive" / "Age_Estimation" / EXPERIMENT_DIRNAME
+
+
+def _mount_drive_for_persistence():
+    """Mount Google Drive (if needed) and return a persistent base directory.
+
+    Returns ``None`` if Drive cannot be mounted, so the caller can fall back to
+    the ephemeral local directory.
+    """
+    try:
+        if not (COLAB_DRIVE_ROOT / "MyDrive").exists():
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to persist trained models...")
+            drive.mount(str(COLAB_DRIVE_ROOT))
+        if (COLAB_DRIVE_ROOT / "MyDrive").exists():
+            return COLAB_PERSIST_BASE
+    except Exception as exc:  # pragma: no cover - environment dependent
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    return None
+
+
+def resolve_output_dirs(models_dir, results_dir):
+    """Pick where to write weights/results, persisting to Drive on Colab.
+
+    Explicit ``--models-dir``/``--results-dir`` values (non-None) always win.
+    When they are unset on Colab, redirect to mounted Google Drive so a runtime
+    crash does not delete the trained models; otherwise use the repo defaults.
+    """
+    if _in_colab() and (models_dir is None or results_dir is None):
+        base = _mount_drive_for_persistence()
+        if base is not None:
+            if models_dir is None:
+                models_dir = str(base / "models")
+            if results_dir is None:
+                results_dir = str(base / "results")
+            print(f"Persisting outputs to Google Drive: {base}")
+        else:
+            print("WARNING: Drive unavailable; trained models will be LOST if the "
+                  "Colab runtime crashes.")
+    if models_dir is None:
+        models_dir = str(DEFAULT_MODELS_DIR)
+    if results_dir is None:
+        results_dir = str(DEFAULT_RESULTS_DIR)
+    return models_dir, results_dir
+
+
 def parse_args(argv=None):
-    if argv is None and _in_notebook():
-        argv = []  # ignore the kernel's injected '-f <connection_file>' flag
     parser = argparse.ArgumentParser(
         description="Train CNN backbones and evaluate weighted ensembles (paper Table 3, top).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR))
-    parser.add_argument("--models-dir", default=str(DEFAULT_MODELS_DIR))
-    parser.add_argument("--results-dir", default=str(DEFAULT_RESULTS_DIR))
+    parser.add_argument("--models-dir", default=None,
+                        help=f"Where to save/load weights (default: {DEFAULT_MODELS_DIR}; "
+                             "on Colab, auto-redirected to Google Drive to survive crashes).")
+    parser.add_argument("--results-dir", default=None,
+                        help=f"Where to write prediction CSVs/summaries (default: {DEFAULT_RESULTS_DIR}; "
+                             "on Colab, auto-redirected to Google Drive).")
     parser.add_argument("--batch-size", type=int, default=BATCH_SIZE,
                         help="128 was used for the published results; lower if VRAM-limited.")
     parser.add_argument("--epochs-frozen", type=int, default=EPOCHS_FROZEN)
@@ -462,8 +488,9 @@ def parse_args(argv=None):
 
 def main(argv=None):
     args = parse_args(argv)
+    models_dir, results_dir = resolve_output_dirs(args.models_dir, args.results_dir)
     ensure_dataset(args.data_dir)
-    results_dir = Path(args.results_dir)
+    results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"GPUs available: {len(tf.config.list_physical_devices('GPU'))}")
@@ -477,7 +504,7 @@ def main(argv=None):
     val_ds_train = create_dataset(args.data_dir, labels_df, "val", args.batch_size, augment=False)
 
     # Train (or load cached weights)
-    trained_models = train_models(train_ds, val_ds_train, args.models_dir,
+    trained_models = train_models(train_ds, val_ds_train, models_dir,
                                   args.epochs_frozen, args.epochs_fine_tune)
 
     # Inference datasets carry image ids for per-image aggregation

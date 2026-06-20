@@ -42,32 +42,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # ===========================================================================
 # Paths
 # ===========================================================================
-EXPERIMENT_DIRNAME = "01_CNN_Ensemble"
-
-
-def _resolve_paths():
-    """Return (SCRIPT_DIR, REPO_ROOT), working both as a script and in Colab.
-
-    In notebooks/Colab ``__file__`` is undefined, so we locate the repository
-    root by searching the working directory and its parents for the marker
-    file ``download_dataset.py``.
-    """
-    try:
-        script_dir = Path(__file__).resolve().parent
-        return script_dir, script_dir.parent
-    except NameError:
-        pass
-    cwd = Path.cwd().resolve()
-    for base in (cwd, *cwd.parents):
-        if (base / "download_dataset.py").exists():
-            return base / EXPERIMENT_DIRNAME, base
-        candidate = base / "Age_Estimation"
-        if (candidate / "download_dataset.py").exists():
-            return candidate / EXPERIMENT_DIRNAME, candidate
-    return cwd / EXPERIMENT_DIRNAME, cwd
-
-
-SCRIPT_DIR, REPO_ROOT = _resolve_paths()
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))  # allow `import download_dataset`
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"
@@ -474,19 +450,7 @@ def report(summary, individual_metrics) -> bool:
 # ===========================================================================
 # CLI
 # ===========================================================================
-def _in_notebook():
-    """True when running inside a Jupyter/Colab kernel (no real CLI argv)."""
-    try:
-        from IPython import get_ipython
-        ip = get_ipython()
-        return ip is not None and "IPKernelApp" in ip.config
-    except Exception:
-        return False
-
-
 def parse_args(argv=None):
-    if argv is None and _in_notebook():
-        argv = []  # ignore the kernel's injected '-f <connection_file>' flag
     parser = argparse.ArgumentParser(
         description="Reproduce the CNN-ensemble results of Experiment 01 (paper Table 3, top).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
