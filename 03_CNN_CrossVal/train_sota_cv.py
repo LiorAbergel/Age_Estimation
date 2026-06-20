@@ -1,5 +1,5 @@
 """
-Experiment 05: SOTA CNN with 5-Fold Stratified Group Cross-Validation (Full Run)
+Experiment 03: SOTA CNN with 5-Fold Stratified Group Cross-Validation (Full Run)
 
 Overview:
 This script performs a rigorous evaluation using 5-Fold Cross-Validation.
@@ -16,11 +16,10 @@ Key Features:
 import os
 import gc
 import csv
-import glob
+import warnings
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from collections import defaultdict
 from PIL import Image
 from sklearn.model_selection import StratifiedGroupKFold
@@ -37,6 +36,11 @@ from tensorflow.keras.applications.efficientnet_v2 import EfficientNetV2M
 np.random.seed(42)
 tf.random.set_seed(42)
 
+# Benign Keras 3 false-positive: the unknown-cardinality tf.data pipeline
+# (flat_map yields a variable number of patches per image) makes Keras warn at
+# end-of-dataset even though every epoch runs to completion. Silence just this.
+warnings.filterwarnings("ignore", message="Your input ran out of data")
+
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from download_dataset import ensure_dataset
@@ -45,14 +49,14 @@ from download_dataset import ensure_dataset
 CONFIG = {
     "PATCH_SIZE": (400, 400),
     "STRIDE": 200,
-    "BATCH_SIZE": 64,
+    "BATCH_SIZE": 128,
     "EPOCHS_INIT": 50,
     "EPOCHS_FT": 10,
     "THR": 0.0054,  # Threshold for filtering empty patches
     "DATA_DIR": "./data",
     "CSV_PATH": "./data/NewAgeSplit.csv",
-    "MODELS_DIR": "./models/cv_strat_group",
-    "RESULTS_DIR": "./results/cv_predictions"
+    "MODELS_DIR": "./models/experiment_03",
+    "RESULTS_DIR": "./results/experiment_03"
 }
 
 # --- Data Processing Functions ---
@@ -139,7 +143,8 @@ def advanced_augmentation(image, label):
     image = tf.image.resize(image, new_size)
     image = tf.image.resize_with_crop_or_pad(image, orig_shape[0], orig_shape[1])
 
-    # Contrast & Noise
+    # Brightness, Contrast & Noise
+    image = tf.image.random_brightness(image, max_delta=0.1)
     image = tf.image.random_contrast(image, lower=0.75, upper=1.25)
     noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=0.05)
     image = tf.clip_by_value(image + noise, 0., 1.)
@@ -189,25 +194,6 @@ def build_sota_model(base_model_fn, input_shape=(400, 400, 3), dropout_rate=0.5)
 
 # --- Evaluation Helpers ---
 
-def group_predictions_by_image_id(predictions_with_ids, labels_df):
-    grouped_predictions = defaultdict(list)
-    grouped_labels = defaultdict(list)
-    
-    for pred, image_id in predictions_with_ids:
-        image_id_str = image_id.decode('utf-8')
-        grouped_predictions[image_id_str].append(pred)
-        
-    for _, row in labels_df.iterrows():
-        file_id = row['File']
-        if file_id in grouped_predictions:
-            grouped_labels[file_id].append(row['Age'])
-            
-    common_ids = set(grouped_predictions.keys()) & set(grouped_labels.keys())
-    predicted_images = [np.mean(grouped_predictions[img_id]) for img_id in common_ids]
-    true_images = [np.mean(grouped_labels[img_id]) for img_id in common_ids]
-    
-    return np.array(predicted_images), np.array(true_images)
-
 def compute_evaluation_metrics(true_images, predicted_images):
     mae = mean_absolute_error(true_images, predicted_images)
     rmse = np.sqrt(mean_squared_error(true_images, predicted_images))
@@ -217,91 +203,229 @@ def compute_evaluation_metrics(true_images, predicted_images):
     with np.errstate(divide='ignore', invalid='ignore'):
         mape = np.mean(np.abs((true_images - predicted_images) / true_images)) * 100
         if np.isnan(mape): mape = 0.0
-    
-    # Calculate accuracy within thresholds
+
+    # Threshold-based accuracy and error statistics
     errors = np.abs(true_images - predicted_images)
-    within_2 = np.mean(errors <= 2) * 100
-    within_5 = np.mean(errors <= 5) * 100
-    
-    metrics = {"MAE": mae, "RMSE": rmse, "R2": r2, "MAPE": mape, "Acc_2yr": within_2, "Acc_5yr": within_5}
+    metrics = {
+        "MAE": mae,
+        "RMSE": rmse,
+        "R2": r2,
+        "MAPE": mape,
+        "Acc_2yr": np.mean(errors <= 2) * 100,
+        "Acc_5yr": np.mean(errors <= 5) * 100,
+        "Acc_10yr": np.mean(errors <= 10) * 100,
+        "Max_Error": float(np.max(errors)),
+        "Median_Error": float(np.median(errors)),
+        "Min_Error": float(np.min(errors)),
+    }
     return metrics
+
+# --- Training callbacks (logging, matched to experiment 01) ---
+
+class BestModelLogger(tf.keras.callbacks.Callback):
+    """Print a single line whenever val_mae improves and the model is saved.
+
+    Mirrors ModelCheckpoint's improvement criterion (strictly lower ``val_mae``)
+    so the message aligns with the actual save, without Keras 3's duplicated
+    "improved ... saving" / "finished saving" output.
+    """
+
+    def __init__(self, save_path, monitor="val_mae"):
+        super().__init__()
+        self.save_path = str(save_path)
+        self.monitor = monitor
+        self.best = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        current = (logs or {}).get(self.monitor)
+        if current is None:
+            return
+        if self.best is None or current < self.best:
+            prev = "inf" if self.best is None else f"{self.best:.5f}"
+            print(f"Epoch {epoch + 1}: {self.monitor} improved from {prev} to "
+                  f"{current:.5f}; saved model to {self.save_path}")
+            self.best = current
+
+
+class EpochCSVLogger(tf.keras.callbacks.Callback):
+    """Append one row per epoch to a CSV, flushing immediately.
+
+    Saved alongside the fold checkpoint so the curves travel with the weights
+    (e.g. to Google Drive on Colab) and survive a mid-training crash. Columns:
+    ``model, phase, epoch`` followed by every Keras log metric. Set
+    ``overwrite=True`` for the first phase and ``False`` to append later phases.
+    """
+
+    def __init__(self, log_path, model_name, phase, overwrite):
+        super().__init__()
+        self.log_path = str(log_path)
+        self.model_name = model_name
+        self.phase = phase
+        self.overwrite = overwrite
+        self._fieldnames = None
+        self._fh = None
+        self._writer = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        row = {"model": self.model_name, "phase": self.phase, "epoch": epoch + 1}
+        row.update({key: float(value) for key, value in logs.items()})
+
+        if self._writer is None:
+            if not self.overwrite and os.path.exists(self.log_path):
+                with open(self.log_path, newline="") as fh:
+                    self._fieldnames = next(csv.reader(fh), None) or list(row.keys())
+                mode, write_header = "a", False
+            else:
+                self._fieldnames = list(row.keys())
+                mode, write_header = "w", True
+            self._fh = open(self.log_path, mode, newline="")
+            self._writer = csv.DictWriter(self._fh, fieldnames=self._fieldnames,
+                                          extrasaction="ignore", restval="")
+            if write_header:
+                self._writer.writeheader()
+
+        self._writer.writerow(row)
+        self._fh.flush()
+
+    def on_train_end(self, logs=None):
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = self._writer = None
+
 
 # --- CV Logic ---
 
+def _make_callbacks(save_path, log_path, model_tag, phase, best_so_far=None):
+    """Build the experiment-01 callback stack for one training phase.
+
+    ``best_so_far`` carries the previous phase's best val_mae into the checkpoint
+    and logger so a phase overwrites the single fold checkpoint only when it
+    actually improves on it (Phase 2 vs. Phase 1). Returns the callback list and
+    the BestModelLogger (whose ``.best`` holds the phase's best val_mae).
+    """
+    best_logger = BestModelLogger(save_path, monitor="val_mae")
+    checkpoint = ModelCheckpoint(str(save_path), monitor="val_mae",
+                                 save_best_only=True, mode="min", verbose=0)
+    if best_so_far is not None:
+        best_logger.best = best_so_far
+        checkpoint.best = best_so_far
+    callbacks = [
+        checkpoint,
+        best_logger,
+        ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
+        EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
+        EpochCSVLogger(log_path, model_tag, phase, overwrite=(phase == "frozen")),
+    ]
+    return callbacks, best_logger
+
+
 def run_cv(df_full, base_model_fn, model_name, n_splits=5):
-    # 1. Prepare Folds
+    """Train one backbone with k-fold CV; return (per-fold metrics, OOF predictions).
+
+    Each fold is trained exactly like experiment 01: a frozen Phase 1 then a
+    fine-tuning Phase 2 rebuilt from the best Phase 1 checkpoint. The two phases
+    share a single ``{model}_fold{fold}_best_model.keras`` checkpoint with
+    carry-forward (Phase 2 overwrites it only when it beats Phase 1); the Phase 1
+    graph is freed before Phase 2 (unfreezing the backbone roughly triples
+    memory); and a ``.done`` marker — written only after Phase 2 — makes a
+    crashed fold retrain from scratch instead of being mistaken for finished.
+    The best checkpoint is reloaded from disk for the out-of-fold evaluation.
+    """
     sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=42)
     splits = list(sgkf.split(df_full.index, df_full["AgeGroup"], df_full["WriterNumber"]))
-    
+
     ckpt_dir = os.path.join(CONFIG["MODELS_DIR"], model_name)
     os.makedirs(ckpt_dir, exist_ok=True)
     fold_metrics = []
+    oof_records = []
 
     for fold, (train_idx, val_idx) in enumerate(splits, start=1):
         print(f"\n── {model_name} Fold {fold}/{n_splits} ──")
 
-        # 2. Slice Dataframes
         train_df = df_full.iloc[train_idx].reset_index(drop=True)
         val_df = df_full.iloc[val_idx].reset_index(drop=True)
 
-        # 3. Datasets
-        train_ds = patch_data_tf_dataset_from_df(train_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=True)
-        val_ds = patch_data_tf_dataset_from_df(val_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=False)
+        save_path = os.path.join(ckpt_dir, f"{model_name}_fold{fold}_best_model.keras")
+        done_path = os.path.join(ckpt_dir, f"{model_name}_fold{fold}.done")
+        log_path = os.path.join(ckpt_dir, f"{model_name}_fold{fold}_training_log.csv")
+        model_tag = f"{model_name}_fold{fold}"
 
-        # 4. Phase 1: Frozen Training
-        model = build_sota_model(base_model_fn, input_shape=(*CONFIG["PATCH_SIZE"], 3))
-        model.layers[1].trainable = False
-        model.compile(optimizer="adam", loss="mse", metrics=["mae"])
-
-        ckpt_init = os.path.join(ckpt_dir, f"{model_name}_fold{fold}_init.keras")
-        # Check if already trained
-        if os.path.exists(ckpt_init):
-            print(f"Loading existing init model: {ckpt_init}")
-            model.load_weights(ckpt_init)
+        # Skip training only when the fold fully completed: the .done marker is
+        # written after Phase 2. The .keras alone is not enough, since
+        # save_best_only writes it as early as epoch 1.
+        if os.path.exists(done_path) and os.path.exists(save_path):
+            print(f"Found completed fold {fold}; loading from disk for evaluation.")
         else:
-            callbacks = [
-                ModelCheckpoint(ckpt_init, monitor="val_mae", save_best_only=True, verbose=1),
-                ReduceLROnPlateau(monitor="val_mae", factor=0.2, patience=4, verbose=1),
-                EarlyStopping(monitor="val_mae", patience=8, restore_best_weights=True, verbose=1)
-            ]
-            model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"], callbacks=callbacks, verbose=2)
+            if os.path.exists(save_path):
+                print(f"Found incomplete checkpoint for {model_tag} (no .done marker); "
+                      f"retraining from scratch.")
 
-        # 5. Phase 2: Fine-Tuning
-        model.load_weights(ckpt_init) # Ensure we start from best frozen weights
-        model.layers[1].trainable = True
-        model.compile(optimizer=tf.keras.optimizers.Adam(1e-4), loss="mse", metrics=["mae"])
+            train_ds = patch_data_tf_dataset_from_df(train_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=True)
+            val_ds = patch_data_tf_dataset_from_df(val_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=False)
 
-        ckpt_ft = os.path.join(ckpt_dir, f"{model_name}_fold{fold}_finetune.keras")
-        if os.path.exists(ckpt_ft):
-             print(f"Loading existing finetuned model: {ckpt_ft}")
-             model.load_weights(ckpt_ft)
-        else:
-            callbacks_ft = [
-                ModelCheckpoint(ckpt_ft, monitor="val_mae", save_best_only=True, verbose=1),
-                ReduceLROnPlateau(monitor="val_mae", factor=0.2, patience=4, verbose=1),
-                EarlyStopping(monitor="val_mae", patience=8, restore_best_weights=True, verbose=1)
-            ]
-            model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"], callbacks=callbacks_ft, verbose=2)
+            # --- Phase 1: frozen backbone ---
+            print("Phase 1: frozen backbone")
+            model = build_sota_model(base_model_fn, input_shape=(*CONFIG["PATCH_SIZE"], 3))
+            model.layers[1].trainable = False
+            callbacks, best_logger = _make_callbacks(save_path, log_path, model_tag, "frozen")
+            model.compile(optimizer=tf.keras.optimizers.Adam(1e-3), loss="mse", metrics=["mae"])
+            model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"],
+                      callbacks=callbacks, verbose=2)
+            phase1_best_mae = best_logger.best
 
-        # 6. Evaluate Fold (Image Level)
+            # Free the Phase 1 graph/optimizer before building Phase 2.
+            del model, callbacks, best_logger
+            gc.collect()
+            tf.keras.backend.clear_session()
+
+            # --- Phase 2: fine-tuning, rebuilt from the best Phase 1 checkpoint ---
+            print("Phase 2: fine-tuning")
+            model = load_model(save_path)
+            for layer in model.layers:
+                layer.trainable = True
+            callbacks_p2, _ = _make_callbacks(save_path, log_path, model_tag, "fine_tune",
+                                              best_so_far=phase1_best_mae)
+            model.compile(optimizer=tf.keras.optimizers.Adam(1e-4), loss="mse", metrics=["mae"])
+            model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"],
+                      callbacks=callbacks_p2, verbose=2)
+            print(f"Saved training log to {log_path}")
+
+            with open(done_path, "w") as fh:
+                fh.write(f"{model_tag} training complete\n")
+            del model, train_ds, val_ds, callbacks_p2
+            gc.collect()
+            tf.keras.backend.clear_session()
+
+        # --- Evaluate fold at image level (OOF), from the best checkpoint on disk ---
+        model = load_model(save_path)
         val_ids_ds = patch_data_tf_dataset_with_ids_from_df(val_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=False)
-        
-        preds = []
+        preds_per_image = defaultdict(list)
         for patches, _, img_ids in val_ids_ds:
             p = model.predict(patches, verbose=0).ravel()
-            preds.extend(zip(p, img_ids.numpy()))
+            for value, iid in zip(p, img_ids.numpy()):
+                preds_per_image[iid.decode("utf-8")].append(float(value))
 
-        y_pred, y_true = group_predictions_by_image_id(preds, val_df)
-        metrics = compute_evaluation_metrics(y_true, y_pred)
+        true_map = dict(zip(val_df["File"], val_df["Age"]))
+        y_true, y_pred = [], []
+        for iid, plist in preds_per_image.items():
+            if iid in true_map:
+                mean_pred = float(np.mean(plist))
+                y_true.append(float(true_map[iid]))
+                y_pred.append(mean_pred)
+                oof_records.append({"Model": model_name, "Fold": fold, "ImageID": iid,
+                                    "Prediction": mean_pred, "TrueAge": float(true_map[iid])})
+
+        metrics = compute_evaluation_metrics(np.array(y_true), np.array(y_pred))
         fold_metrics.append(metrics)
-        print(f"Fold {fold} Metrics: MAE={metrics['MAE']:.2f}, R2={metrics['R2']:.2f}")
+        print(f"Fold {fold}: MAE={metrics['MAE']:.2f}, RMSE={metrics['RMSE']:.2f}, R2={metrics['R2']:.2f}")
 
-        # Cleanup
-        del model, train_ds, val_ds, val_ids_ds
+        # Free this fold before the next one.
+        del model, val_ids_ds, preds_per_image
         gc.collect()
         tf.keras.backend.clear_session()
 
-    return fold_metrics
+    return fold_metrics, oof_records
 
 # --- Final Inference & Ensembling ---
 
@@ -316,7 +440,7 @@ def predict_on_test_set(models_dict, test_df):
 
     for model_name, folds_to_run in models_dict.items():
         for fold in folds_to_run:
-            ckpt_path = os.path.join(CONFIG["MODELS_DIR"], model_name, f"{model_name}_fold{fold}_finetune.keras")
+            ckpt_path = os.path.join(CONFIG["MODELS_DIR"], model_name, f"{model_name}_fold{fold}_best_model.keras")
             
             if not os.path.exists(ckpt_path):
                 print(f"Warning: Checkpoint not found {ckpt_path}, skipping.")
@@ -381,35 +505,116 @@ def predict_on_test_set(models_dict, test_df):
 
 # --- Main Execution ---
 
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
+    try:
+        import google.colab  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def resolve_output_dirs():
+    """On Colab, redirect model/result output to mounted Google Drive.
+
+    Everything under /content is wiped on a Colab runtime crash, which would
+    destroy the fold checkpoints (and their .done markers) mid-run. Persisting
+    to Drive lets a rerun resume from the last completed phase. Local runs keep
+    the repo-relative defaults unchanged.
+    """
+    if not _in_colab():
+        return
+    drive_root = "/content/drive"
+    persist_base = os.path.join(drive_root, "MyDrive", "Age_Estimation", "03_CNN_CrossVal")
+    try:
+        if not os.path.exists(os.path.join(drive_root, "MyDrive")):
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to persist trained models...")
+            drive.mount(drive_root)
+        if os.path.exists(os.path.join(drive_root, "MyDrive")):
+            CONFIG["MODELS_DIR"] = os.path.join(persist_base, "models")
+            CONFIG["RESULTS_DIR"] = os.path.join(persist_base, "results")
+            print(f"Persisting outputs to Google Drive: {persist_base}")
+            return
+    except Exception as exc:  # pragma: no cover - environment dependent
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    print("WARNING: Drive unavailable; trained models will be LOST if the "
+          "Colab runtime crashes.")
+
+
+def save_cv_results(all_fold_metrics, all_oof_records):
+    """Persist OOF predictions, per-fold metrics, and the mean±std CV summary.
+
+    ``oof_predictions.csv`` is the input consumed by reproduce_results.py's fast
+    path; ``cv_metrics_summary.csv`` reproduces the paper's individual-model CV
+    table (mean ± std across folds).
+    """
+    out_dir = CONFIG["RESULTS_DIR"]
+    os.makedirs(out_dir, exist_ok=True)
+
+    oof_path = os.path.join(out_dir, "oof_predictions.csv")
+    pd.DataFrame(all_oof_records).to_csv(oof_path, index=False)
+    print(f"\nSaved OOF predictions to {oof_path} ({len(all_oof_records)} rows)")
+
+    per_fold_rows = []
+    for model_name, fms in all_fold_metrics.items():
+        for i, fm in enumerate(fms, start=1):
+            row = {"Model": model_name, "Fold": i}
+            row.update(fm)
+            per_fold_rows.append(row)
+    per_fold_path = os.path.join(out_dir, "cv_metrics_per_fold.csv")
+    pd.DataFrame(per_fold_rows).to_csv(per_fold_path, index=False)
+    print(f"Saved per-fold metrics to {per_fold_path}")
+
+    metric_keys = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr", "Acc_10yr",
+                   "Max_Error", "Median_Error", "Min_Error"]
+    summary_rows = []
+    print("\n────── CV SUMMARY (mean ± std across folds) ──────")
+    for model_name, fms in all_fold_metrics.items():
+        if not fms:
+            continue
+        row = {"Model": model_name}
+        print(f"\n{model_name}:")
+        for k in metric_keys:
+            arr = np.array([fm[k] for fm in fms], dtype=float)
+            row[f"{k}_mean"], row[f"{k}_std"] = arr.mean(), arr.std()
+            print(f"  {k:<13}: {arr.mean():.2f} ± {arr.std():.2f}")
+        summary_rows.append(row)
+    summary_path = os.path.join(out_dir, "cv_metrics_summary.csv")
+    pd.DataFrame(summary_rows).to_csv(summary_path, index=False)
+    print(f"\nSaved CV summary to {summary_path}")
+
+
 def main():
+    resolve_output_dirs()  # redirect outputs to Google Drive on Colab (crash-safe)
     if not os.path.exists(CONFIG["CSV_PATH"]):
         print(f"Error: CSV not found at {CONFIG['CSV_PATH']}")
         return
 
     df_full = pd.read_csv(CONFIG["CSV_PATH"])
-    
-    # 1. Run Cross-Validation Training
+
+    # Backbones, ordered as in the original training script.
     models_to_run = {
         'ResNet50': ResNet50,
-        'InceptionV3': InceptionV3,
         'DenseNet121': DenseNet121,
+        'InceptionV3': InceptionV3,
         'InceptionResNetV2': InceptionResNetV2,
-        'EfficientNetV2M': EfficientNetV2M
+        'EfficientNetV2M': EfficientNetV2M,
     }
-    
-    for name, architecture in models_to_run.items():
-        run_cv(df_full, architecture, name, n_splits=5)
 
-    # 2. Run Inference on Test Set
-    # We use ALL 5 folds for ALL models
-    inference_map = {
-        'ResNet50': [1, 2, 3, 4, 5],
-        'InceptionV3': [1, 2, 3, 4, 5],
-        'DenseNet121': [1, 2, 3, 4, 5],
-        'InceptionResNetV2': [1, 2, 3, 4, 5],
-        'EfficientNetV2M': [1, 2, 3, 4, 5]
-    }
-    
+    # 1. Cross-validation training + out-of-fold evaluation (paper CV table).
+    all_fold_metrics = {}
+    all_oof_records = []
+    for name, architecture in models_to_run.items():
+        fold_metrics, oof_records = run_cv(df_full, architecture, name, n_splits=5)
+        all_fold_metrics[name] = fold_metrics
+        all_oof_records.extend(oof_records)
+
+    save_cv_results(all_fold_metrics, all_oof_records)
+
+    # 2. Test-set inference + cross-fold ensemble (kept for completeness; not part
+    #    of the paper's individual-model CV table).
+    inference_map = {name: [1, 2, 3, 4, 5] for name in models_to_run}
     test_df = df_full[df_full['Set'] == 'test'].reset_index(drop=True)
     predict_on_test_set(inference_map, test_df)
 

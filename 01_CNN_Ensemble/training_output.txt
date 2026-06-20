@@ -1,0 +1,34 @@
+Validation MAE per model:
+  ResNet50             3.5851
+  DenseNet121          4.1681
+  InceptionV3          3.7697
+  InceptionResNetV2    4.3140
+  EfficientNetV2M      3.1751
+  [Full Ensemble] grid-search best validation MAE: 3.1440
+  [Best 4] grid-search best validation MAE: 3.1466
+  [Best 3] grid-search best validation MAE: 3.1426
+  [Best 2] grid-search best validation MAE: 3.6310
+
+=== Ensemble Evaluation Summary (test set) ===
+Ensemble Group      Method                                                                                                       Weights      MAE     RMSE        R2  MAPE (%)  Within ±2 Years (%)  Within ±5 Years (%)  Within ±10 Years (%)  Max Error  Median Error
+ Full Ensemble Grid Search   {'ResNet50': 0.1, 'InceptionV3': 0.1, 'InceptionResNetV2': 0.3, 'DenseNet121': 0.3, 'EfficientNetV2M': 0.2} 2.728212 6.087504  0.073714 13.934405            72.413793            88.793103             96.551724  32.421652      1.224001
+        Best 4 Grid Search                           {'ResNet50': 0.1, 'InceptionResNetV2': 0.4, 'DenseNet121': 0.4, 'InceptionV3': 0.1} 2.731099 6.053748  0.083958 14.128678            71.551724            87.068966             96.551724  31.783213      1.197116
+        Best 3 Grid Search                                               {'ResNet50': 0.1, 'InceptionResNetV2': 0.4, 'DenseNet121': 0.5} 2.748462 6.054549  0.083716 14.124724            71.551724            87.068966             96.551724  31.346272      1.151805
+        Best 3   MAE-based                                            {'ResNet50': 0.35, 'InceptionResNetV2': 0.32, 'DenseNet121': 0.33} 2.757967 6.109748  0.066932 14.160588            70.689655            88.793103             96.551724  32.342753      1.114967
+ Full Ensemble   MAE-based {'ResNet50': 0.2, 'InceptionV3': 0.2, 'InceptionResNetV2': 0.19, 'DenseNet121': 0.2, 'EfficientNetV2M': 0.21} 2.759695 6.125242  0.062194 14.119722            67.241379            89.655172             96.551724  33.076013      1.117456
+        Best 4   MAE-based                       {'ResNet50': 0.26, 'InceptionResNetV2': 0.24, 'DenseNet121': 0.25, 'InceptionV3': 0.25} 2.817294 6.104003  0.068686 14.664211            59.482759            87.068966             96.551724  32.746525      1.130506
+        Best 2 Grid Search                                                                   {'ResNet50': 0.9, 'InceptionResNetV2': 0.1} 3.177897 6.375778 -0.016092 16.604733            50.862069            93.103448             95.689655  34.363128      1.905615
+        Best 2   MAE-based                                                                 {'ResNet50': 0.55, 'InceptionResNetV2': 0.45} 3.448536 6.386259 -0.019435 18.657465            44.827586            89.655172             96.551724  33.714895      2.148418
+
+Ensemble test MAE vs. results.md:
+  Group           Method           MAE  reported   status
+  Full Ensemble   Grid Search     2.73      3.01   FAIL
+  Best 4          Grid Search     2.73      2.93   FAIL
+  Best 3          Grid Search     2.75      2.86   FAIL
+  Best 3          MAE-based       2.76      2.86   FAIL
+  Full Ensemble   MAE-based       2.76      3.77   FAIL
+  Best 4          MAE-based       2.82      3.14   FAIL
+  Best 2          Grid Search     3.18      3.24   FAIL
+  Best 2          MAE-based       3.45      3.35   FAIL
+
+Summary saved to /content/drive/MyDrive/Age_Estimation/01_CNN_Ensemble/results/ensemble_evaluation_summary.csv

@@ -1,4 +1,4 @@
-# Experiment 05 — SOTA CNN Cross-Validation: Results
+# Experiment 03 — SOTA CNN Cross-Validation: Results
 
 > **Role in paper:** Table 2 (top section) — CNN individual models, 5-fold stratified group CV.
 > Results reported as mean ± std across 5 folds. Folds are stratified by AgeGroup and grouped
