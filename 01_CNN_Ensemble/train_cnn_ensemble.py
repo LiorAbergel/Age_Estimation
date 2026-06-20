@@ -372,9 +372,10 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
 
         model, base_model = build_sota_model(architecture)
         log_path = models_dir / f"{name}_training_log.csv"
+        best_logger = BestModelLogger(save_path, monitor="val_mae")
         callbacks = [
             ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=0),
-            BestModelLogger(save_path, monitor="val_mae"),
+            best_logger,
             ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
             EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
         ]
@@ -384,11 +385,39 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
         model.fit(train_ds, validation_data=val_ds, epochs=epochs_frozen, verbose=2,
                   callbacks=callbacks + [EpochCSVLogger(log_path, name, "frozen", overwrite=True)])
 
+        # ---- Free Phase 1 graph/optimizer before building Phase 2 ----
+        # Phase 2 unfreezes the entire backbone, which roughly triples memory
+        # (Adam keeps two state tensors per trainable parameter).  Without this
+        # cleanup TF tries to allocate the Phase 2 graph while Phase 1's graph
+        # and optimizer state still occupy GPU memory, causing OOM on Colab.
+        phase1_best_mae = best_logger.best
+        del model, base_model, callbacks, best_logger
+        tf.keras.backend.clear_session()
+        gc.collect()
+
+        # Rebuild from the best Phase 1 checkpoint with all layers trainable.
         print("Phase 2: fine-tuning")
-        base_model.trainable = True
+        model = load_model(save_path)
+        for layer in model.layers:
+            layer.trainable = True
+
+        # Carry Phase 1's best val_mae forward so the checkpoint is only
+        # overwritten when Phase 2 actually improves on it.
+        phase2_logger = BestModelLogger(save_path, monitor="val_mae")
+        phase2_logger.best = phase1_best_mae
+        checkpoint_p2 = ModelCheckpoint(str(save_path), monitor="val_mae",
+                                        save_best_only=True, mode="min", verbose=0)
+        checkpoint_p2.best = phase1_best_mae
+        callbacks_p2 = [
+            checkpoint_p2,
+            phase2_logger,
+            ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
+            EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
+        ]
+
         model.compile(optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR), loss="mse", metrics=["mae"])
         model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune, verbose=2,
-                  callbacks=callbacks + [EpochCSVLogger(log_path, name, "fine_tune", overwrite=False)])
+                  callbacks=callbacks_p2 + [EpochCSVLogger(log_path, name, "fine_tune", overwrite=False)])
         print(f"Saved training log to {log_path}")
 
         # Mark training as fully complete so reruns skip this backbone.
@@ -398,7 +427,7 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
         # Release this backbone before training the next one: the best weights
         # are safely on disk, so free GPU/host memory and reset the Keras
         # session to keep only a single model resident at a time.
-        del model, base_model
+        del model
         tf.keras.backend.clear_session()
         gc.collect()
     return available
