@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gc
 import itertools
 import os
 import sys
@@ -330,11 +331,17 @@ class EpochCSVLogger(tf.keras.callbacks.Callback):
             self._fh = self._writer = None
 
 
-def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) -> dict:
-    """Train (or load) each backbone: a frozen phase followed by fine-tuning."""
+def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) -> list:
+    """Train (or load) each backbone: a frozen phase followed by fine-tuning.
+
+    Returns the list of available backbone names. The best weights live on disk
+    (see ModelCheckpoint), so trained models are NOT kept resident in GPU
+    memory: each is freed before the next backbone and reloaded one-at-a-time
+    for inference.
+    """
     models_dir = Path(models_dir)
     models_dir.mkdir(parents=True, exist_ok=True)
-    trained = {}
+    available = []
 
     for name, architecture in ARCHITECTURES.items():
         print(f"\n{'=' * 30}\n{name}\n{'=' * 30}")
@@ -345,8 +352,8 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
         # ModelCheckpoint saves it as early as epoch 1 (so a crashed run leaves a
         # partial checkpoint that must NOT be treated as finished).
         if done_path.is_file() and save_path.is_file():
-            print(f"Found completed {name}; loading {save_path}.")
-            trained[name] = load_model(save_path)
+            print(f"Found completed {name}; will load from disk for inference.")
+            available.append(name)
             continue
         if save_path.is_file():
             print(f"Found incomplete checkpoint for {name} (no '{done_path.name}' "
@@ -363,44 +370,59 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
 
         print("Phase 1: frozen backbone")
         model.compile(optimizer=tf.keras.optimizers.Adam(FROZEN_LR), loss="mse", metrics=["mae"])
-        model.fit(train_ds, validation_data=val_ds, epochs=epochs_frozen,
+        model.fit(train_ds, validation_data=val_ds, epochs=epochs_frozen, verbose=2,
                   callbacks=callbacks + [EpochCSVLogger(log_path, name, "frozen", overwrite=True)])
 
         print("Phase 2: fine-tuning")
         base_model.trainable = True
         model.compile(optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR), loss="mse", metrics=["mae"])
-        model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune,
+        model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune, verbose=2,
                   callbacks=callbacks + [EpochCSVLogger(log_path, name, "fine_tune", overwrite=False)])
         print(f"Saved training log to {log_path}")
 
         # Mark training as fully complete so reruns skip this backbone.
         done_path.write_text(f"{name} training complete\n")
+        available.append(name)
 
-        trained[name] = model
-    return trained
+        # Release this backbone before training the next one: the best weights
+        # are safely on disk, so free GPU/host memory and reset the Keras
+        # session to keep only a single model resident at a time.
+        del model, base_model
+        tf.keras.backend.clear_session()
+        gc.collect()
+    return available
 
 
 # ===========================================================================
 # Inference / prediction caching
 # ===========================================================================
-def cache_patch_predictions(trained_models, dataset, csv_path) -> pd.DataFrame:
-    """Write per-patch predictions to ``csv_path`` (resumable); return the DataFrame."""
+def cache_patch_predictions(model_names, models_dir, dataset, csv_path) -> pd.DataFrame:
+    """Write per-patch predictions to ``csv_path`` (resumable); return the DataFrame.
+
+    Models are loaded from disk one at a time and freed afterwards, so only a
+    single backbone is resident in GPU memory during inference.
+    """
     csv_path = Path(csv_path)
     if csv_path.is_file():
         print(f"Predictions exist at {csv_path}; skipping inference.")
         return pd.read_csv(csv_path)
 
+    models_dir = Path(models_dir)
     print(f"Generating patch-level predictions -> {csv_path}")
     with open(csv_path, "w", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["Model", "ImageID", "PatchIndex", "Prediction"])
-        for name, model in trained_models.items():
+        for name in model_names:
+            model = load_model(models_dir / f"{name}_best_model.keras")
             patch_idx = 0
             for patches, _, ids in tqdm(dataset, desc=name):
                 preds = model.predict(patches, verbose=0).flatten()
                 for i, pred in enumerate(preds):
                     writer.writerow([name, ids.numpy()[i].decode("utf-8"), patch_idx + i, pred])
                 patch_idx += len(preds)
+            del model
+            tf.keras.backend.clear_session()
+            gc.collect()
     return pd.read_csv(csv_path)
 
 
@@ -599,8 +621,8 @@ def main(argv=None):
     val_ds_train = create_dataset(args.data_dir, labels_df, "val", args.batch_size, augment=False)
 
     # Train (or load cached weights)
-    trained_models = train_models(train_ds, val_ds_train, models_dir,
-                                  args.epochs_frozen, args.epochs_fine_tune)
+    model_names = train_models(train_ds, val_ds_train, models_dir,
+                               args.epochs_frozen, args.epochs_fine_tune)
 
     # Inference datasets carry image ids for per-image aggregation
     print("Creating inference datasets...")
@@ -608,8 +630,8 @@ def main(argv=None):
     test_ds = create_dataset(args.data_dir, labels_df, "test", args.batch_size, augment=False, include_id=True)
 
     # Cache patch-level predictions, then aggregate to per-image pivots
-    val_patch_df = cache_patch_predictions(trained_models, val_ds, results_dir / "val_patch_level_predictions.csv")
-    test_patch_df = cache_patch_predictions(trained_models, test_ds, results_dir / "patch_level_predictions.csv")
+    val_patch_df = cache_patch_predictions(model_names, models_dir, val_ds, results_dir / "val_patch_level_predictions.csv")
+    test_patch_df = cache_patch_predictions(model_names, models_dir, test_ds, results_dir / "patch_level_predictions.csv")
 
     val_pivot = image_level_pivot(val_patch_df)
     test_pivot = image_level_pivot(test_patch_df)
