@@ -71,6 +71,7 @@ warnings.filterwarnings("ignore", message="Your input ran out of data")
 PATCH_SIZE = (400, 400)
 STRIDE = 200
 STANDARD_SIZE = 800
+THR = 0.0054             # mean-intensity threshold; near-blank patches are dropped
 BATCH_SIZE = 128          # used for the published results; lower if VRAM-limited
 EPOCHS_FROZEN = 50
 EPOCHS_FINE_TUNE = 10
@@ -163,6 +164,15 @@ def process_image(row, data_dir, include_id=False):
     )
     patches = tf.reshape(patches, [-1, PATCH_SIZE[0], PATCH_SIZE[1], 3])
     labels = tf.fill([tf.shape(patches)[0]], row["Age"])
+
+    # Drop near-blank (background) patches by mean intensity, matching the
+    # cross-validation and DiT pipelines so preprocessing is uniform across
+    # experiments. Affects both training and (id-carrying) inference datasets.
+    patch_means = tf.reduce_mean(patches, axis=[1, 2, 3])
+    mask = patch_means > THR
+    patches = tf.boolean_mask(patches, mask)
+    labels = tf.boolean_mask(labels, mask)
+
     if include_id:
         ids = tf.fill([tf.shape(patches)[0]], row["File"])
         return patches, labels, ids
@@ -174,7 +184,7 @@ rotation_layer = tf.keras.layers.RandomRotation(factor=0.04167)  # +/- 15 degree
 
 
 def advanced_augmentation(image, label):
-    """Random rotation (+/-15 deg), zoom (0.9-1.1), brightness, and Gaussian noise."""
+    """Random rotation (+/-15 deg), zoom (0.9-1.1), brightness, contrast, and Gaussian noise."""
     image = rotation_layer(image, training=True)
 
     orig_shape = tf.shape(image)[:2]
@@ -184,6 +194,7 @@ def advanced_augmentation(image, label):
     image = tf.image.resize_with_crop_or_pad(image, orig_shape[0], orig_shape[1])
 
     image = tf.image.random_brightness(image, max_delta=0.1)
+    image = tf.image.random_contrast(image, lower=0.75, upper=1.25)
 
     noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=0.05)
     image = tf.clip_by_value(image + noise, 0.0, 1.0)

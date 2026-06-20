@@ -72,6 +72,7 @@ GRID_STEP = 0.1  # weight resolution for the grid search
 PATCH_SIZE = (400, 400)
 STRIDE = 200
 STANDARD_SIZE = 800
+THR = 0.0054  # empty-patch filter threshold (matches the training pipeline)
 INFERENCE_BATCH_SIZE = 32  # does not affect predictions
 
 # ---------------------------------------------------------------------------
@@ -361,6 +362,9 @@ def run_full_inference(labels_df, data_dir, weights_dir):
             padding="VALID",
         )
         patches = tf.reshape(patches, [-1, PATCH_SIZE[0], PATCH_SIZE[1], 3])
+        # Drop near-blank (background) patches, matching the training pipeline.
+        patch_means = tf.reduce_mean(patches, axis=[1, 2, 3])
+        patches = tf.boolean_mask(patches, patch_means > THR)
         ids = tf.fill([tf.shape(patches)[0]], row["File"])
         return patches, ids
 
