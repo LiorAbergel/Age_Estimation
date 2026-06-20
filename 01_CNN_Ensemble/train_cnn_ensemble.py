@@ -339,10 +339,18 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
     for name, architecture in ARCHITECTURES.items():
         print(f"\n{'=' * 30}\n{name}\n{'=' * 30}")
         save_path = models_dir / f"{name}_best_model.keras"
-        if save_path.is_file():
-            print(f"Found {save_path}; loading.")
+        done_path = models_dir / f"{name}.done"
+        # Skip only when training fully completed: the .done marker is written
+        # after Phase 2. The .keras checkpoint alone is not enough, since
+        # ModelCheckpoint saves it as early as epoch 1 (so a crashed run leaves a
+        # partial checkpoint that must NOT be treated as finished).
+        if done_path.is_file() and save_path.is_file():
+            print(f"Found completed {name}; loading {save_path}.")
             trained[name] = load_model(save_path)
             continue
+        if save_path.is_file():
+            print(f"Found incomplete checkpoint for {name} (no '{done_path.name}' "
+                  f"marker); retraining from scratch.")
 
         model, base_model = build_sota_model(architecture)
         log_path = models_dir / f"{name}_training_log.csv"
@@ -364,6 +372,9 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
         model.fit(train_ds, validation_data=val_ds, epochs=epochs_fine_tune,
                   callbacks=callbacks + [EpochCSVLogger(log_path, name, "fine_tune", overwrite=False)])
         print(f"Saved training log to {log_path}")
+
+        # Mark training as fully complete so reruns skip this backbone.
+        done_path.write_text(f"{name} training complete\n")
 
         trained[name] = model
     return trained
