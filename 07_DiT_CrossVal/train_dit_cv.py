@@ -304,6 +304,7 @@ def run_full_cv():
                         if m["MAE"] < best_mae:
                             best_mae = m["MAE"]
                             torch.save(model.state_dict(), stage1_ckpt)
+                            print(f"    Val MAE improved to {best_mae:.3f}; saved model to {stage1_ckpt}")
                         print(f"  Ep {ep}: Loss {loss:.4f} | Val MAE {m['MAE']:.3f}")
 
                 # Stage 2: Full Fine-tuning
@@ -320,6 +321,7 @@ def run_full_cv():
                     if m["MAE"] < best_mae:
                         best_mae = m["MAE"]
                         torch.save(model.state_dict(), final_ckpt)
+                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {final_ckpt}")
                     print(f"  Ep {ep}: Loss {loss:.4f} | Val MAE {m['MAE']:.3f}")
 
             # Evaluate the best checkpoint on this fold's validation split

@@ -267,9 +267,9 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
 
         model, base_model = build_sota_model(architecture)
         callbacks = [
-            ModelCheckpoint(str(save_path), monitor="val_loss", save_best_only=True, mode="min", verbose=0),
-            ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=5, verbose=0),
-            EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True, verbose=1),
+            ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=1),
+            ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
+            EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
         ]
 
         print("Phase 1: frozen backbone")

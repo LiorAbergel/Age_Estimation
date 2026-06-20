@@ -506,6 +506,7 @@ def main():
                     if metrics["MAE"] < best_mae:
                         best_mae = metrics["MAE"]
                         torch.save(model.state_dict(), stage1_ckpt)
+                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {stage1_ckpt}")
             else:
                 print("Stage 1 already completed. Loading weights.")
                 model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
@@ -524,6 +525,7 @@ def main():
                     if metrics["MAE"] < best_mae:
                         best_mae = metrics["MAE"]
                         torch.save(model.state_dict(), final_ckpt)
+                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {final_ckpt}")
 
             if final_ckpt.exists():
                 model.load_state_dict(torch.load(final_ckpt, map_location=device))
