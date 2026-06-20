@@ -1,4 +1,4 @@
-tensorflow>=2.13,<2.16
+tensorflow>=2.13
 tf-keras
 keras-cv-attention-models
 kagglehub
