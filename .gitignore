@@ -33,5 +33,6 @@ Thumbs.db
 # Generated reproduction artifacts (downloaded weights + recomputed outputs)
 **/reproduction_output/
 01_CNN_Ensemble/weights/
+04_ViT/weights/
 
 paper/

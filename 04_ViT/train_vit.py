@@ -18,6 +18,7 @@ Requirements:
 
 import os
 import gc
+import csv
 
 # --- Colab Setup ---
 from google.colab import drive
@@ -42,7 +43,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D, Input
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 # Import architectures from external library
 # Ensure you have run: pip install keras-cv-attention-models
@@ -66,20 +67,14 @@ CONFIG = {
     "STRIDE": 200,
     "BATCH_SIZE": 128,
     "EPOCHS_INIT": 50,
-    "EPOCHS_FT": 30,
+    "EPOCHS_FT": 10,
     "LR_INIT": 1e-3,
     "LR_FT": 1e-4,
-    "WEIGHT_DECAY": 1e-4,
-    "WARMUP_EPOCHS": 5,
-    "CLIP_NORM": 1.0,
     "DATA_DIR": DATA_ROOT,
     "CSV_PATH": os.path.join(DATA_ROOT, 'NewAgeSplit.csv'),
-    "MODELS_DIR": os.path.join(DATA_ROOT, 'ViT2'),
-    "RESULTS_DIR": os.path.join(DATA_ROOT, 'ViT2', 'results')
+    "MODELS_DIR": os.path.join(DATA_ROOT, 'ViT'),
+    "RESULTS_DIR": os.path.join(DATA_ROOT, 'ViT', 'results')
 }
-
-# --- Mixed Precision ---
-tf.keras.mixed_precision.set_global_policy('mixed_float16')
 
 # --- Data Processing ---
 
@@ -150,17 +145,19 @@ def advanced_augmentation(image, label):
     image = tf.image.resize(image, new_size)
     image = tf.image.resize_with_crop_or_pad(image, orig_shape[0], orig_shape[1])
     image = tf.image.random_brightness(image, max_delta=0.1)
+    image = tf.image.random_contrast(image, lower=0.75, upper=1.25)
     noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=0.05)
     image = tf.clip_by_value(image + noise, 0.0, 1.0)
     return image, label
 
 def resize_for_model(patch, label, final_size):
     """Resizes the 400x400 patch to the model's expected input size (e.g. 224x224)."""
-    patch = tf.image.resize(patch, [final_size, final_size])
+    patch = tf.image.resize(patch, [final_size, final_size], method='bicubic')
     return patch, label
 
 def resize_for_model_with_id(patch, label, img_id, final_size):
-    patch = tf.image.resize(patch, [final_size, final_size])
+    # Use the same (bicubic) resize for inference as for training.
+    patch = tf.image.resize(patch, [final_size, final_size], method='bicubic')
     return patch, label, img_id
 
 # --- Dataset Generators ---
@@ -215,10 +212,85 @@ def build_backbone_regressor(backbone_fn, input_size, dropout=0.5, pretrained="i
 
     x = GlobalAveragePooling2D()(backbone.output)
     x = Dropout(dropout)(x)
-    # Use float32 for the output layer to maintain regression precision under mixed_float16
-    output = Dense(1, activation="linear", dtype="float32")(x)
-    
+    output = Dense(1, activation="linear")(x)
+
     return Model(backbone.input, output)
+
+# --- Training callbacks (matched to experiments 01 and 03) ---
+
+class BestModelLogger(tf.keras.callbacks.Callback):
+    """Print a single line whenever val_mae improves and the model is saved."""
+
+    def __init__(self, save_path, monitor="val_mae"):
+        super().__init__()
+        self.save_path = str(save_path)
+        self.monitor = monitor
+        self.best = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        current = (logs or {}).get(self.monitor)
+        if current is None:
+            return
+        if self.best is None or current < self.best:
+            prev = "inf" if self.best is None else f"{self.best:.5f}"
+            print(f"Epoch {epoch + 1}: {self.monitor} improved from {prev} to "
+                  f"{current:.5f}; saved model to {self.save_path}")
+            self.best = current
+
+
+class EpochCSVLogger(tf.keras.callbacks.Callback):
+    """Append one row per epoch to a CSV, flushing immediately."""
+
+    def __init__(self, log_path, model_name, phase, overwrite):
+        super().__init__()
+        self.log_path = str(log_path)
+        self.model_name = model_name
+        self.phase = phase
+        self.overwrite = overwrite
+        self._fieldnames = None
+        self._fh = None
+        self._writer = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        row = {"model": self.model_name, "phase": self.phase, "epoch": epoch + 1}
+        row.update({key: float(value) for key, value in logs.items()})
+
+        if self._writer is None:
+            if not self.overwrite and os.path.exists(self.log_path):
+                with open(self.log_path, newline="") as fh:
+                    self._fieldnames = next(csv.reader(fh), None) or list(row.keys())
+                mode, write_header = "a", False
+            else:
+                self._fieldnames = list(row.keys())
+                mode, write_header = "w", True
+            self._fh = open(self.log_path, mode, newline="")
+            self._writer = csv.DictWriter(self._fh, fieldnames=self._fieldnames,
+                                          extrasaction="ignore", restval="")
+            if write_header:
+                self._writer.writeheader()
+
+        self._writer.writerow(row)
+        self._fh.flush()
+
+    def on_train_end(self, logs=None):
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = self._writer = None
+
+
+def _make_callbacks(save_path, log_path, model_name, phase):
+    """Build the experiment-01/03 callback stack for one training phase."""
+    best_logger = BestModelLogger(save_path, monitor="val_mae")
+    callbacks = [
+        ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=0),
+        best_logger,
+        ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
+        EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
+        EpochCSVLogger(log_path, model_name, phase, overwrite=(phase == "frozen")),
+    ]
+    return callbacks, best_logger
+
 
 # --- Training Loop ---
 
@@ -239,75 +311,37 @@ def train_one_model(backbone_fn, input_size, labels_df, data_dir, model_name):
 
     # Build Model
     model = build_backbone_regressor(backbone_fn, input_size)
+    log_path = os.path.join(ckpt_root, f"{model_name}_training_log.csv")
 
-    # --- Phase 1: Frozen Backbone ---
+    # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
     print(f"[{model_name}] Phase 1: Frozen Training")
     for layer in model.layers[:-2]:
         layer.trainable = False
+    model.compile(optimizer=tf.keras.optimizers.Adam(CONFIG["LR_INIT"]), loss='mse', metrics=['mae'])
 
-    # Cosine decay with warmup for Phase 1
-    steps_per_epoch_est = 200  # approximate; adapts via callbacks
-    total_steps_p1 = CONFIG["EPOCHS_INIT"] * steps_per_epoch_est
-    warmup_steps_p1 = CONFIG["WARMUP_EPOCHS"] * steps_per_epoch_est
-
-    lr_schedule_p1 = tf.keras.optimizers.schedules.CosineDecay(
-        initial_learning_rate=1e-6,
-        decay_steps=total_steps_p1,
-        alpha=1e-6,
-        warmup_target=CONFIG["LR_INIT"],
-        warmup_steps=warmup_steps_p1
-    )
-    optimizer_p1 = tf.keras.optimizers.AdamW(
-        learning_rate=lr_schedule_p1,
-        weight_decay=CONFIG["WEIGHT_DECAY"],
-        clipnorm=CONFIG["CLIP_NORM"]
-    )
-    model.compile(optimizer=optimizer_p1, loss='mse', metrics=['mae'])
-    
     ckpt_init = os.path.join(ckpt_root, f"{model_name}_init.keras")
     if os.path.exists(ckpt_init):
         print(f"Loading existing init model: {ckpt_init}")
         model.load_weights(ckpt_init)
     else:
-        callbacks = [
-            ModelCheckpoint(ckpt_init, monitor='val_mae', save_best_only=True, verbose=1),
-            EarlyStopping(monitor='val_mae', patience=10, restore_best_weights=True)
-        ]
-        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"], callbacks=callbacks)
+        callbacks, _ = _make_callbacks(ckpt_init, log_path, model_name, "frozen")
+        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"],
+                  callbacks=callbacks, verbose=2)
 
-    # --- Phase 2: Fine-Tuning ---
+    # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
     print(f"[{model_name}] Phase 2: Fine-Tuning")
     for layer in model.layers:
         layer.trainable = True
+    model.compile(optimizer=tf.keras.optimizers.Adam(CONFIG["LR_FT"]), loss='mse', metrics=['mae'])
 
-    # Cosine decay with warmup for Phase 2
-    total_steps_p2 = CONFIG["EPOCHS_FT"] * steps_per_epoch_est
-    warmup_steps_p2 = 3 * steps_per_epoch_est  # shorter warmup for fine-tune
-
-    lr_schedule_p2 = tf.keras.optimizers.schedules.CosineDecay(
-        initial_learning_rate=1e-7,
-        decay_steps=total_steps_p2,
-        alpha=1e-7,
-        warmup_target=CONFIG["LR_FT"],
-        warmup_steps=warmup_steps_p2
-    )
-    optimizer_p2 = tf.keras.optimizers.AdamW(
-        learning_rate=lr_schedule_p2,
-        weight_decay=CONFIG["WEIGHT_DECAY"],
-        clipnorm=CONFIG["CLIP_NORM"]
-    )
-    model.compile(optimizer=optimizer_p2, loss='mse', metrics=['mae'])
-    
     ckpt_ft = os.path.join(ckpt_root, f"{model_name}_finetune.keras")
     if os.path.exists(ckpt_ft):
         print(f"Loading existing finetuned model: {ckpt_ft}")
         model.load_weights(ckpt_ft)
     else:
-        callbacks_ft = [
-            ModelCheckpoint(ckpt_ft, monitor='val_mae', save_best_only=True, verbose=1),
-            EarlyStopping(monitor='val_mae', patience=7, restore_best_weights=True)
-        ]
-        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"], callbacks=callbacks_ft)
+        callbacks_ft, _ = _make_callbacks(ckpt_ft, log_path, model_name, "fine_tune")
+        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"],
+                  callbacks=callbacks_ft, verbose=2)
 
     return model
 
@@ -325,7 +359,7 @@ def group_predictions_by_image_id(preds_with_ids, labels_df):
     y_pred = np.array([np.mean(pred_dict[k]) for k in common])
     y_true = np.array([true_dict[k] for k in common])
     
-    return y_true, y_pred
+    return y_true, y_pred, common
 
 def compute_evaluation_metrics(y_true, y_pred):
     errors = np.abs(y_true - y_pred)
@@ -389,6 +423,8 @@ def main():
     
     # Reload models to ensure clean state (optional, but safe)
     image_level_preds = {}
+    pred_by_image = {}   # model_name -> {ImageID: prediction}
+    common_ids = None
     y_true_ref = None
     
     for name, (fn, img_size) in MODEL_REGISTRY.items():
@@ -404,26 +440,32 @@ def main():
             ps = model.predict(imgs, verbose=0).flatten()
             preds_list.extend(zip(ps, ids.numpy()))
             
-        y_true, y_pred = group_predictions_by_image_id(preds_list, labels_data)
+        y_true, y_pred, common = group_predictions_by_image_id(preds_list, labels_data)
         compute_evaluation_metrics(y_true, y_pred)
         
         image_level_preds[name] = y_pred
+        pred_by_image[name] = dict(zip(common, y_pred))
         if y_true_ref is None:
             y_true_ref = y_true
+            common_ids = common
             
         tf.keras.backend.clear_session()
 
-    # 4. Simple Average Ensemble
+    # 4. Save per-image per-model predictions (consumed by reproduce_results.py)
+    if pred_by_image and common_ids is not None:
+        preds_df = pd.DataFrame({"ImageID": common_ids})
+        for name in MODEL_REGISTRY:
+            preds_df[name] = [pred_by_image[name].get(iid, np.nan) for iid in common_ids]
+        out_csv = os.path.join(CONFIG["RESULTS_DIR"], "test_image_predictions.csv")
+        preds_df.to_csv(out_csv, index=False)
+        print(f"Per-image test predictions saved to {out_csv}")
+
+    # 5. Simple Average Ensemble
     print("\n=== ViT Ensemble Metrics ===")
     if image_level_preds:
         # Average all predictions
         ensemble_preds = np.mean(list(image_level_preds.values()), axis=0)
         compute_evaluation_metrics(y_true_ref, ensemble_preds)
-        
-        # Save Predictions
-        df_res = pd.DataFrame({'TrueAge': y_true_ref, 'PredAge': ensemble_preds})
-        df_res.to_csv(os.path.join(CONFIG["RESULTS_DIR"], "vit_ensemble_preds.csv"), index=False)
-        print("Ensemble predictions saved.")
 
 if __name__ == "__main__":
     main()
