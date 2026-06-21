@@ -76,12 +76,12 @@ INFERENCE_BATCH_SIZE = 64  # does not affect predictions
 
 # ---------------------------------------------------------------------------
 # Pretrained weights hosted on Zenodo (anonymous, DOI-citable download).
-# After uploading the four ``*_finetune.keras`` files to a Zenodo record, set
+# After uploading the four ``*_best_model.keras`` files to a Zenodo record, set
 # the integer record id below (visible in the record URL, e.g.
 # https://zenodo.org/records/1234567) or export HHD_AGE_VIT_ZENODO_RECORD.
 # ---------------------------------------------------------------------------
 ZENODO_RECORD_ID = os.environ.get("HHD_AGE_VIT_ZENODO_RECORD", "REPLACE_WITH_ZENODO_RECORD_ID")
-WEIGHT_FILES = {name: f"{name}_finetune.keras" for name in MODEL_NAMES}
+WEIGHT_FILES = {name: f"{name}_best_model.keras" for name in MODEL_NAMES}
 # Optional integrity check: fill in {filename: md5_hex} once the files are uploaded.
 WEIGHT_MD5: dict[str, str] = {}
 
@@ -244,7 +244,7 @@ def ensure_weights(weights_dir) -> Path:
     if ZENODO_RECORD_ID == "REPLACE_WITH_ZENODO_RECORD_ID":
         raise RuntimeError(
             "ViT weights are missing and no Zenodo record id is configured.\n"
-            f"Either place the checkpoints at {weights_dir}/<Model>_finetune.keras\n"
+            f"Either place the checkpoints at {weights_dir}/<Model>_best_model.keras\n"
             "or set ZENODO_RECORD_ID in this script (or the HHD_AGE_VIT_ZENODO_RECORD "
             "environment variable) to enable automatic download."
         )

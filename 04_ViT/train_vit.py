@@ -1,5 +1,5 @@
 """
-Experiment 06: Vision Transformers (ViT) for Age Estimation
+Experiment 04: Vision Transformers (ViT) for Age Estimation
 
 Overview:
 This experiment evaluates modern Vision Transformer architectures and hybrid
@@ -19,49 +19,52 @@ Requirements:
 import os
 import gc
 import csv
+import sys
+import warnings
 
-# --- Colab Setup ---
-from google.colab import drive
-drive.mount('/content/drive')
-
-# Install required packages
-import subprocess
-subprocess.run(['pip', 'install', '-q', 'keras-cv-attention-models', 'tf-keras', 'tqdm'], check=True)
-
-# --- CRITICAL SETUP ---
-# keras-cv-attention-models requires legacy tf-keras behavior in newer TF versions
+# keras-cv-attention-models requires legacy tf-keras behavior in newer TF versions.
+# Must be set before importing TensorFlow.
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from collections import defaultdict
 from tqdm import tqdm
 from PIL import Image
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D, Input
+from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 # Import architectures from external library
-# Ensure you have run: pip install keras-cv-attention-models
 try:
     import keras_cv_attention_models.swin_transformer_v2 as swin_v2
     import keras_cv_attention_models.mobilevit as mobilevit
     import keras_cv_attention_models.convnext as convnext
     import keras_cv_attention_models.tinyvit as tiny_vit
 except ImportError:
-    raise ImportError("Please run: pip install keras-cv-attention-models")
+    raise ImportError("Please run: pip install keras-cv-attention-models tf-keras")
 
-# Set seeds
-np.random.seed(42)
-tf.random.set_seed(42)
+# Benign Keras 3 false-positive: with an unknown-cardinality tf.data pipeline
+# (flat_map yields a variable number of patches per image), Keras cannot
+# pre-compute steps and warns at end-of-dataset even though every epoch runs to
+# completion.  Silence just this message to keep the training log readable.
+warnings.filterwarnings("ignore", message="Your input ran out of data")
+
+# Reproducibility
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+EXPERIMENT_DIRNAME = "04_ViT"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
+from download_dataset import ensure_dataset
 
 # --- Configuration ---
-DATA_ROOT = '/content/drive/MyDrive/HHD_AgeSplit'
-
 CONFIG = {
     "PATCH_SIZE": (400, 400),
     "STRIDE": 200,
@@ -70,10 +73,11 @@ CONFIG = {
     "EPOCHS_FT": 10,
     "LR_INIT": 1e-3,
     "LR_FT": 1e-4,
-    "DATA_DIR": DATA_ROOT,
-    "CSV_PATH": os.path.join(DATA_ROOT, 'NewAgeSplit.csv'),
-    "MODELS_DIR": os.path.join(DATA_ROOT, 'ViT'),
-    "RESULTS_DIR": os.path.join(DATA_ROOT, 'ViT', 'results')
+    "THR": 0.0054,
+    "DATA_DIR": os.path.join(REPO_ROOT, "data"),
+    "CSV_PATH": os.path.join(REPO_ROOT, "data", "NewAgeSplit.csv"),
+    "MODELS_DIR": os.path.join(REPO_ROOT, "models", "experiment_04"),
+    "RESULTS_DIR": os.path.join(REPO_ROOT, "results", "experiment_04")
 }
 
 # --- Data Processing ---
@@ -123,6 +127,13 @@ def process_image(row, root_dir, patch_size, step_size):
     )
     patches = tf.reshape(patches, [-1, patch_size[0], patch_size[1], 3])
     labels = tf.fill([tf.shape(patches)[0]], row['Age'])
+
+    # Filter empty patches (matching exp 01 and 03)
+    patch_means = tf.reduce_mean(patches, axis=[1, 2, 3])
+    mask = patch_means > CONFIG["THR"]
+    patches = tf.boolean_mask(patches, mask)
+    labels = tf.boolean_mask(labels, mask)
+
     return patches, labels
 
 def process_row_with_id(row):
@@ -279,11 +290,21 @@ class EpochCSVLogger(tf.keras.callbacks.Callback):
             self._fh = self._writer = None
 
 
-def _make_callbacks(save_path, log_path, model_name, phase):
-    """Build the experiment-01/03 callback stack for one training phase."""
+def _make_callbacks(save_path, log_path, model_name, phase, best_so_far=None):
+    """Build the experiment-01/03 callback stack for one training phase.
+
+    ``best_so_far`` carries the previous phase's best val_mae into the checkpoint
+    and logger so a phase overwrites the checkpoint only when it actually improves
+    on it (Phase 2 vs. Phase 1). Returns the callback list and the BestModelLogger.
+    """
     best_logger = BestModelLogger(save_path, monitor="val_mae")
+    checkpoint = ModelCheckpoint(str(save_path), monitor="val_mae",
+                                 save_best_only=True, mode="min", verbose=0)
+    if best_so_far is not None:
+        best_logger.best = best_so_far
+        checkpoint.best = best_so_far
     callbacks = [
-        ModelCheckpoint(str(save_path), monitor="val_mae", save_best_only=True, mode="min", verbose=0),
+        checkpoint,
         best_logger,
         ReduceLROnPlateau(monitor="val_mae", factor=0.1, patience=5, verbose=1),
         EarlyStopping(monitor="val_mae", patience=10, restore_best_weights=True, verbose=1),
@@ -297,6 +318,20 @@ def _make_callbacks(save_path, log_path, model_name, phase):
 def train_one_model(backbone_fn, input_size, labels_df, data_dir, model_name):
     ckpt_root = os.path.join(CONFIG["MODELS_DIR"], model_name)
     os.makedirs(ckpt_root, exist_ok=True)
+    save_path = os.path.join(ckpt_root, f"{model_name}_best_model.keras")
+    done_path = os.path.join(ckpt_root, f"{model_name}.done")
+    log_path = os.path.join(ckpt_root, f"{model_name}_training_log.csv")
+
+    # Skip only when training fully completed: the .done marker is written
+    # after Phase 2.  The .keras checkpoint alone is not enough, since
+    # ModelCheckpoint saves it as early as epoch 1 (so a crashed run leaves a
+    # partial checkpoint that must NOT be treated as finished).
+    if os.path.exists(done_path) and os.path.exists(save_path):
+        print(f"Found completed {model_name}; will load from disk for inference.")
+        return
+    if os.path.exists(save_path):
+        print(f"Found incomplete checkpoint for {model_name} (no '{model_name}.done' "
+              f"marker); retraining from scratch.")
 
     print(f"\nSetting up Data for {model_name} (Input: {input_size}x{input_size})...")
     train_ds = patch_data_tf_dataset_from_df(
@@ -309,41 +344,49 @@ def train_one_model(backbone_fn, input_size, labels_df, data_dir, model_name):
         CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"],
         augment=False, final_size=input_size)
 
-    # Build Model
-    model = build_backbone_regressor(backbone_fn, input_size)
-    log_path = os.path.join(ckpt_root, f"{model_name}_training_log.csv")
-
     # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
     print(f"[{model_name}] Phase 1: Frozen Training")
+    model = build_backbone_regressor(backbone_fn, input_size)
     for layer in model.layers[:-2]:
         layer.trainable = False
     model.compile(optimizer=tf.keras.optimizers.Adam(CONFIG["LR_INIT"]), loss='mse', metrics=['mae'])
 
-    ckpt_init = os.path.join(ckpt_root, f"{model_name}_init.keras")
-    if os.path.exists(ckpt_init):
-        print(f"Loading existing init model: {ckpt_init}")
-        model.load_weights(ckpt_init)
-    else:
-        callbacks, _ = _make_callbacks(ckpt_init, log_path, model_name, "frozen")
-        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"],
-                  callbacks=callbacks, verbose=2)
+    callbacks, best_logger = _make_callbacks(save_path, log_path, model_name, "frozen")
+    model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_INIT"],
+              callbacks=callbacks, verbose=2)
+    phase1_best_mae = best_logger.best
+
+    # Free Phase 1 graph/optimizer before Phase 2 (exp 01/03 pattern to avoid OOM)
+    del model, callbacks, best_logger
+    tf.keras.backend.clear_session()
+    gc.collect()
 
     # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
+    # Rebuild from the best Phase 1 checkpoint with all layers trainable.
     print(f"[{model_name}] Phase 2: Fine-Tuning")
+    model = build_backbone_regressor(backbone_fn, input_size)
+    model.load_weights(save_path)  # start from best Phase 1 checkpoint
     for layer in model.layers:
         layer.trainable = True
     model.compile(optimizer=tf.keras.optimizers.Adam(CONFIG["LR_FT"]), loss='mse', metrics=['mae'])
 
-    ckpt_ft = os.path.join(ckpt_root, f"{model_name}_finetune.keras")
-    if os.path.exists(ckpt_ft):
-        print(f"Loading existing finetuned model: {ckpt_ft}")
-        model.load_weights(ckpt_ft)
-    else:
-        callbacks_ft, _ = _make_callbacks(ckpt_ft, log_path, model_name, "fine_tune")
-        model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"],
-                  callbacks=callbacks_ft, verbose=2)
+    # Carry Phase 1's best val_mae forward so the checkpoint is only
+    # overwritten when Phase 2 actually improves on it.
+    callbacks_ft, _ = _make_callbacks(save_path, log_path, model_name, "fine_tune",
+                                     best_so_far=phase1_best_mae)
+    model.fit(train_ds, validation_data=val_ds, epochs=CONFIG["EPOCHS_FT"],
+              callbacks=callbacks_ft, verbose=2)
+    print(f"Saved training log to {log_path}")
 
-    return model
+    # Mark training as fully complete so reruns skip this backbone.
+    with open(done_path, "w") as fh:
+        fh.write(f"{model_name} training complete\n")
+
+    # Release this backbone before the next one: the best weights are safely
+    # on disk, so free GPU/host memory and reset the Keras session.
+    del model
+    tf.keras.backend.clear_session()
+    gc.collect()
 
 # --- Evaluation Helper ---
 
@@ -366,7 +409,9 @@ def compute_evaluation_metrics(y_true, y_pred):
     mae = mean_absolute_error(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     r2 = r2_score(y_true, y_pred)
-    mape = np.mean(errors / y_true) * 100
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+        if np.isnan(mape): mape = 0.0
     
     pct = lambda thr: 100 * np.mean(errors <= thr)
     within_2 = pct(2)
@@ -386,9 +431,49 @@ def compute_evaluation_metrics(y_true, y_pred):
     }
     return metrics
 
+# --- Colab / output directory handling (matched to experiments 01 and 03) ---
+
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
+    try:
+        import google.colab  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def resolve_output_dirs():
+    """On Colab, redirect model/result output to mounted Google Drive.
+
+    Everything under /content is wiped on a Colab runtime crash, which would
+    destroy the checkpoints (and their .done markers) mid-run.  Persisting
+    to Drive lets a rerun resume from the last completed backbone.  Local runs
+    keep the repo-relative defaults unchanged.
+    """
+    if not _in_colab():
+        return
+    drive_root = "/content/drive"
+    persist_base = os.path.join(drive_root, "MyDrive", "Age_Estimation", EXPERIMENT_DIRNAME)
+    try:
+        if not os.path.exists(os.path.join(drive_root, "MyDrive")):
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to persist trained models...")
+            drive.mount(drive_root)
+        if os.path.exists(os.path.join(drive_root, "MyDrive")):
+            CONFIG["MODELS_DIR"] = os.path.join(persist_base, "models")
+            CONFIG["RESULTS_DIR"] = os.path.join(persist_base, "results")
+            print(f"Persisting outputs to Google Drive: {persist_base}")
+            return
+    except Exception as exc:
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    print("WARNING: Drive unavailable; trained models will be LOST if the "
+          "Colab runtime crashes.")
+
+
 # --- Main ---
 
 def main():
+    resolve_output_dirs()
     os.makedirs(CONFIG["MODELS_DIR"], exist_ok=True)
     os.makedirs(CONFIG["RESULTS_DIR"], exist_ok=True)
 
@@ -406,17 +491,10 @@ def main():
         "TinyViT_11M":     (tiny_vit.TinyViT_11M, 224),
     }
 
-    trained_models = {}
-
     # 2. Training Loop
     for name, (fn, img_size) in MODEL_REGISTRY.items():
         print(f"\n{'='*40}\nProcessing {name}\n{'='*40}")
-        model = train_one_model(fn, img_size, labels_data, CONFIG["DATA_DIR"], name)
-        trained_models[name] = (model, img_size)
-        
-        # Cleanup
-        tf.keras.backend.clear_session()
-        gc.collect()
+        train_one_model(fn, img_size, labels_data, CONFIG["DATA_DIR"], name)
 
     # 3. Evaluation & Ensemble
     print(f"\n{'='*40}\nRunning Evaluation\n{'='*40}")
@@ -429,7 +507,7 @@ def main():
     
     for name, (fn, img_size) in MODEL_REGISTRY.items():
         print(f"Evaluating {name}...")
-        ckpt_path = os.path.join(CONFIG["MODELS_DIR"], name, f"{name}_finetune.keras")
+        ckpt_path = os.path.join(CONFIG["MODELS_DIR"], name, f"{name}_best_model.keras")
         model = tf.keras.models.load_model(ckpt_path)
         
         # Generate Test Data (Dynamic Resizing per model)
@@ -468,4 +546,5 @@ def main():
         compute_evaluation_metrics(y_true_ref, ensemble_preds)
 
 if __name__ == "__main__":
+    ensure_dataset(CONFIG["DATA_DIR"])
     main()
