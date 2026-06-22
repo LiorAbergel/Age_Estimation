@@ -26,11 +26,13 @@ consumed by reproduce_results.py.
 
 from __future__ import annotations
 
+import os
+os.environ['TF_USE_LEGACY_KERAS'] = '1'
+
 import argparse
 import csv
 import gc
 import itertools
-import os
 import sys
 import warnings
 from pathlib import Path

@@ -161,9 +161,9 @@ def create_dataset(df_subset, root_dir, final_size):
         tf.data.Dataset.from_tensor_slices(a),
         tf.data.Dataset.from_tensor_slices(i)
     )))
-    # Resize 400x400 patches to ViT input size (224 or 256)
+    # Resize 400x400 patches to ViT input size (224 or 256) using bicubic method
     ds = ds.map(
-        lambda p, a, i: (tf.image.resize(p, [final_size, final_size]), a, i),
+        lambda p, a, i: (tf.image.resize(p, [final_size, final_size], method='bicubic'), a, i),
         num_parallel_calls=tf.data.AUTOTUNE
     )
     return ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
@@ -208,11 +208,18 @@ def run_inference(model, dataset):
 def find_checkpoint(model_name, fold_idx, ckpt_root):
     """Search for the best available checkpoint for a given model/fold."""
     fold_dir = os.path.join(ckpt_root, model_name, f'fold_{fold_idx:02d}')
-    # Prefer fine-tuned, fall back to init
+    
+    # 1. Try the new aligned naming scheme first
+    new_path = os.path.join(fold_dir, f'{model_name}_fold{fold_idx:02d}_best_model.keras')
+    if os.path.isfile(new_path):
+        return new_path
+
+    # 2. Prefer fine-tuned, fall back to init (old naming schemes)
     for suffix in ['_finetune.keras', '_init.keras']:
         path = os.path.join(fold_dir, f'{model_name}{suffix}')
         if os.path.isfile(path):
             return path
+            
     return None
 
 
@@ -423,19 +430,19 @@ def main():
     {'Parameter':<25} {'Repo (train_vit_cv.py)':<30} {'Colab (v6)':<30}
     {'-'*25} {'-'*30} {'-'*30}
     {'Freeze method':<25} {'model.layers[:-2]':<30} {'model.layers[1] (BUG)':<30}
-    {'Optimizer Stage 1':<25} {'AdamW + CosineDecay':<30} {'Adam (default lr=1e-3)':<30}
-    {'LR Stage 1':<25} {'1e-6 -> 1e-3 (warmup)':<30} {'1e-3 (constant)':<30}
-    {'Optimizer Stage 2':<25} {'AdamW + CosineDecay':<30} {'Adam(1e-4)':<30}
-    {'LR Stage 2':<25} {'1e-7 -> 1e-4 (warmup)':<30} {'1e-4 (constant)':<30}
-    {'Weight decay':<25} {'1e-4':<30} {'None':<30}
-    {'Gradient clipping':<25} {'clipnorm=1.0':<30} {'None':<30}
-    {'Mixed precision':<25} {'mixed_float16':<30} {'No':<30}
+    {'Optimizer Stage 1':<25} {'Adam':<30} {'Adam (default lr=1e-3)':<30}
+    {'LR Stage 1':<25} {'1e-3':<30} {'1e-3 (constant)':<30}
+    {'Optimizer Stage 2':<25} {'Adam':<30} {'Adam(1e-4)':<30}
+    {'LR Stage 2':<25} {'1e-4':<30} {'1e-4 (constant)':<30}
+    {'Weight decay':<25} {'None':<30} {'None':<30}
+    {'Gradient clipping':<25} {'None':<30} {'None':<30}
+    {'Mixed precision':<25} {'No':<30} {'No':<30}
     {'Epochs Stage 1':<25} {'50':<30} {'50':<30}
-    {'Epochs Stage 2':<25} {'30':<30} {'10':<30}
-    {'EarlyStopping Stage 1':<25} {'patience=10':<30} {'patience=8':<30}
-    {'EarlyStopping Stage 2':<25} {'patience=7':<30} {'patience=8':<30}
-    {'Resize method':<25} {'bilinear (default)':<30} {'bicubic':<30}
-    {'Augmentation':<25} {'Contrast':<30} {'Contrast (v1) / Bright(v2)':<30}
+    {'Epochs Stage 2':<25} {'10':<30} {'10':<30}
+    {'EarlyStopping Stage 1':<25} {'patience=10':<30} {'ptience=8':<30}
+    {'EarlyStopping Stage 2':<25} {'patience=10':<30} {'ptience=8':<30}
+    {'Resize method':<25} {'bicubic':<30} {'bicubic':<30}
+    {'Augmentation':<25} {'Brightness & Contrast':<30} {'Contrast (v1) / Bright(v2)':<30}
     {'Batch size':<25} {'64':<30} {'64':<30}
     {'THR':<25} {'0.0054':<30} {'0.0054':<30}
     {'CV strategy':<25} {'StratifiedGroupKFold(42)':<30} {'StratifiedGroupKFold(42)':<30}
@@ -443,10 +450,8 @@ def main():
     NOTE: The GDrive checkpoints were trained with the COLAB configuration.
           If you retrain using the repo script, results may differ due to:
           1. Correct backbone freezing (Colab never truly froze the backbone)
-          2. CosineDecay+warmup vs constant LR
-          3. Weight decay / gradient clipping (not in Colab)
-          4. 30 fine-tune epochs vs 10
-          5. bilinear vs bicubic resize
+          2. Early stopping patience (10 vs 8)
+          3. Correct augmentation alignment (both brightness & contrast)
     """)
 
 

@@ -14,6 +14,8 @@ Key Features:
 """
 
 import os
+os.environ['TF_USE_LEGACY_KERAS'] = '1'
+
 import gc
 import csv
 import warnings

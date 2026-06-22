@@ -8,8 +8,9 @@ model's focus. It specifically targets:
 1. Various Age Groups (Young, Middle, Old)
 2. Performance Extremes (Best predictions vs. Worst failures)
 """
-
 import os
+os.environ['TF_USE_LEGACY_KERAS'] = '1'
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf

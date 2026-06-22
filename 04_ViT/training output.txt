@@ -1,754 +1,409 @@
-Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount("/content/drive", force_remount=True).
+Cloning into 'Age_Estimation'...
+remote: Enumerating objects: 209, done.
+remote: Counting objects: 100% (209/209), done.
+remote: Compressing objects: 100% (159/159), done.
+remote: Total 209 (delta 83), reused 173 (delta 47), pack-reused 0 (from 0)
+Receiving objects: 100% (209/209), 302.65 KiB | 27.51 MiB/s, done.
+Resolving deltas: 100% (83/83), done.
+/content/Age_Estimation
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 191.1/191.1 kB 17.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.1/806.1 kB 63.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 kB 5.0 MB/s eta 0:00:00
+Dataset not found at /content/Age_Estimation/data. Downloading from Kaggle...
+Using Colab cache for faster access to the 'hhd-age' dataset.
+Downloaded to: /kaggle/input/hhd-age
+Dataset ready at /content/Age_Estimation/data
+Colab detected: mounting Google Drive to persist trained models...
+Mounted at /content/drive
+Persisting outputs to Google Drive: /content/drive/MyDrive/Age_Estimation/04_ViT
 
 ========================================
 Processing SwinV2_Tiny
 ========================================
 
 Setting up Data for SwinV2_Tiny (Input: 256x256)...
->>>> Load pretrained from: /root/.keras/models/swin_transformer_v2_tiny_window8_256_imagenet.h5
 [SwinV2_Tiny] Phase 1: Frozen Training
+Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/swin_transformer_v2/swin_transformer_v2_tiny_window8_256_imagenet.h5
+114320936/114320936 [==============================] - 4s 0us/step
+>>>> Load pretrained from: /root/.keras/models/swin_transformer_v2_tiny_window8_256_imagenet.h5
 Epoch 1/50
-     97/Unknown - 119s 1s/step - loss: 579.1643 - mae: 22.3315
-Epoch 1: val_mae improved from inf to 17.83648, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 137s 1s/step - loss: 579.1643 - mae: 22.3315 - val_loss: 386.0043 - val_mae: 17.8365
+Epoch 1: val_mae improved from inf to 8.83271; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/SwinV2_Tiny/SwinV2_Tiny_best_model.keras
+97/97 - 96s - loss: 327.8293 - mae: 15.1953 - val_loss: 139.9030 - val_mae: 8.8327 - lr: 0.0010 - 96s/epoch - 986ms/step
 Epoch 2/50
-97/97 [==============================] - ETA: 0s - loss: 488.6463 - mae: 20.2287
-Epoch 2: val_mae improved from 17.83648 to 15.94321, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 882ms/step - loss: 488.6463 - mae: 20.2287 - val_loss: 319.3545 - val_mae: 15.9432
+Epoch 2: val_mae improved from 8.83271 to 6.02584; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/SwinV2_Tiny/SwinV2_Tiny_best_model.keras
+97/97 - 75s - loss: 101.0285 - mae: 6.7269 - val_loss: 88.1042 - val_mae: 6.0258 - lr: 0.0010 - 75s/epoch - 776ms/step
 Epoch 3/50
-97/97 [==============================] - ETA: 0s - loss: 334.5964 - mae: 16.0269
-Epoch 3: val_mae improved from 15.94321 to 12.81000, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 885ms/step - loss: 334.5964 - mae: 16.0269 - val_loss: 226.7145 - val_mae: 12.8100
+Epoch 3: val_mae improved from 6.02584 to 5.83049; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/SwinV2_Tiny/SwinV2_Tiny_best_model.keras
+97/97 - 76s - loss: 79.7949 - mae: 6.4203 - val_loss: 82.4030 - val_mae: 5.8305 - lr: 0.0010 - 76s/epoch - 783ms/step
 Epoch 4/50
-97/97 [==============================] - ETA: 0s - loss: 174.2650 - mae: 9.8901
-Epoch 4: val_mae improved from 12.81000 to 8.63851, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 888ms/step - loss: 174.2650 - mae: 9.8901 - val_loss: 137.1473 - val_mae: 8.6385
+97/97 - 75s - loss: 77.2946 - mae: 6.4033 - val_loss: 81.8785 - val_mae: 5.8573 - lr: 0.0010 - 75s/epoch - 770ms/step
 Epoch 5/50
-97/97 [==============================] - ETA: 0s - loss: 93.0064 - mae: 6.5417
-Epoch 5: val_mae improved from 8.63851 to 7.37572, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 883ms/step - loss: 93.0064 - mae: 6.5417 - val_loss: 113.4976 - val_mae: 7.3757
+97/97 - 75s - loss: 75.8955 - mae: 6.3508 - val_loss: 82.1352 - val_mae: 5.9218 - lr: 0.0010 - 75s/epoch - 769ms/step
 Epoch 6/50
-97/97 [==============================] - ETA: 0s - loss: 78.9314 - mae: 6.1430
-Epoch 6: val_mae improved from 7.37572 to 7.13914, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 885ms/step - loss: 78.9314 - mae: 6.1430 - val_loss: 108.0651 - val_mae: 7.1391
+97/97 - 74s - loss: 74.9187 - mae: 6.2910 - val_loss: 82.6464 - val_mae: 5.9911 - lr: 0.0010 - 74s/epoch - 765ms/step
 Epoch 7/50
-97/97 [==============================] - ETA: 0s - loss: 76.8782 - mae: 6.1332
-Epoch 7: val_mae did not improve from 7.13914
-97/97 [==============================] - 85s 872ms/step - loss: 76.8782 - mae: 6.1332 - val_loss: 107.7484 - val_mae: 7.1647
+97/97 - 74s - loss: 73.9495 - mae: 6.2294 - val_loss: 82.6192 - val_mae: 6.0319 - lr: 0.0010 - 74s/epoch - 766ms/step
 Epoch 8/50
-97/97 [==============================] - ETA: 0s - loss: 76.2516 - mae: 6.0929
-Epoch 8: val_mae improved from 7.13914 to 7.12999, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 882ms/step - loss: 76.2516 - mae: 6.0929 - val_loss: 106.4661 - val_mae: 7.1300
+
+Epoch 8: ReduceLROnPlateau reducing learning rate to 0.00010000000474974513.
+97/97 - 74s - loss: 73.3760 - mae: 6.2094 - val_loss: 82.8538 - val_mae: 6.0885 - lr: 0.0010 - 74s/epoch - 765ms/step
 Epoch 9/50
-97/97 [==============================] - ETA: 0s - loss: 75.7858 - mae: 6.1005
-Epoch 9: val_mae improved from 7.12999 to 7.03393, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 75.7858 - mae: 6.1005 - val_loss: 104.1337 - val_mae: 7.0339
+97/97 - 74s - loss: 71.9046 - mae: 6.0059 - val_loss: 82.2978 - val_mae: 6.0660 - lr: 1.0000e-04 - 74s/epoch - 766ms/step
 Epoch 10/50
-97/97 [==============================] - ETA: 0s - loss: 74.7458 - mae: 6.0908
-Epoch 10: val_mae improved from 7.03393 to 6.96914, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 74.7458 - mae: 6.0908 - val_loss: 102.3904 - val_mae: 6.9691
+97/97 - 74s - loss: 71.3328 - mae: 5.9988 - val_loss: 81.8169 - val_mae: 6.0466 - lr: 1.0000e-04 - 74s/epoch - 767ms/step
 Epoch 11/50
-97/97 [==============================] - ETA: 0s - loss: 75.7113 - mae: 6.1292
-Epoch 11: val_mae improved from 6.96914 to 6.91494, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 888ms/step - loss: 75.7113 - mae: 6.1292 - val_loss: 100.9575 - val_mae: 6.9149
+97/97 - 74s - loss: 71.1676 - mae: 6.0220 - val_loss: 81.4576 - val_mae: 6.0333 - lr: 1.0000e-04 - 74s/epoch - 766ms/step
 Epoch 12/50
-97/97 [==============================] - ETA: 0s - loss: 74.7750 - mae: 6.0873
-Epoch 12: val_mae improved from 6.91494 to 6.78899, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 882ms/step - loss: 74.7750 - mae: 6.0873 - val_loss: 98.2803 - val_mae: 6.7890
+97/97 - 74s - loss: 71.1335 - mae: 6.0133 - val_loss: 81.1535 - val_mae: 6.0220 - lr: 1.0000e-04 - 74s/epoch - 766ms/step
 Epoch 13/50
-97/97 [==============================] - ETA: 0s - loss: 74.4369 - mae: 6.0656
-Epoch 13: val_mae improved from 6.78899 to 6.70869, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 882ms/step - loss: 74.4369 - mae: 6.0656 - val_loss: 96.6702 - val_mae: 6.7087
-Epoch 14/50
-97/97 [==============================] - ETA: 0s - loss: 73.6868 - mae: 6.0315
-Epoch 14: val_mae improved from 6.70869 to 6.59292, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 887ms/step - loss: 73.6868 - mae: 6.0315 - val_loss: 94.2911 - val_mae: 6.5929
-Epoch 15/50
-97/97 [==============================] - ETA: 0s - loss: 73.3515 - mae: 6.0151
-Epoch 15: val_mae improved from 6.59292 to 6.49520, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 73.3515 - mae: 6.0151 - val_loss: 92.3967 - val_mae: 6.4952
-Epoch 16/50
-97/97 [==============================] - ETA: 0s - loss: 73.3359 - mae: 6.0023
-Epoch 16: val_mae improved from 6.49520 to 6.47372, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 73.3359 - mae: 6.0023 - val_loss: 91.9936 - val_mae: 6.4737
-Epoch 17/50
-97/97 [==============================] - ETA: 0s - loss: 73.1054 - mae: 5.9446
-Epoch 17: val_mae improved from 6.47372 to 6.35697, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 73.1054 - mae: 5.9446 - val_loss: 89.7261 - val_mae: 6.3570
-Epoch 18/50
-97/97 [==============================] - ETA: 0s - loss: 73.3387 - mae: 5.9880
-Epoch 18: val_mae improved from 6.35697 to 6.30997, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 884ms/step - loss: 73.3387 - mae: 5.9880 - val_loss: 88.8681 - val_mae: 6.3100
-Epoch 19/50
-97/97 [==============================] - ETA: 0s - loss: 72.5454 - mae: 5.9282
-Epoch 19: val_mae improved from 6.30997 to 6.26277, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 72.5454 - mae: 5.9282 - val_loss: 87.9508 - val_mae: 6.2628
-Epoch 20/50
-97/97 [==============================] - ETA: 0s - loss: 72.8094 - mae: 5.9636
-Epoch 20: val_mae improved from 6.26277 to 6.22225, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 72.8094 - mae: 5.9636 - val_loss: 87.4387 - val_mae: 6.2223
-Epoch 21/50
-97/97 [==============================] - ETA: 0s - loss: 72.1788 - mae: 5.9165
-Epoch 21: val_mae improved from 6.22225 to 6.17681, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 885ms/step - loss: 72.1788 - mae: 5.9165 - val_loss: 86.5401 - val_mae: 6.1768
-Epoch 22/50
-97/97 [==============================] - ETA: 0s - loss: 72.4448 - mae: 5.9254
-Epoch 22: val_mae improved from 6.17681 to 6.03719, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 885ms/step - loss: 72.4448 - mae: 5.9254 - val_loss: 83.9352 - val_mae: 6.0372
-Epoch 23/50
-97/97 [==============================] - ETA: 0s - loss: 72.2866 - mae: 5.9257
-Epoch 23: val_mae did not improve from 6.03719
-97/97 [==============================] - 85s 872ms/step - loss: 72.2866 - mae: 5.9257 - val_loss: 84.1734 - val_mae: 6.0413
-Epoch 24/50
-97/97 [==============================] - ETA: 0s - loss: 72.1757 - mae: 5.8908
-Epoch 24: val_mae improved from 6.03719 to 5.98210, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 72.1757 - mae: 5.8908 - val_loss: 82.9881 - val_mae: 5.9821
-Epoch 25/50
-97/97 [==============================] - ETA: 0s - loss: 72.1998 - mae: 5.8916
-Epoch 25: val_mae improved from 5.98210 to 5.90889, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 72.1998 - mae: 5.8916 - val_loss: 81.5141 - val_mae: 5.9089
-Epoch 26/50
-97/97 [==============================] - ETA: 0s - loss: 72.0091 - mae: 5.9052
-Epoch 26: val_mae did not improve from 5.90889
-97/97 [==============================] - 86s 873ms/step - loss: 72.0091 - mae: 5.9052 - val_loss: 81.7078 - val_mae: 5.9100
-Epoch 27/50
-97/97 [==============================] - ETA: 0s - loss: 72.4050 - mae: 5.8966
-Epoch 27: val_mae improved from 5.90889 to 5.84274, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 882ms/step - loss: 72.4050 - mae: 5.8966 - val_loss: 80.5547 - val_mae: 5.8427
-Epoch 28/50
-97/97 [==============================] - ETA: 0s - loss: 71.5968 - mae: 5.8631
-Epoch 28: val_mae improved from 5.84274 to 5.76046, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 71.5968 - mae: 5.8631 - val_loss: 79.0326 - val_mae: 5.7605
-Epoch 29/50
-97/97 [==============================] - ETA: 0s - loss: 71.5312 - mae: 5.8594
-Epoch 29: val_mae did not improve from 5.76046
-97/97 [==============================] - 85s 871ms/step - loss: 71.5312 - mae: 5.8594 - val_loss: 79.7797 - val_mae: 5.7882
-Epoch 30/50
-97/97 [==============================] - ETA: 0s - loss: 71.8534 - mae: 5.8517
-Epoch 30: val_mae did not improve from 5.76046
-97/97 [==============================] - 85s 867ms/step - loss: 71.8534 - mae: 5.8517 - val_loss: 79.2069 - val_mae: 5.7643
-Epoch 31/50
-97/97 [==============================] - ETA: 0s - loss: 72.0490 - mae: 5.8594
-Epoch 31: val_mae improved from 5.76046 to 5.70128, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 880ms/step - loss: 72.0490 - mae: 5.8594 - val_loss: 78.1484 - val_mae: 5.7013
-Epoch 32/50
-97/97 [==============================] - ETA: 0s - loss: 71.6933 - mae: 5.8543
-Epoch 32: val_mae improved from 5.70128 to 5.64172, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 71.6933 - mae: 5.8543 - val_loss: 76.9151 - val_mae: 5.6417
-Epoch 33/50
-97/97 [==============================] - ETA: 0s - loss: 71.3248 - mae: 5.8630
-Epoch 33: val_mae improved from 5.64172 to 5.62298, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 887ms/step - loss: 71.3248 - mae: 5.8630 - val_loss: 76.7645 - val_mae: 5.6230
-Epoch 34/50
-97/97 [==============================] - ETA: 0s - loss: 70.9592 - mae: 5.8409
-Epoch 34: val_mae improved from 5.62298 to 5.60236, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 887ms/step - loss: 70.9592 - mae: 5.8409 - val_loss: 76.3753 - val_mae: 5.6024
-Epoch 35/50
-97/97 [==============================] - ETA: 0s - loss: 71.1839 - mae: 5.8219
-Epoch 35: val_mae improved from 5.60236 to 5.60185, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 71.1839 - mae: 5.8219 - val_loss: 76.3668 - val_mae: 5.6018
-Epoch 36/50
-97/97 [==============================] - ETA: 0s - loss: 71.1149 - mae: 5.7921
-Epoch 36: val_mae improved from 5.60185 to 5.57186, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 71.1149 - mae: 5.7921 - val_loss: 75.8652 - val_mae: 5.5719
-Epoch 37/50
-97/97 [==============================] - ETA: 0s - loss: 70.7643 - mae: 5.7957
-Epoch 37: val_mae improved from 5.57186 to 5.54114, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 70.7643 - mae: 5.7957 - val_loss: 75.4303 - val_mae: 5.5411
-Epoch 38/50
-97/97 [==============================] - ETA: 0s - loss: 71.0713 - mae: 5.7908
-Epoch 38: val_mae improved from 5.54114 to 5.47835, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 71.0713 - mae: 5.7908 - val_loss: 74.1614 - val_mae: 5.4783
-Epoch 39/50
-97/97 [==============================] - ETA: 0s - loss: 71.1712 - mae: 5.8120
-Epoch 39: val_mae did not improve from 5.47835
-97/97 [==============================] - 85s 873ms/step - loss: 71.1712 - mae: 5.8120 - val_loss: 74.3266 - val_mae: 5.4891
-Epoch 40/50
-97/97 [==============================] - ETA: 0s - loss: 71.0360 - mae: 5.8075
-Epoch 40: val_mae did not improve from 5.47835
-97/97 [==============================] - 85s 868ms/step - loss: 71.0360 - mae: 5.8075 - val_loss: 74.9148 - val_mae: 5.5131
-Epoch 41/50
-97/97 [==============================] - ETA: 0s - loss: 70.9995 - mae: 5.7796
-Epoch 41: val_mae did not improve from 5.47835
-97/97 [==============================] - 85s 869ms/step - loss: 70.9995 - mae: 5.7796 - val_loss: 74.5910 - val_mae: 5.4918
-Epoch 42/50
-97/97 [==============================] - ETA: 0s - loss: 70.3516 - mae: 5.7688
-Epoch 42: val_mae improved from 5.47835 to 5.46665, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 880ms/step - loss: 70.3516 - mae: 5.7688 - val_loss: 74.1210 - val_mae: 5.4667
-Epoch 43/50
-97/97 [==============================] - ETA: 0s - loss: 70.4664 - mae: 5.7540
-Epoch 43: val_mae improved from 5.46665 to 5.44659, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 887ms/step - loss: 70.4664 - mae: 5.7540 - val_loss: 73.9472 - val_mae: 5.4466
-Epoch 44/50
-97/97 [==============================] - ETA: 0s - loss: 70.3295 - mae: 5.7761
-Epoch 44: val_mae improved from 5.44659 to 5.44515, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 885ms/step - loss: 70.3295 - mae: 5.7761 - val_loss: 73.9290 - val_mae: 5.4452
-Epoch 45/50
-97/97 [==============================] - ETA: 0s - loss: 71.1040 - mae: 5.7715
-Epoch 45: val_mae improved from 5.44515 to 5.43052, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 886ms/step - loss: 71.1040 - mae: 5.7715 - val_loss: 73.7304 - val_mae: 5.4305
-Epoch 46/50
-97/97 [==============================] - ETA: 0s - loss: 70.8693 - mae: 5.7484
-Epoch 46: val_mae improved from 5.43052 to 5.40748, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 70.8693 - mae: 5.7484 - val_loss: 73.2283 - val_mae: 5.4075
-Epoch 47/50
-97/97 [==============================] - ETA: 0s - loss: 70.9050 - mae: 5.7447
-Epoch 47: val_mae improved from 5.40748 to 5.40119, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 885ms/step - loss: 70.9050 - mae: 5.7447 - val_loss: 73.1512 - val_mae: 5.4012
-Epoch 48/50
-97/97 [==============================] - ETA: 0s - loss: 70.3407 - mae: 5.7182
-Epoch 48: val_mae improved from 5.40119 to 5.38140, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 883ms/step - loss: 70.3407 - mae: 5.7182 - val_loss: 72.7950 - val_mae: 5.3814
-Epoch 49/50
-97/97 [==============================] - ETA: 0s - loss: 70.5186 - mae: 5.7540
-Epoch 49: val_mae improved from 5.38140 to 5.37454, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 87s 887ms/step - loss: 70.5186 - mae: 5.7540 - val_loss: 72.8008 - val_mae: 5.3745
-Epoch 50/50
-97/97 [==============================] - ETA: 0s - loss: 70.7510 - mae: 5.7229
-Epoch 50: val_mae improved from 5.37454 to 5.34430, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_init.keras
-97/97 [==============================] - 86s 884ms/step - loss: 70.7510 - mae: 5.7229 - val_loss: 72.2446 - val_mae: 5.3443
+
+Epoch 13: ReduceLROnPlateau reducing learning rate to 1.0000000656873453e-05.
+97/97 - 74s - loss: 71.0376 - mae: 6.0170 - val_loss: 80.9440 - val_mae: 6.0157 - lr: 1.0000e-04 - 74s/epoch - 767ms/step
+Epoch 13: early stopping
+Restoring model weights from the end of the best epoch: 3.
 [SwinV2_Tiny] Phase 2: Fine-Tuning
-Epoch 1/30
-     97/Unknown - 160s 1s/step - loss: 73.7059 - mae: 5.7813
-Epoch 1: val_mae improved from inf to 8.90231, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/SwinV2_Tiny/SwinV2_Tiny_finetune.keras
-97/97 [==============================] - 173s 1s/step - loss: 73.7059 - mae: 5.7813 - val_loss: 107.1767 - val_mae: 8.9023
-Epoch 2/30
-97/97 [==============================] - ETA: 0s - loss: 97.6453 - mae: 6.7166
-Epoch 2: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 97.6453 - mae: 6.7166 - val_loss: 178.7440 - val_mae: 12.4135
-Epoch 3/30
-97/97 [==============================] - ETA: 0s - loss: 87.9077 - mae: 6.3712
-Epoch 3: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 87.9077 - mae: 6.3712 - val_loss: 137.1954 - val_mae: 10.6117
-Epoch 4/30
-97/97 [==============================] - ETA: 0s - loss: 92.6233 - mae: 6.9813
-Epoch 4: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 92.6233 - mae: 6.9813 - val_loss: 192.7187 - val_mae: 13.0771
-Epoch 5/30
-97/97 [==============================] - ETA: 0s - loss: 96.6441 - mae: 7.0104
-Epoch 5: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 96.6441 - mae: 7.0104 - val_loss: 169.2899 - val_mae: 12.0857
-Epoch 6/30
-97/97 [==============================] - ETA: 0s - loss: 111.1254 - mae: 7.5495
-Epoch 6: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 111.1254 - mae: 7.5495 - val_loss: 179.3408 - val_mae: 12.5259
-Epoch 7/30
-97/97 [==============================] - ETA: 0s - loss: 105.7789 - mae: 7.0664
-Epoch 7: val_mae did not improve from 8.90231
-97/97 [==============================] - 102s 1s/step - loss: 105.7789 - mae: 7.0664 - val_loss: 162.0243 - val_mae: 11.7413
-Epoch 8/30
-97/97 [==============================] - ETA: 0s - loss: 95.7436 - mae: 6.9849
-Epoch 8: val_mae did not improve from 8.90231
-97/97 [==============================] - 103s 1s/step - loss: 95.7436 - mae: 6.9849 - val_loss: 185.9851 - val_mae: 12.8114
+>>>> Load pretrained from: /root/.keras/models/swin_transformer_v2_tiny_window8_256_imagenet.h5
+Epoch 1/10
+97/97 - 153s - loss: 90.0492 - mae: 6.2238 - val_loss: 102.5365 - val_mae: 8.6986 - lr: 1.0000e-04 - 153s/epoch - 2s/step
+Epoch 2/10
+97/97 - 98s - loss: 99.5813 - mae: 7.3016 - val_loss: 114.9977 - val_mae: 9.4018 - lr: 1.0000e-04 - 98s/epoch - 1s/step
+Epoch 3/10
+97/97 - 98s - loss: 89.6659 - mae: 6.9228 - val_loss: 99.9363 - val_mae: 8.3671 - lr: 1.0000e-04 - 98s/epoch - 1s/step
+Epoch 4/10
+97/97 - 97s - loss: 84.0583 - mae: 6.6398 - val_loss: 89.7538 - val_mae: 7.4601 - lr: 1.0000e-04 - 97s/epoch - 1s/step
+Epoch 5/10
+97/97 - 97s - loss: 80.1724 - mae: 6.4767 - val_loss: 84.1935 - val_mae: 7.0339 - lr: 1.0000e-04 - 97s/epoch - 1s/step
+Epoch 6/10
+97/97 - 97s - loss: 79.5575 - mae: 6.4433 - val_loss: 82.4369 - val_mae: 6.8620 - lr: 1.0000e-04 - 97s/epoch - 1s/step
+Epoch 7/10
+97/97 - 97s - loss: 77.9789 - mae: 6.3724 - val_loss: 108.9448 - val_mae: 9.0078 - lr: 1.0000e-04 - 97s/epoch - 1s/step
+Epoch 8/10
+97/97 - 98s - loss: 105.9451 - mae: 7.5373 - val_loss: 126.2392 - val_mae: 10.0373 - lr: 1.0000e-04 - 98s/epoch - 1s/step
+Epoch 9/10
+97/97 - 98s - loss: 95.8279 - mae: 7.4884 - val_loss: 127.7095 - val_mae: 10.1468 - lr: 1.0000e-04 - 98s/epoch - 1s/step
+Epoch 10/10
+97/97 - 97s - loss: 82.9242 - mae: 6.5328 - val_loss: 110.6980 - val_mae: 9.2150 - lr: 1.0000e-04 - 97s/epoch - 1s/step
+Restoring model weights from the end of the best epoch: 6.
+Saved training log to /content/drive/MyDrive/Age_Estimation/04_ViT/models/SwinV2_Tiny/SwinV2_Tiny_training_log.csv
 
 ========================================
 Processing MobileViT_XXS
 ========================================
 
 Setting up Data for MobileViT_XXS (Input: 256x256)...
+[MobileViT_XXS] Phase 1: Frozen Training
 Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/mobilevit/mobilevit_xxs_imagenet.h5
 5882120/5882120 [==============================] - 0s 0us/step
 >>>> Load pretrained from: /root/.keras/models/mobilevit_xxs_imagenet.h5
-[MobileViT_XXS] Phase 1: Frozen Training
 Epoch 1/50
-     97/Unknown - 105s 874ms/step - loss: 579.0139 - mae: 22.3417
-Epoch 1: val_mae improved from inf to 17.77280, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 123s 1s/step - loss: 579.0139 - mae: 22.3417 - val_loss: 383.9250 - val_mae: 17.7728
+Epoch 1: val_mae improved from inf to 13.62140; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 88s - loss: 482.6227 - mae: 20.0122 - val_loss: 253.7328 - val_mae: 13.6214 - lr: 0.0010 - 88s/epoch - 903ms/step
 Epoch 2/50
-97/97 [==============================] - ETA: 0s - loss: 555.7545 - mae: 21.8161
-Epoch 2: val_mae improved from 17.77280 to 17.03073, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 874ms/step - loss: 555.7545 - mae: 21.8161 - val_loss: 357.9466 - val_mae: 17.0307
+Epoch 2: val_mae improved from 13.62140 to 9.76636; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 75s - loss: 321.8307 - mae: 15.5110 - val_loss: 163.3785 - val_mae: 9.7664 - lr: 0.0010 - 75s/epoch - 771ms/step
 Epoch 3/50
-97/97 [==============================] - ETA: 0s - loss: 510.3787 - mae: 20.7497
-Epoch 3: val_mae improved from 17.03073 to 15.79526, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 872ms/step - loss: 510.3787 - mae: 20.7497 - val_loss: 317.1707 - val_mae: 15.7953
+Epoch 3: val_mae improved from 9.76636 to 6.58928; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 75s - loss: 216.3596 - mae: 11.6759 - val_loss: 111.0702 - val_mae: 6.5893 - lr: 0.0010 - 75s/epoch - 774ms/step
 Epoch 4/50
-97/97 [==============================] - ETA: 0s - loss: 446.5147 - mae: 19.1535
-Epoch 4: val_mae improved from 15.79526 to 14.06876, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 874ms/step - loss: 446.5147 - mae: 19.1535 - val_loss: 265.3637 - val_mae: 14.0688
+Epoch 4: val_mae improved from 6.58928 to 4.93983; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 75s - loss: 152.2070 - mae: 8.9274 - val_loss: 84.1771 - val_mae: 4.9398 - lr: 0.0010 - 75s/epoch - 769ms/step
 Epoch 5/50
-97/97 [==============================] - ETA: 0s - loss: 369.0615 - mae: 17.0190
-Epoch 5: val_mae improved from 14.06876 to 11.84916, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 872ms/step - loss: 369.0615 - mae: 17.0190 - val_loss: 207.6274 - val_mae: 11.8492
+Epoch 5: val_mae improved from 4.93983 to 4.63847; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 75s - loss: 116.5416 - mae: 7.4247 - val_loss: 72.5099 - val_mae: 4.6385 - lr: 0.0010 - 75s/epoch - 771ms/step
 Epoch 6/50
-97/97 [==============================] - ETA: 0s - loss: 285.8704 - mae: 14.3731
-Epoch 6: val_mae improved from 11.84916 to 9.13713, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 86s 879ms/step - loss: 285.8704 - mae: 14.3731 - val_loss: 150.6216 - val_mae: 9.1371
+97/97 - 74s - loss: 97.5174 - mae: 6.7088 - val_loss: 68.8350 - val_mae: 4.9307 - lr: 0.0010 - 74s/epoch - 762ms/step
 Epoch 7/50
-97/97 [==============================] - ETA: 0s - loss: 204.3314 - mae: 11.1956
-Epoch 7: val_mae improved from 9.13713 to 6.08647, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 870ms/step - loss: 204.3314 - mae: 11.1956 - val_loss: 102.6475 - val_mae: 6.0865
+97/97 - 74s - loss: 88.2336 - mae: 6.3989 - val_loss: 68.6903 - val_mae: 5.3055 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 8/50
-97/97 [==============================] - ETA: 0s - loss: 143.3870 - mae: 8.5350
-Epoch 8: val_mae improved from 6.08647 to 4.63546, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_init.keras
-97/97 [==============================] - 85s 874ms/step - loss: 143.3870 - mae: 8.5350 - val_loss: 76.2194 - val_mae: 4.6355
+97/97 - 74s - loss: 83.2759 - mae: 6.2682 - val_loss: 69.6866 - val_mae: 5.5887 - lr: 0.0010 - 74s/epoch - 764ms/step
 Epoch 9/50
-97/97 [==============================] - ETA: 0s - loss: 105.4101 - mae: 6.9933
-Epoch 9: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 864ms/step - loss: 105.4101 - mae: 6.9933 - val_loss: 68.1960 - val_mae: 4.6585
+97/97 - 74s - loss: 81.4385 - mae: 6.2847 - val_loss: 70.7272 - val_mae: 5.7838 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 10/50
-97/97 [==============================] - ETA: 0s - loss: 90.1223 - mae: 6.4750
-Epoch 10: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 866ms/step - loss: 90.1223 - mae: 6.4750 - val_loss: 66.6382 - val_mae: 4.9653
+
+Epoch 10: ReduceLROnPlateau reducing learning rate to 0.00010000000474974513.
+97/97 - 74s - loss: 80.3371 - mae: 6.2890 - val_loss: 71.4807 - val_mae: 5.9063 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 11/50
-97/97 [==============================] - ETA: 0s - loss: 83.9693 - mae: 6.2998
-Epoch 11: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 864ms/step - loss: 83.9693 - mae: 6.2998 - val_loss: 66.7084 - val_mae: 5.1948
+97/97 - 74s - loss: 79.8947 - mae: 6.2943 - val_loss: 71.5442 - val_mae: 5.9161 - lr: 1.0000e-04 - 74s/epoch - 764ms/step
 Epoch 12/50
-97/97 [==============================] - ETA: 0s - loss: 81.3328 - mae: 6.2425
-Epoch 12: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 866ms/step - loss: 81.3328 - mae: 6.2425 - val_loss: 67.1680 - val_mae: 5.3652
+97/97 - 74s - loss: 79.3982 - mae: 6.2677 - val_loss: 71.6100 - val_mae: 5.9262 - lr: 1.0000e-04 - 74s/epoch - 758ms/step
 Epoch 13/50
-97/97 [==============================] - ETA: 0s - loss: 79.1474 - mae: 6.1911
-Epoch 13: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 866ms/step - loss: 79.1474 - mae: 6.1911 - val_loss: 67.5459 - val_mae: 5.4713
+97/97 - 74s - loss: 79.5008 - mae: 6.2681 - val_loss: 71.6751 - val_mae: 5.9362 - lr: 1.0000e-04 - 74s/epoch - 759ms/step
 Epoch 14/50
-97/97 [==============================] - ETA: 0s - loss: 78.5480 - mae: 6.1762
-Epoch 14: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 866ms/step - loss: 78.5480 - mae: 6.1762 - val_loss: 67.7159 - val_mae: 5.5253
+97/97 - 74s - loss: 79.6169 - mae: 6.2697 - val_loss: 71.7417 - val_mae: 5.9462 - lr: 1.0000e-04 - 74s/epoch - 758ms/step
 Epoch 15/50
-97/97 [==============================] - ETA: 0s - loss: 77.6029 - mae: 6.1706
-Epoch 15: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 866ms/step - loss: 77.6029 - mae: 6.1706 - val_loss: 67.6157 - val_mae: 5.5287
-Epoch 16/50
-97/97 [==============================] - ETA: 0s - loss: 77.0724 - mae: 6.1449
-Epoch 16: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 863ms/step - loss: 77.0724 - mae: 6.1449 - val_loss: 67.5137 - val_mae: 5.5300
-Epoch 17/50
-97/97 [==============================] - ETA: 0s - loss: 77.4112 - mae: 6.1487
-Epoch 17: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 863ms/step - loss: 77.4112 - mae: 6.1487 - val_loss: 67.3757 - val_mae: 5.5250
-Epoch 18/50
-97/97 [==============================] - ETA: 0s - loss: 77.1941 - mae: 6.1451
-Epoch 18: val_mae did not improve from 4.63546
-97/97 [==============================] - 84s 865ms/step - loss: 77.1941 - mae: 6.1451 - val_loss: 67.0246 - val_mae: 5.4845
+
+Epoch 15: ReduceLROnPlateau reducing learning rate to 1.0000000656873453e-05.
+97/97 - 74s - loss: 78.8979 - mae: 6.2343 - val_loss: 71.8051 - val_mae: 5.9557 - lr: 1.0000e-04 - 74s/epoch - 762ms/step
+Epoch 15: early stopping
+Restoring model weights from the end of the best epoch: 5.
 [MobileViT_XXS] Phase 2: Fine-Tuning
-Epoch 1/30
-     97/Unknown - 222s 1s/step - loss: 570.8338 - mae: 22.0118   
-Epoch 1: val_mae improved from inf to 16.29888, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_finetune.keras
-97/97 [==============================] - 232s 2s/step - loss: 570.8338 - mae: 22.0118 - val_loss: 341.8976 - val_mae: 16.2989
-Epoch 2/30
-97/97 [==============================] - ETA: 0s - loss: 373.1257 - mae: 16.8083
-Epoch 2: val_mae improved from 16.29888 to 8.83079, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_finetune.keras
-97/97 [==============================] - 89s 907ms/step - loss: 373.1257 - mae: 16.8083 - val_loss: 142.8370 - val_mae: 8.8308
-Epoch 3/30
-97/97 [==============================] - ETA: 0s - loss: 163.7566 - mae: 9.1856
-Epoch 3: val_mae improved from 8.83079 to 4.48016, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/MobileViT_XXS/MobileViT_XXS_finetune.keras
-97/97 [==============================] - 88s 906ms/step - loss: 163.7566 - mae: 9.1856 - val_loss: 69.4204 - val_mae: 4.4802
-Epoch 4/30
-97/97 [==============================] - ETA: 0s - loss: 122.7799 - mae: 7.8083
-Epoch 4: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 892ms/step - loss: 122.7799 - mae: 7.8083 - val_loss: 68.2518 - val_mae: 5.0558
-Epoch 5/30
-97/97 [==============================] - ETA: 0s - loss: 113.4938 - mae: 7.7880
-Epoch 5: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 890ms/step - loss: 113.4938 - mae: 7.7880 - val_loss: 81.4819 - val_mae: 6.3234
-Epoch 6/30
-97/97 [==============================] - ETA: 0s - loss: 104.8964 - mae: 7.3161
-Epoch 6: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 892ms/step - loss: 104.8964 - mae: 7.3161 - val_loss: 114.9763 - val_mae: 8.7907
-Epoch 7/30
-97/97 [==============================] - ETA: 0s - loss: 93.3622 - mae: 6.8673
-Epoch 7: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 892ms/step - loss: 93.3622 - mae: 6.8673 - val_loss: 129.0792 - val_mae: 9.5524
-Epoch 8/30
-97/97 [==============================] - ETA: 0s - loss: 89.5878 - mae: 6.7520
-Epoch 8: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 890ms/step - loss: 89.5878 - mae: 6.7520 - val_loss: 69.9099 - val_mae: 5.7636
-Epoch 9/30
-97/97 [==============================] - ETA: 0s - loss: 88.3914 - mae: 6.7551
-Epoch 9: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 889ms/step - loss: 88.3914 - mae: 6.7551 - val_loss: 1844.3118 - val_mae: 26.1231
-Epoch 10/30
-97/97 [==============================] - ETA: 0s - loss: 84.4726 - mae: 6.2576
-Epoch 10: val_mae did not improve from 4.48016
-97/97 [==============================] - 87s 889ms/step - loss: 84.4726 - mae: 6.2576 - val_loss: 650.8591 - val_mae: 14.6704
+>>>> Load pretrained from: /root/.keras/models/mobilevit_xxs_imagenet.h5
+Epoch 1/10
+Epoch 1: val_mae improved from 4.63847 to 4.57807; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_best_model.keras
+97/97 - 132s - loss: 273.3091 - mae: 12.7428 - val_loss: 67.5140 - val_mae: 4.5781 - lr: 1.0000e-04 - 132s/epoch - 1s/step
+Epoch 2/10
+97/97 - 77s - loss: 115.0482 - mae: 7.4713 - val_loss: 69.7943 - val_mae: 5.7063 - lr: 1.0000e-04 - 77s/epoch - 798ms/step
+Epoch 3/10
+97/97 - 77s - loss: 104.9713 - mae: 7.0529 - val_loss: 77.1305 - val_mae: 6.6305 - lr: 1.0000e-04 - 77s/epoch - 796ms/step
+Epoch 4/10
+97/97 - 77s - loss: 89.8958 - mae: 6.6463 - val_loss: 110.2806 - val_mae: 8.3799 - lr: 1.0000e-04 - 77s/epoch - 796ms/step
+Epoch 5/10
+97/97 - 77s - loss: 86.2096 - mae: 6.5696 - val_loss: 78.0560 - val_mae: 6.7173 - lr: 1.0000e-04 - 77s/epoch - 796ms/step
+Epoch 6/10
+
+Epoch 6: ReduceLROnPlateau reducing learning rate to 9.999999747378752e-06.
+97/97 - 77s - loss: 84.3471 - mae: 6.5230 - val_loss: 96.9607 - val_mae: 7.7754 - lr: 1.0000e-04 - 77s/epoch - 793ms/step
+Epoch 7/10
+97/97 - 77s - loss: 80.8404 - mae: 6.3209 - val_loss: 84.4135 - val_mae: 7.0417 - lr: 1.0000e-05 - 77s/epoch - 796ms/step
+Epoch 8/10
+97/97 - 77s - loss: 79.7661 - mae: 6.2151 - val_loss: 87.8113 - val_mae: 7.3235 - lr: 1.0000e-05 - 77s/epoch - 795ms/step
+Epoch 9/10
+97/97 - 77s - loss: 79.6599 - mae: 6.2293 - val_loss: 89.9859 - val_mae: 7.5105 - lr: 1.0000e-05 - 77s/epoch - 794ms/step
+Epoch 10/10
+97/97 - 77s - loss: 79.2370 - mae: 6.1694 - val_loss: 92.2402 - val_mae: 7.7177 - lr: 1.0000e-05 - 77s/epoch - 796ms/step
+Restoring model weights from the end of the best epoch: 1.
+Saved training log to /content/drive/MyDrive/Age_Estimation/04_ViT/models/MobileViT_XXS/MobileViT_XXS_training_log.csv
 
 ========================================
 Processing ConvNeXtV2_Tiny
 ========================================
 
 Setting up Data for ConvNeXtV2_Tiny (Input: 224x224)...
-Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/convnext/convnext_tiny_imagenet.h5
-114829704/114829704 [==============================] - 3s 0us/step
->>>> Load pretrained from: /root/.keras/models/convnext_tiny_imagenet.h5
 [ConvNeXtV2_Tiny] Phase 1: Frozen Training
+Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/convnext/convnext_tiny_imagenet.h5
+114829704/114829704 [==============================] - 10s 0us/step
+>>>> Load pretrained from: /root/.keras/models/convnext_tiny_imagenet.h5
 Epoch 1/50
-     97/Unknown - 146s 1s/step - loss: 579.6580 - mae: 22.2046
-Epoch 1: val_mae improved from inf to 16.94813, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 197s 2s/step - loss: 579.6580 - mae: 22.2046 - val_loss: 354.6546 - val_mae: 16.9481
+Epoch 1: val_mae improved from inf to 5.59085; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 86s - loss: 196.2920 - mae: 10.3006 - val_loss: 80.8796 - val_mae: 5.5908 - lr: 0.0010 - 86s/epoch - 884ms/step
 Epoch 2/50
-97/97 [==============================] - ETA: 0s - loss: 403.0267 - mae: 17.7436
-Epoch 2: val_mae improved from 16.94813 to 12.44538, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 88s 896ms/step - loss: 403.0267 - mae: 17.7436 - val_loss: 219.1507 - val_mae: 12.4454
+Epoch 2: val_mae improved from 5.59085 to 5.44160; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 109.9117 - mae: 7.8999 - val_loss: 77.5924 - val_mae: 5.4416 - lr: 0.0010 - 75s/epoch - 769ms/step
 Epoch 3/50
-97/97 [==============================] - ETA: 0s - loss: 185.9453 - mae: 10.0233
-Epoch 3: val_mae improved from 12.44538 to 6.44625, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 87s 893ms/step - loss: 185.9453 - mae: 10.0233 - val_loss: 100.8478 - val_mae: 6.4462
+Epoch 3: val_mae improved from 5.44160 to 5.37214; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 103.2882 - mae: 7.6207 - val_loss: 74.3871 - val_mae: 5.3721 - lr: 0.0010 - 75s/epoch - 774ms/step
 Epoch 4/50
-97/97 [==============================] - ETA: 0s - loss: 112.8697 - mae: 7.7725
-Epoch 4: val_mae improved from 6.44625 to 5.65614, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 87s 894ms/step - loss: 112.8697 - mae: 7.7725 - val_loss: 85.2932 - val_mae: 5.6561
+Epoch 4: val_mae improved from 5.37214 to 5.31795; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 96.2338 - mae: 7.3147 - val_loss: 72.2304 - val_mae: 5.3180 - lr: 0.0010 - 75s/epoch - 770ms/step
 Epoch 5/50
-97/97 [==============================] - ETA: 0s - loss: 100.5864 - mae: 7.3410
-Epoch 5: val_mae improved from 5.65614 to 5.36044, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 88s 895ms/step - loss: 100.5864 - mae: 7.3410 - val_loss: 76.7804 - val_mae: 5.3604
+Epoch 5: val_mae improved from 5.31795 to 5.29863; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 91.2120 - mae: 7.0924 - val_loss: 70.5772 - val_mae: 5.2986 - lr: 0.0010 - 75s/epoch - 771ms/step
 Epoch 6/50
-97/97 [==============================] - ETA: 0s - loss: 95.3383 - mae: 7.1560
-Epoch 6: val_mae improved from 5.36044 to 5.31026, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 88s 896ms/step - loss: 95.3383 - mae: 7.1560 - val_loss: 73.7490 - val_mae: 5.3103
+Epoch 6: val_mae improved from 5.29863 to 5.28609; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 88.2135 - mae: 6.9604 - val_loss: 69.3380 - val_mae: 5.2861 - lr: 0.0010 - 75s/epoch - 769ms/step
 Epoch 7/50
-97/97 [==============================] - ETA: 0s - loss: 90.2300 - mae: 6.9239
-Epoch 7: val_mae did not improve from 5.31026
-97/97 [==============================] - 87s 889ms/step - loss: 90.2300 - mae: 6.9239 - val_loss: 71.3225 - val_mae: 5.3140
+Epoch 7: val_mae improved from 5.28609 to 5.27745; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 84.9731 - mae: 6.8314 - val_loss: 68.3711 - val_mae: 5.2775 - lr: 0.0010 - 75s/epoch - 769ms/step
 Epoch 8/50
-97/97 [==============================] - ETA: 0s - loss: 89.3339 - mae: 6.9196
-Epoch 8: val_mae improved from 5.31026 to 5.31024, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 88s 895ms/step - loss: 89.3339 - mae: 6.9196 - val_loss: 70.2749 - val_mae: 5.3102
+Epoch 8: val_mae improved from 5.27745 to 5.26023; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 74s - loss: 83.3370 - mae: 6.7396 - val_loss: 67.8101 - val_mae: 5.2602 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 9/50
-97/97 [==============================] - ETA: 0s - loss: 87.0311 - mae: 6.8531
-Epoch 9: val_mae improved from 5.31024 to 5.28564, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_init.keras
-97/97 [==============================] - 88s 898ms/step - loss: 87.0311 - mae: 6.8531 - val_loss: 69.2282 - val_mae: 5.2856
+Epoch 9: val_mae improved from 5.26023 to 5.23827; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 74s - loss: 82.0865 - mae: 6.6763 - val_loss: 67.3726 - val_mae: 5.2383 - lr: 0.0010 - 74s/epoch - 764ms/step
 Epoch 10/50
-97/97 [==============================] - ETA: 0s - loss: 84.4532 - mae: 6.6558
-Epoch 10: val_mae did not improve from 5.28564
-97/97 [==============================] - 87s 891ms/step - loss: 84.4532 - mae: 6.6558 - val_loss: 67.7275 - val_mae: 5.3696
+Epoch 10: val_mae improved from 5.23827 to 5.22917; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 74s - loss: 80.7210 - mae: 6.6125 - val_loss: 66.7718 - val_mae: 5.2292 - lr: 0.0010 - 74s/epoch - 766ms/step
 Epoch 11/50
-97/97 [==============================] - ETA: 0s - loss: 81.8964 - mae: 6.4488
-Epoch 11: val_mae did not improve from 5.28564
-97/97 [==============================] - 86s 884ms/step - loss: 81.8964 - mae: 6.4488 - val_loss: 67.6557 - val_mae: 5.5196
+97/97 - 73s - loss: 79.7865 - mae: 6.5963 - val_loss: 66.3475 - val_mae: 5.2306 - lr: 0.0010 - 73s/epoch - 757ms/step
 Epoch 12/50
-97/97 [==============================] - ETA: 0s - loss: 82.0859 - mae: 6.5272
-Epoch 12: val_mae did not improve from 5.28564
-97/97 [==============================] - 87s 886ms/step - loss: 82.0859 - mae: 6.5272 - val_loss: 67.1185 - val_mae: 5.4924
+Epoch 12: val_mae improved from 5.22917 to 5.22769; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 78.3925 - mae: 6.5358 - val_loss: 65.9903 - val_mae: 5.2277 - lr: 0.0010 - 75s/epoch - 768ms/step
 Epoch 13/50
-97/97 [==============================] - ETA: 0s - loss: 81.1766 - mae: 6.4884
-Epoch 13: val_mae did not improve from 5.28564
-97/97 [==============================] - 86s 884ms/step - loss: 81.1766 - mae: 6.4884 - val_loss: 66.7185 - val_mae: 5.4789
+97/97 - 74s - loss: 77.9775 - mae: 6.4918 - val_loss: 65.7783 - val_mae: 5.2279 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 14/50
-97/97 [==============================] - ETA: 0s - loss: 81.6618 - mae: 6.4705
-Epoch 14: val_mae did not improve from 5.28564
-97/97 [==============================] - 86s 882ms/step - loss: 81.6618 - mae: 6.4705 - val_loss: 66.9837 - val_mae: 5.5521
+Epoch 14: val_mae improved from 5.22769 to 5.21725; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 77.8002 - mae: 6.4653 - val_loss: 65.5520 - val_mae: 5.2172 - lr: 0.0010 - 75s/epoch - 770ms/step
 Epoch 15/50
-97/97 [==============================] - ETA: 0s - loss: 80.4464 - mae: 6.4325
-Epoch 15: val_mae did not improve from 5.28564
-97/97 [==============================] - 87s 885ms/step - loss: 80.4464 - mae: 6.4325 - val_loss: 67.0565 - val_mae: 5.5662
+97/97 - 74s - loss: 77.5263 - mae: 6.4967 - val_loss: 65.3852 - val_mae: 5.2278 - lr: 0.0010 - 74s/epoch - 760ms/step
 Epoch 16/50
-97/97 [==============================] - ETA: 0s - loss: 80.6921 - mae: 6.4627
-Epoch 16: val_mae did not improve from 5.28564
-97/97 [==============================] - 86s 883ms/step - loss: 80.6921 - mae: 6.4627 - val_loss: 65.9162 - val_mae: 5.4217
+97/97 - 74s - loss: 77.2786 - mae: 6.4914 - val_loss: 65.2663 - val_mae: 5.2199 - lr: 0.0010 - 74s/epoch - 760ms/step
 Epoch 17/50
-97/97 [==============================] - ETA: 0s - loss: 79.8241 - mae: 6.4250
-Epoch 17: val_mae did not improve from 5.28564
-97/97 [==============================] - 87s 885ms/step - loss: 79.8241 - mae: 6.4250 - val_loss: 65.6197 - val_mae: 5.3513
+Epoch 17: val_mae improved from 5.21725 to 5.20819; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 76.9382 - mae: 6.4622 - val_loss: 64.7877 - val_mae: 5.2082 - lr: 0.0010 - 75s/epoch - 772ms/step
 Epoch 18/50
-97/97 [==============================] - ETA: 0s - loss: 78.6577 - mae: 6.3619
-Epoch 18: val_mae did not improve from 5.28564
-97/97 [==============================] - 86s 882ms/step - loss: 78.6577 - mae: 6.3619 - val_loss: 65.9716 - val_mae: 5.4261
+Epoch 18: val_mae improved from 5.20819 to 5.19712; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 76.7480 - mae: 6.4714 - val_loss: 64.5567 - val_mae: 5.1971 - lr: 0.0010 - 75s/epoch - 771ms/step
 Epoch 19/50
-97/97 [==============================] - ETA: 0s - loss: 79.2039 - mae: 6.3027
-Epoch 19: val_mae did not improve from 5.28564
-97/97 [==============================] - 87s 886ms/step - loss: 79.2039 - mae: 6.3027 - val_loss: 65.8436 - val_mae: 5.4957
+Epoch 19: val_mae improved from 5.19712 to 5.18112; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_best_model.keras
+97/97 - 75s - loss: 75.6042 - mae: 6.4086 - val_loss: 64.4504 - val_mae: 5.1811 - lr: 0.0010 - 75s/epoch - 771ms/step
+Epoch 20/50
+97/97 - 74s - loss: 75.7592 - mae: 6.4155 - val_loss: 64.4989 - val_mae: 5.1892 - lr: 0.0010 - 74s/epoch - 762ms/step
+Epoch 21/50
+97/97 - 74s - loss: 74.8429 - mae: 6.3908 - val_loss: 64.3571 - val_mae: 5.1819 - lr: 0.0010 - 74s/epoch - 761ms/step
+Epoch 22/50
+97/97 - 73s - loss: 75.3865 - mae: 6.3941 - val_loss: 64.1181 - val_mae: 5.1822 - lr: 0.0010 - 73s/epoch - 754ms/step
+Epoch 23/50
+97/97 - 73s - loss: 73.6250 - mae: 6.3391 - val_loss: 64.2961 - val_mae: 5.2008 - lr: 0.0010 - 73s/epoch - 750ms/step
+Epoch 24/50
+
+Epoch 24: ReduceLROnPlateau reducing learning rate to 0.00010000000474974513.
+97/97 - 73s - loss: 73.7880 - mae: 6.3278 - val_loss: 64.1860 - val_mae: 5.1875 - lr: 0.0010 - 73s/epoch - 751ms/step
+Epoch 25/50
+97/97 - 73s - loss: 72.0965 - mae: 5.9392 - val_loss: 64.5402 - val_mae: 5.2922 - lr: 1.0000e-04 - 73s/epoch - 752ms/step
+Epoch 26/50
+97/97 - 73s - loss: 70.9694 - mae: 5.9720 - val_loss: 64.8612 - val_mae: 5.3602 - lr: 1.0000e-04 - 73s/epoch - 752ms/step
+Epoch 27/50
+97/97 - 73s - loss: 70.7981 - mae: 6.0176 - val_loss: 64.9731 - val_mae: 5.3917 - lr: 1.0000e-04 - 73s/epoch - 753ms/step
+Epoch 28/50
+97/97 - 73s - loss: 69.5061 - mae: 5.9522 - val_loss: 65.0728 - val_mae: 5.4188 - lr: 1.0000e-04 - 73s/epoch - 753ms/step
+Epoch 29/50
+
+Epoch 29: ReduceLROnPlateau reducing learning rate to 1.0000000656873453e-05.
+97/97 - 73s - loss: 69.9933 - mae: 6.0238 - val_loss: 65.0330 - val_mae: 5.4210 - lr: 1.0000e-04 - 73s/epoch - 751ms/step
+Epoch 29: early stopping
+Restoring model weights from the end of the best epoch: 19.
 [ConvNeXtV2_Tiny] Phase 2: Fine-Tuning
-Epoch 1/30
-     97/Unknown - 262s 2s/step - loss: 78.8824 - mae: 6.1486
-Epoch 1: val_mae improved from inf to 6.40218, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_finetune.keras
-97/97 [==============================] - 274s 2s/step - loss: 78.8824 - mae: 6.1486 - val_loss: 75.2411 - val_mae: 6.4022
-Epoch 2/30
-97/97 [==============================] - ETA: 0s - loss: 90.1310 - mae: 6.7639
-Epoch 2: val_mae did not improve from 6.40218
-97/97 [==============================] - 133s 1s/step - loss: 90.1310 - mae: 6.7639 - val_loss: 86.8999 - val_mae: 7.6382
-Epoch 3/30
-97/97 [==============================] - ETA: 0s - loss: 90.2467 - mae: 6.5488
-Epoch 3: val_mae did not improve from 6.40218
-97/97 [==============================] - 132s 1s/step - loss: 90.2467 - mae: 6.5488 - val_loss: 118.9187 - val_mae: 9.7214
-Epoch 4/30
-97/97 [==============================] - ETA: 0s - loss: 91.2050 - mae: 6.6958
-Epoch 4: val_mae did not improve from 6.40218
-97/97 [==============================] - 133s 1s/step - loss: 91.2050 - mae: 6.6958 - val_loss: 133.4902 - val_mae: 10.4733
-Epoch 5/30
-97/97 [==============================] - ETA: 0s - loss: 91.7608 - mae: 6.4752
-Epoch 5: val_mae did not improve from 6.40218
-97/97 [==============================] - 133s 1s/step - loss: 91.7608 - mae: 6.4752 - val_loss: 143.1311 - val_mae: 10.9738
-Epoch 6/30
-97/97 [==============================] - ETA: 0s - loss: 87.5583 - mae: 6.5438
-Epoch 6: val_mae did not improve from 6.40218
-97/97 [==============================] - 132s 1s/step - loss: 87.5583 - mae: 6.5438 - val_loss: 166.9771 - val_mae: 12.0343
-Epoch 7/30
-97/97 [==============================] - ETA: 0s - loss: 94.2680 - mae: 6.9447
-Epoch 7: val_mae did not improve from 6.40218
-97/97 [==============================] - 133s 1s/step - loss: 94.2680 - mae: 6.9447 - val_loss: 114.0918 - val_mae: 9.3697
-Epoch 8/30
-97/97 [==============================] - ETA: 0s - loss: 92.5735 - mae: 6.7884
-Epoch 8: val_mae did not improve from 6.40218
-97/97 [==============================] - 133s 1s/step - loss: 92.5735 - mae: 6.7884 - val_loss: 146.6443 - val_mae: 11.0594
+>>>> Load pretrained from: /root/.keras/models/convnext_tiny_imagenet.h5
+Epoch 1/10
+97/97 - 126s - loss: 99.7368 - mae: 6.9998 - val_loss: 71.5091 - val_mae: 6.1311 - lr: 1.0000e-04 - 126s/epoch - 1s/step
+Epoch 2/10
+97/97 - 90s - loss: 88.8783 - mae: 6.8126 - val_loss: 90.3503 - val_mae: 7.9828 - lr: 1.0000e-04 - 90s/epoch - 927ms/step
+Epoch 3/10
+97/97 - 89s - loss: 80.2732 - mae: 6.5875 - val_loss: 79.3590 - val_mae: 6.7963 - lr: 1.0000e-04 - 89s/epoch - 915ms/step
+Epoch 4/10
+97/97 - 90s - loss: 77.5782 - mae: 6.6121 - val_loss: 76.1724 - val_mae: 5.9251 - lr: 1.0000e-04 - 90s/epoch - 924ms/step
+Epoch 5/10
+97/97 - 90s - loss: 75.9362 - mae: 6.4278 - val_loss: 90.9269 - val_mae: 8.0663 - lr: 1.0000e-04 - 90s/epoch - 923ms/step
+Epoch 6/10
+97/97 - 90s - loss: 73.9254 - mae: 6.4665 - val_loss: 73.8187 - val_mae: 5.8844 - lr: 1.0000e-04 - 90s/epoch - 925ms/step
+Epoch 7/10
+97/97 - 89s - loss: 71.4184 - mae: 6.3140 - val_loss: 73.4061 - val_mae: 5.9711 - lr: 1.0000e-04 - 89s/epoch - 918ms/step
+Epoch 8/10
+97/97 - 89s - loss: 69.3224 - mae: 6.2317 - val_loss: 72.8649 - val_mae: 5.6235 - lr: 1.0000e-04 - 89s/epoch - 918ms/step
+Epoch 9/10
+97/97 - 89s - loss: 66.1192 - mae: 6.0868 - val_loss: 70.4800 - val_mae: 5.4316 - lr: 1.0000e-04 - 89s/epoch - 918ms/step
+Epoch 10/10
+97/97 - 90s - loss: 65.2410 - mae: 6.0776 - val_loss: 67.4841 - val_mae: 5.4629 - lr: 1.0000e-04 - 90s/epoch - 925ms/step
+Restoring model weights from the end of the best epoch: 9.
+Saved training log to /content/drive/MyDrive/Age_Estimation/04_ViT/models/ConvNeXtV2_Tiny/ConvNeXtV2_Tiny_training_log.csv
 
 ========================================
 Processing TinyViT_11M
 ========================================
 
 Setting up Data for TinyViT_11M (Input: 224x224)...
-Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/tinyvit/tiny_vit_11m_224_imagenet.h5
-44814104/44814104 [==============================] - 1s 0us/step
->>>> Load pretrained from: /root/.keras/models/tiny_vit_11m_224_imagenet.h5
 [TinyViT_11M] Phase 1: Frozen Training
+Downloading data from https://github.com/leondgarse/keras_cv_attention_models/releases/download/tinyvit/tiny_vit_11m_224_imagenet.h5
+44814104/44814104 [==============================] - 3s 0us/step
+>>>> Load pretrained from: /root/.keras/models/tiny_vit_11m_224_imagenet.h5
 Epoch 1/50
-     97/Unknown - 107s 906ms/step - loss: 582.9843 - mae: 22.4111
-Epoch 1: val_mae improved from inf to 17.95286, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 125s 1s/step - loss: 582.9843 - mae: 22.4111 - val_loss: 390.8277 - val_mae: 17.9529
+Epoch 1: val_mae improved from inf to 15.78973; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 86s - loss: 515.9927 - mae: 20.8779 - val_loss: 315.1266 - val_mae: 15.7897 - lr: 0.0010 - 86s/epoch - 884ms/step
 Epoch 2/50
-97/97 [==============================] - ETA: 0s - loss: 566.2166 - mae: 22.0396
-Epoch 2: val_mae improved from 17.95286 to 17.54974, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 566.2166 - mae: 22.0396 - val_loss: 376.0612 - val_mae: 17.5497
+Epoch 2: val_mae improved from 15.78973 to 13.53767; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 391.4865 - mae: 17.7041 - val_loss: 247.7913 - val_mae: 13.5377 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 3/50
-97/97 [==============================] - ETA: 0s - loss: 534.2413 - mae: 21.3145
-Epoch 3: val_mae improved from 17.54974 to 16.87873, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 534.2413 - mae: 21.3145 - val_loss: 352.2653 - val_mae: 16.8787
+Epoch 3: val_mae improved from 13.53767 to 11.50846; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 295.9097 - mae: 14.8116 - val_loss: 196.5428 - val_mae: 11.5085 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 4/50
-97/97 [==============================] - ETA: 0s - loss: 487.7628 - mae: 20.2141
-Epoch 4: val_mae improved from 16.87873 to 15.93761, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 487.7628 - mae: 20.2141 - val_loss: 320.5374 - val_mae: 15.9376
+Epoch 4: val_mae improved from 11.50846 to 9.71727; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 224.9609 - mae: 12.2237 - val_loss: 158.7319 - val_mae: 9.7173 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 5/50
-97/97 [==============================] - ETA: 0s - loss: 429.9160 - mae: 18.7503
-Epoch 5: val_mae improved from 15.93761 to 14.73040, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 429.9160 - mae: 18.7503 - val_loss: 282.6591 - val_mae: 14.7304
+Epoch 5: val_mae improved from 9.71727 to 8.24054; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 174.2209 - mae: 10.1042 - val_loss: 131.4997 - val_mae: 8.2405 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 6/50
-97/97 [==============================] - ETA: 0s - loss: 364.4212 - mae: 16.9352
-Epoch 6: val_mae improved from 14.73040 to 13.25716, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 920ms/step - loss: 364.4212 - mae: 16.9352 - val_loss: 240.7272 - val_mae: 13.2572
+Epoch 6: val_mae improved from 8.24054 to 7.20452; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 139.9417 - mae: 8.5896 - val_loss: 112.3986 - val_mae: 7.2045 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 7/50
-97/97 [==============================] - ETA: 0s - loss: 294.2350 - mae: 14.7455
-Epoch 7: val_mae improved from 13.25716 to 11.51798, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 916ms/step - loss: 294.2350 - mae: 14.7455 - val_loss: 197.2837 - val_mae: 11.5180
+Epoch 7: val_mae improved from 7.20452 to 6.60165; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 116.5346 - mae: 7.5338 - val_loss: 99.3768 - val_mae: 6.6016 - lr: 0.0010 - 74s/epoch - 764ms/step
 Epoch 8/50
-97/97 [==============================] - ETA: 0s - loss: 225.2137 - mae: 12.1977
-Epoch 8: val_mae improved from 11.51798 to 9.51117, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 225.2137 - mae: 12.1977 - val_loss: 155.2778 - val_mae: 9.5112
+Epoch 8: val_mae improved from 6.60165 to 6.25755; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 101.4419 - mae: 6.8855 - val_loss: 90.6669 - val_mae: 6.2576 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 9/50
-97/97 [==============================] - ETA: 0s - loss: 167.2999 - mae: 9.7436
-Epoch 9: val_mae improved from 9.51117 to 7.64138, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 167.2999 - mae: 9.7436 - val_loss: 121.4396 - val_mae: 7.6414
+Epoch 9: val_mae improved from 6.25755 to 6.06183; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 91.6326 - mae: 6.5165 - val_loss: 84.9062 - val_mae: 6.0618 - lr: 0.0010 - 74s/epoch - 763ms/step
 Epoch 10/50
-97/97 [==============================] - ETA: 0s - loss: 124.4181 - mae: 7.8076
-Epoch 10: val_mae improved from 7.64138 to 6.48369, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 124.4181 - mae: 7.8076 - val_loss: 98.7492 - val_mae: 6.4837
+Epoch 10: val_mae improved from 6.06183 to 5.95856; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 85.5934 - mae: 6.3408 - val_loss: 81.1723 - val_mae: 5.9586 - lr: 0.0010 - 74s/epoch - 764ms/step
 Epoch 11/50
-97/97 [==============================] - ETA: 0s - loss: 97.9680 - mae: 6.7303
-Epoch 11: val_mae improved from 6.48369 to 6.02892, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 919ms/step - loss: 97.9680 - mae: 6.7303 - val_loss: 87.3885 - val_mae: 6.0289
+Epoch 11: val_mae improved from 5.95856 to 5.91263; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 82.2228 - mae: 6.2747 - val_loss: 78.7484 - val_mae: 5.9126 - lr: 0.0010 - 74s/epoch - 765ms/step
 Epoch 12/50
-97/97 [==============================] - ETA: 0s - loss: 88.5093 - mae: 6.4234
-Epoch 12: val_mae improved from 6.02892 to 5.87301, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 88.5093 - mae: 6.4234 - val_loss: 82.4867 - val_mae: 5.8730
+Epoch 12: val_mae improved from 5.91263 to 5.89934; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 74s - loss: 80.2810 - mae: 6.2314 - val_loss: 77.1765 - val_mae: 5.8993 - lr: 0.0010 - 74s/epoch - 761ms/step
 Epoch 13/50
-97/97 [==============================] - ETA: 0s - loss: 83.6302 - mae: 6.2640
-Epoch 13: val_mae improved from 5.87301 to 5.77657, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 910ms/step - loss: 83.6302 - mae: 6.2640 - val_loss: 79.0506 - val_mae: 5.7766
+97/97 - 73s - loss: 78.2956 - mae: 6.2291 - val_loss: 76.1084 - val_mae: 5.8995 - lr: 0.0010 - 73s/epoch - 754ms/step
 Epoch 14/50
-97/97 [==============================] - ETA: 0s - loss: 80.9082 - mae: 6.2092
-Epoch 14: val_mae improved from 5.77657 to 5.72392, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 80.9082 - mae: 6.2092 - val_loss: 76.8009 - val_mae: 5.7239
+97/97 - 73s - loss: 78.2599 - mae: 6.2607 - val_loss: 75.3986 - val_mae: 5.9072 - lr: 0.0010 - 73s/epoch - 754ms/step
 Epoch 15/50
-97/97 [==============================] - ETA: 0s - loss: 78.7667 - mae: 6.1726
-Epoch 15: val_mae improved from 5.72392 to 5.70009, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 78.7667 - mae: 6.1726 - val_loss: 75.4340 - val_mae: 5.7001
+97/97 - 73s - loss: 77.2981 - mae: 6.2625 - val_loss: 74.8938 - val_mae: 5.9144 - lr: 0.0010 - 73s/epoch - 753ms/step
 Epoch 16/50
-97/97 [==============================] - ETA: 0s - loss: 77.7852 - mae: 6.1414
-Epoch 16: val_mae improved from 5.70009 to 5.68465, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 77.7852 - mae: 6.1414 - val_loss: 74.5854 - val_mae: 5.6847
+97/97 - 73s - loss: 77.5951 - mae: 6.2922 - val_loss: 74.5299 - val_mae: 5.9197 - lr: 0.0010 - 73s/epoch - 754ms/step
 Epoch 17/50
-97/97 [==============================] - ETA: 0s - loss: 77.6980 - mae: 6.1452
-Epoch 17: val_mae improved from 5.68465 to 5.67178, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 77.6980 - mae: 6.1452 - val_loss: 73.8829 - val_mae: 5.6718
+
+Epoch 17: ReduceLROnPlateau reducing learning rate to 0.00010000000474974513.
+97/97 - 73s - loss: 77.0092 - mae: 6.2801 - val_loss: 74.2043 - val_mae: 5.9252 - lr: 0.0010 - 73s/epoch - 754ms/step
 Epoch 18/50
-97/97 [==============================] - ETA: 0s - loss: 76.7718 - mae: 6.1305
-Epoch 18: val_mae improved from 5.67178 to 5.66358, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 910ms/step - loss: 76.7718 - mae: 6.1305 - val_loss: 73.4296 - val_mae: 5.6636
+97/97 - 73s - loss: 76.5183 - mae: 6.2633 - val_loss: 74.1748 - val_mae: 5.9259 - lr: 1.0000e-04 - 73s/epoch - 755ms/step
 Epoch 19/50
-97/97 [==============================] - ETA: 0s - loss: 77.0250 - mae: 6.1157
-Epoch 19: val_mae improved from 5.66358 to 5.65976, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 916ms/step - loss: 77.0250 - mae: 6.1157 - val_loss: 73.0664 - val_mae: 5.6598
+97/97 - 73s - loss: 76.3731 - mae: 6.2688 - val_loss: 74.1418 - val_mae: 5.9266 - lr: 1.0000e-04 - 73s/epoch - 754ms/step
 Epoch 20/50
-97/97 [==============================] - ETA: 0s - loss: 76.4215 - mae: 6.1097
-Epoch 20: val_mae improved from 5.65976 to 5.65692, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 917ms/step - loss: 76.4215 - mae: 6.1097 - val_loss: 72.8983 - val_mae: 5.6569
+97/97 - 73s - loss: 76.0610 - mae: 6.2432 - val_loss: 74.1091 - val_mae: 5.9273 - lr: 1.0000e-04 - 73s/epoch - 752ms/step
 Epoch 21/50
-97/97 [==============================] - ETA: 0s - loss: 76.4379 - mae: 6.0849
-Epoch 21: val_mae improved from 5.65692 to 5.64948, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 917ms/step - loss: 76.4379 - mae: 6.0849 - val_loss: 72.6005 - val_mae: 5.6495
+97/97 - 73s - loss: 76.6729 - mae: 6.2552 - val_loss: 74.0800 - val_mae: 5.9277 - lr: 1.0000e-04 - 73s/epoch - 752ms/step
 Epoch 22/50
-97/97 [==============================] - ETA: 0s - loss: 75.9765 - mae: 6.0841
-Epoch 22: val_mae improved from 5.64948 to 5.64417, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 75.9765 - mae: 6.0841 - val_loss: 72.3433 - val_mae: 5.6442
-Epoch 23/50
-97/97 [==============================] - ETA: 0s - loss: 75.4105 - mae: 6.0263
-Epoch 23: val_mae improved from 5.64417 to 5.63651, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 75.4105 - mae: 6.0263 - val_loss: 72.1344 - val_mae: 5.6365
-Epoch 24/50
-97/97 [==============================] - ETA: 0s - loss: 76.0066 - mae: 6.0299
-Epoch 24: val_mae improved from 5.63651 to 5.63158, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 76.0066 - mae: 6.0299 - val_loss: 71.8123 - val_mae: 5.6316
-Epoch 25/50
-97/97 [==============================] - ETA: 0s - loss: 75.3451 - mae: 6.0278
-Epoch 25: val_mae improved from 5.63158 to 5.62713, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 75.3451 - mae: 6.0278 - val_loss: 71.6116 - val_mae: 5.6271
-Epoch 26/50
-97/97 [==============================] - ETA: 0s - loss: 75.0330 - mae: 5.9862
-Epoch 26: val_mae improved from 5.62713 to 5.62504, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 75.0330 - mae: 5.9862 - val_loss: 71.5396 - val_mae: 5.6250
-Epoch 27/50
-97/97 [==============================] - ETA: 0s - loss: 74.9495 - mae: 5.9700
-Epoch 27: val_mae improved from 5.62504 to 5.61530, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 918ms/step - loss: 74.9495 - mae: 5.9700 - val_loss: 71.3438 - val_mae: 5.6153
-Epoch 28/50
-97/97 [==============================] - ETA: 0s - loss: 75.6114 - mae: 5.9997
-Epoch 28: val_mae improved from 5.61530 to 5.60954, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 921ms/step - loss: 75.6114 - mae: 5.9997 - val_loss: 71.1948 - val_mae: 5.6095
-Epoch 29/50
-97/97 [==============================] - ETA: 0s - loss: 75.1842 - mae: 5.9791
-Epoch 29: val_mae improved from 5.60954 to 5.60007, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 916ms/step - loss: 75.1842 - mae: 5.9791 - val_loss: 70.9211 - val_mae: 5.6001
-Epoch 30/50
-97/97 [==============================] - ETA: 0s - loss: 74.7414 - mae: 5.9646
-Epoch 30: val_mae improved from 5.60007 to 5.59097, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 74.7414 - mae: 5.9646 - val_loss: 70.7501 - val_mae: 5.5910
-Epoch 31/50
-97/97 [==============================] - ETA: 0s - loss: 74.9302 - mae: 5.9483
-Epoch 31: val_mae improved from 5.59097 to 5.58196, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 916ms/step - loss: 74.9302 - mae: 5.9483 - val_loss: 70.5507 - val_mae: 5.5820
-Epoch 32/50
-97/97 [==============================] - ETA: 0s - loss: 74.9789 - mae: 5.9622
-Epoch 32: val_mae improved from 5.58196 to 5.57403, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 74.9789 - mae: 5.9622 - val_loss: 70.3733 - val_mae: 5.5740
-Epoch 33/50
-97/97 [==============================] - ETA: 0s - loss: 74.7867 - mae: 5.9209
-Epoch 33: val_mae improved from 5.57403 to 5.56788, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 74.7867 - mae: 5.9209 - val_loss: 70.1548 - val_mae: 5.5679
-Epoch 34/50
-97/97 [==============================] - ETA: 0s - loss: 74.9845 - mae: 5.9439
-Epoch 34: val_mae improved from 5.56788 to 5.56425, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 74.9845 - mae: 5.9439 - val_loss: 70.1120 - val_mae: 5.5643
-Epoch 35/50
-97/97 [==============================] - ETA: 0s - loss: 74.3131 - mae: 5.9194
-Epoch 35: val_mae improved from 5.56425 to 5.55618, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 916ms/step - loss: 74.3131 - mae: 5.9194 - val_loss: 69.9480 - val_mae: 5.5562
-Epoch 36/50
-97/97 [==============================] - ETA: 0s - loss: 74.4452 - mae: 5.9140
-Epoch 36: val_mae improved from 5.55618 to 5.54921, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 912ms/step - loss: 74.4452 - mae: 5.9140 - val_loss: 69.8022 - val_mae: 5.5492
-Epoch 37/50
-97/97 [==============================] - ETA: 0s - loss: 73.9752 - mae: 5.8818
-Epoch 37: val_mae improved from 5.54921 to 5.54419, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 910ms/step - loss: 73.9752 - mae: 5.8818 - val_loss: 69.6685 - val_mae: 5.5442
-Epoch 38/50
-97/97 [==============================] - ETA: 0s - loss: 73.9323 - mae: 5.8894
-Epoch 38: val_mae improved from 5.54419 to 5.53904, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 73.9323 - mae: 5.8894 - val_loss: 69.5464 - val_mae: 5.5390
-Epoch 39/50
-97/97 [==============================] - ETA: 0s - loss: 74.0786 - mae: 5.8803
-Epoch 39: val_mae improved from 5.53904 to 5.52966, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 74.0786 - mae: 5.8803 - val_loss: 69.3705 - val_mae: 5.5297
-Epoch 40/50
-97/97 [==============================] - ETA: 0s - loss: 74.0851 - mae: 5.8769
-Epoch 40: val_mae improved from 5.52966 to 5.52408, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 74.0851 - mae: 5.8769 - val_loss: 69.2762 - val_mae: 5.5241
-Epoch 41/50
-97/97 [==============================] - ETA: 0s - loss: 74.8185 - mae: 5.9035
-Epoch 41: val_mae improved from 5.52408 to 5.52007, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 74.8185 - mae: 5.9035 - val_loss: 69.2003 - val_mae: 5.5201
-Epoch 42/50
-97/97 [==============================] - ETA: 0s - loss: 74.2088 - mae: 5.8801
-Epoch 42: val_mae improved from 5.52007 to 5.51461, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 914ms/step - loss: 74.2088 - mae: 5.8801 - val_loss: 69.0829 - val_mae: 5.5146
-Epoch 43/50
-97/97 [==============================] - ETA: 0s - loss: 74.4055 - mae: 5.8595
-Epoch 43: val_mae improved from 5.51461 to 5.50777, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 74.4055 - mae: 5.8595 - val_loss: 68.9336 - val_mae: 5.5078
-Epoch 44/50
-97/97 [==============================] - ETA: 0s - loss: 74.0678 - mae: 5.8601
-Epoch 44: val_mae improved from 5.50777 to 5.50067, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 917ms/step - loss: 74.0678 - mae: 5.8601 - val_loss: 68.8280 - val_mae: 5.5007
-Epoch 45/50
-97/97 [==============================] - ETA: 0s - loss: 74.0508 - mae: 5.8460
-Epoch 45: val_mae improved from 5.50067 to 5.49469, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 74.0508 - mae: 5.8460 - val_loss: 68.6748 - val_mae: 5.4947
-Epoch 46/50
-97/97 [==============================] - ETA: 0s - loss: 74.0680 - mae: 5.8617
-Epoch 46: val_mae improved from 5.49469 to 5.49116, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 917ms/step - loss: 74.0680 - mae: 5.8617 - val_loss: 68.6318 - val_mae: 5.4912
-Epoch 47/50
-97/97 [==============================] - ETA: 0s - loss: 74.3068 - mae: 5.8468
-Epoch 47: val_mae improved from 5.49116 to 5.48713, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 914ms/step - loss: 74.3068 - mae: 5.8468 - val_loss: 68.6042 - val_mae: 5.4871
-Epoch 48/50
-97/97 [==============================] - ETA: 0s - loss: 74.5056 - mae: 5.8556
-Epoch 48: val_mae improved from 5.48713 to 5.48227, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 915ms/step - loss: 74.5056 - mae: 5.8556 - val_loss: 68.5261 - val_mae: 5.4823
-Epoch 49/50
-97/97 [==============================] - ETA: 0s - loss: 74.1724 - mae: 5.8580
-Epoch 49: val_mae improved from 5.48227 to 5.47873, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 90s 915ms/step - loss: 74.1724 - mae: 5.8580 - val_loss: 68.4077 - val_mae: 5.4787
-Epoch 50/50
-97/97 [==============================] - ETA: 0s - loss: 73.8475 - mae: 5.8243
-Epoch 50: val_mae improved from 5.47873 to 5.47504, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_init.keras
-97/97 [==============================] - 89s 913ms/step - loss: 73.8475 - mae: 5.8243 - val_loss: 68.3955 - val_mae: 5.4750
+
+Epoch 22: ReduceLROnPlateau reducing learning rate to 1.0000000656873453e-05.
+97/97 - 73s - loss: 76.0347 - mae: 6.2513 - val_loss: 74.0474 - val_mae: 5.9284 - lr: 1.0000e-04 - 73s/epoch - 753ms/step
+Epoch 22: early stopping
+Restoring model weights from the end of the best epoch: 12.
 [TinyViT_11M] Phase 2: Fine-Tuning
-Epoch 1/30
-     97/Unknown - 243s 2s/step - loss: 242.6788 - mae: 10.9124
-Epoch 1: val_mae improved from inf to 6.48934, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_finetune.keras
-97/97 [==============================] - 254s 2s/step - loss: 242.6788 - mae: 10.9124 - val_loss: 75.1376 - val_mae: 6.4893
-Epoch 2/30
-97/97 [==============================] - ETA: 0s - loss: 93.0787 - mae: 7.0239
-Epoch 2: val_mae did not improve from 6.48934
-97/97 [==============================] - 121s 1s/step - loss: 93.0787 - mae: 7.0239 - val_loss: 75.5866 - val_mae: 6.4923
-Epoch 3/30
-97/97 [==============================] - ETA: 0s - loss: 86.5189 - mae: 6.4640
-Epoch 3: val_mae improved from 6.48934 to 4.60518, saving model to /content/drive/MyDrive/HHD_AgeSplit/ViT2/TinyViT_11M/TinyViT_11M_finetune.keras
-97/97 [==============================] - 123s 1s/step - loss: 86.5189 - mae: 6.4640 - val_loss: 65.5648 - val_mae: 4.6052
-Epoch 4/30
-97/97 [==============================] - ETA: 0s - loss: 95.6318 - mae: 6.7130
-Epoch 4: val_mae did not improve from 4.60518
-97/97 [==============================] - 123s 1s/step - loss: 95.6318 - mae: 6.7130 - val_loss: 99.5182 - val_mae: 8.4763
-Epoch 5/30
-97/97 [==============================] - ETA: 0s - loss: 91.3339 - mae: 6.6007
-Epoch 5: val_mae did not improve from 4.60518
-97/97 [==============================] - 120s 1s/step - loss: 91.3339 - mae: 6.6007 - val_loss: 102.6655 - val_mae: 8.6798
-Epoch 6/30
-97/97 [==============================] - ETA: 0s - loss: 92.0853 - mae: 6.5328
-Epoch 6: val_mae did not improve from 4.60518
-97/97 [==============================] - 121s 1s/step - loss: 92.0853 - mae: 6.5328 - val_loss: 128.6041 - val_mae: 10.1812
-Epoch 7/30
-97/97 [==============================] - ETA: 0s - loss: 99.8636 - mae: 7.0347 
-Epoch 7: val_mae did not improve from 4.60518
-97/97 [==============================] - 121s 1s/step - loss: 99.8636 - mae: 7.0347 - val_loss: 103.6934 - val_mae: 8.7067
-Epoch 8/30
-97/97 [==============================] - ETA: 0s - loss: 93.6304 - mae: 6.9446
-Epoch 8: val_mae did not improve from 4.60518
-97/97 [==============================] - 121s 1s/step - loss: 93.6304 - mae: 6.9446 - val_loss: 84.4035 - val_mae: 7.5082
-Epoch 9/30
-97/97 [==============================] - ETA: 0s - loss: 86.6530 - mae: 6.8252
-Epoch 9: val_mae did not improve from 4.60518
-97/97 [==============================] - 121s 1s/step - loss: 86.6530 - mae: 6.8252 - val_loss: 91.8945 - val_mae: 8.0209
-Epoch 10/30
-97/97 [==============================] - ETA: 0s - loss: 84.5395 - mae: 6.6698
-Epoch 10: val_mae did not improve from 4.60518
-97/97 [==============================] - 121s 1s/step - loss: 84.5395 - mae: 6.6698 - val_loss: 212.3192 - val_mae: 12.9803
+>>>> Load pretrained from: /root/.keras/models/tiny_vit_11m_224_imagenet.h5
+Epoch 1/10
+97/97 - 127s - loss: 111.2757 - mae: 6.8043 - val_loss: 80.1162 - val_mae: 6.9011 - lr: 1.0000e-04 - 127s/epoch - 1s/step
+Epoch 2/10
+97/97 - 80s - loss: 90.8668 - mae: 6.7999 - val_loss: 99.1735 - val_mae: 8.4237 - lr: 1.0000e-04 - 80s/epoch - 829ms/step
+Epoch 3/10
+97/97 - 79s - loss: 84.2169 - mae: 6.6397 - val_loss: 108.9270 - val_mae: 9.0892 - lr: 1.0000e-04 - 79s/epoch - 819ms/step
+Epoch 4/10
+97/97 - 80s - loss: 80.8151 - mae: 6.5100 - val_loss: 95.5352 - val_mae: 8.3242 - lr: 1.0000e-04 - 80s/epoch - 828ms/step
+Epoch 5/10
+97/97 - 80s - loss: 81.7251 - mae: 6.5327 - val_loss: 88.1427 - val_mae: 7.6827 - lr: 1.0000e-04 - 80s/epoch - 829ms/step
+Epoch 6/10
+
+Epoch 6: ReduceLROnPlateau reducing learning rate to 9.999999747378752e-06.
+97/97 - 80s - loss: 80.6494 - mae: 6.5121 - val_loss: 78.3525 - val_mae: 6.9662 - lr: 1.0000e-04 - 80s/epoch - 824ms/step
+Epoch 7/10
+Epoch 7: val_mae improved from 5.89934 to 5.86019; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 81s - loss: 68.3697 - mae: 6.0529 - val_loss: 67.0656 - val_mae: 5.8602 - lr: 1.0000e-05 - 81s/epoch - 837ms/step
+Epoch 8/10
+Epoch 8: val_mae improved from 5.86019 to 5.67179; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 82s - loss: 60.7487 - mae: 5.4733 - val_loss: 64.7660 - val_mae: 5.6718 - lr: 1.0000e-05 - 82s/epoch - 844ms/step
+Epoch 9/10
+Epoch 9: val_mae improved from 5.67179 to 5.62924; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 82s - loss: 57.3139 - mae: 5.3380 - val_loss: 63.5504 - val_mae: 5.6292 - lr: 1.0000e-05 - 82s/epoch - 845ms/step
+Epoch 10/10
+Epoch 10: val_mae improved from 5.62924 to 5.48666; saved model to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_best_model.keras
+97/97 - 82s - loss: 54.8584 - mae: 5.3060 - val_loss: 61.7779 - val_mae: 5.4867 - lr: 1.0000e-05 - 82s/epoch - 845ms/step
+Restoring model weights from the end of the best epoch: 10.
+Saved training log to /content/drive/MyDrive/Age_Estimation/04_ViT/models/TinyViT_11M/TinyViT_11M_training_log.csv
 
 ========================================
 Running Evaluation
 ========================================
+Evaluating SwinV2_Tiny...
+13it [00:13,  1.02s/it]
+MAE: 5.46 | RMSE: 7.46 | R²: -0.391 | MAPE: 30.87%
+±2 yrs: 11.21% | ±5 yrs: 55.17% | ±10 yrs: 94.83%
+Max Error: 32.41 | Median Error: 4.83
+Evaluating MobileViT_XXS...
+13it [00:10,  1.25it/s]
+MAE: 2.79 | RMSE: 6.13 | R²: 0.060 | MAPE: 13.59%
+±2 yrs: 65.52% | ±5 yrs: 93.97% | ±10 yrs: 95.69%
+Max Error: 34.91 | Median Error: 1.35
 Evaluating ConvNeXtV2_Tiny...
-13it [00:38,  2.98s/it]
-MAE: 4.40 | RMSE: 6.56 | R²: -0.077 | MAPE: 27.25%
-±2 yrs: 38.79% | ±5 yrs: 73.28% | ±10 yrs: 87.07%
-Max Error: 25.10 | Median Error: 2.80
+13it [00:09,  1.41it/s]
+MAE: 3.86 | RMSE: 6.08 | R²: 0.075 | MAPE: 21.87%
+±2 yrs: 37.07% | ±5 yrs: 81.03% | ±10 yrs: 94.83%
+Max Error: 27.99 | Median Error: 2.98
 Evaluating TinyViT_11M...
-13it [00:26,  2.05s/it]MAE: 3.15 | RMSE: 6.01 | R²: 0.098 | MAPE: 17.17%
-±2 yrs: 57.76% | ±5 yrs: 81.03% | ±10 yrs: 96.55%
-Max Error: 31.20 | Median Error: 1.69
+13it [00:09,  1.30it/s]MAE: 4.69 | RMSE: 6.23 | R²: 0.029 | MAPE: 28.95%
+±2 yrs: 18.97% | ±5 yrs: 70.69% | ±10 yrs: 93.10%
+Max Error: 25.95 | Median Error: 3.68
+Per-image test predictions saved to /content/drive/MyDrive/Age_Estimation/04_ViT/results/test_image_predictions.csv
 
 === ViT Ensemble Metrics ===
-MAE: 3.55 | RMSE: 6.06 | R²: 0.081 | MAPE: 20.84%
-±2 yrs: 51.72% | ±5 yrs: 79.31% | ±10 yrs: 95.69%
-Max Error: 28.15 | Median Error: 1.95
-Ensemble predictions saved.
+MAE: 3.06 | RMSE: 5.76 | R²: 0.171 | MAPE: 16.27%
+±2 yrs: 53.45% | ±5 yrs: 85.34% | ±10 yrs: 96.55%
+Max Error: 30.31 | Median Error: 1.68

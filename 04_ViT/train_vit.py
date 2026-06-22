@@ -426,8 +426,9 @@ def compute_evaluation_metrics(y_true, y_pred):
     
     metrics = {
         "MAE": mae, "RMSE": rmse, "R2": r2, "MAPE": mape,
-        "Within_2yr": within_2, "Within_5yr": within_5, "Within_10yr": within_10,
-        "Max_Error": max_err, "Median_Error": median_err
+        "Acc_2yr": within_2, "Acc_5yr": within_5, "Acc_10yr": within_10,
+        "Max_Error": max_err, "Median_Error": median_err,
+        "Min_Error": float(np.min(errors)),
     }
     return metrics
 
