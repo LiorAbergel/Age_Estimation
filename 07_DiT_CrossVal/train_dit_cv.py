@@ -306,7 +306,7 @@ def _train_phase(model, loader, val_loader, optimizer, device, scaler, accum_ste
     Returns the best val MAE achieved (may be unchanged if no improvement).
     """
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.1, patience=5, verbose=True
+        optimizer, mode='min', factor=0.1, patience=5
     )
     patience_counter = 0
     EARLY_STOP_PATIENCE = 10
