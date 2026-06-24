@@ -16,13 +16,21 @@ Key Features:
 - Mixed Precision (FP16) training for memory efficiency.
 - Gradient Accumulation to maintain effective batch sizes on limited VRAM.
 - Dynamic Resizing and Patching logic matching SOTA CNN experiments.
+
+Pipeline (matched to reference experiments 03/05):
+- Phase 1: Frozen backbone, Adam(1e-3), up to 50 epochs.
+- Phase 2: All layers unfrozen, Adam(1e-4), up to 10 epochs.
+- Both phases use ReduceLROnPlateau(factor=0.1, patience=5) and EarlyStopping(patience=10).
+- Best checkpoint is carried forward: Phase 2 only overwrites if it beats Phase 1.
+- Out-of-fold predictions collected for each fold (matched to Exp 03/05).
+
+Requirements:
+pip install transformers torch torchvision pandas numpy scikit-learn
 """
 
 import os
-import time
 import shutil
 import random
-import json
 import gc
 from collections import defaultdict
 import numpy as np
@@ -41,26 +49,31 @@ from tqdm.auto import tqdm
 from torch.cuda.amp import GradScaler, autocast
 
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
 from download_dataset import ensure_dataset
+
+EXPERIMENT_DIRNAME = "07_DiT_CrossVal"
 
 # --- Configuration ---
 CONFIG = {
     "PATCH_SIZE": 400,
     "STRIDE": 200,
     "STANDARD_SIZE": 800,
-    "LR_BASE": 1e-4,
+    "LR_INIT": 1e-3,
+    "LR_FT": 1e-4,
     "THR": 0.0054,  # Empty patch threshold
     "SEED": 42,
     "N_SPLITS": 5,
     "BATCH_SIZE": 1,        # Image batch size (patches expand ~8-12x per image)
     "GRAD_ACCUM_STEPS": 4,  # Simulate a larger effective batch without extra memory
-    "EPOCHS_STAGE1": 15,
-    "EPOCHS_STAGE2": 30,
-    "DATA_DIR": "./data",
-    "CSV_PATH": os.path.join("data", "NewAgeSplit.csv"),
-    "MODELS_DIR": "./models/dit_cv",
-    "RESULTS_DIR": "./results/dit_cv"
+    "EPOCHS_PHASE1": 50,
+    "EPOCHS_PHASE2": 10,
+    "DATA_DIR": os.path.join(REPO_ROOT, "data"),
+    "CSV_PATH": os.path.join(REPO_ROOT, "data", "NewAgeSplit.csv"),
+    "MODELS_DIR": os.path.join(REPO_ROOT, "models", EXPERIMENT_DIRNAME),
+    "RESULTS_DIR": os.path.join(REPO_ROOT, "results", EXPERIMENT_DIRNAME),
 }
 
 # Full Model List
@@ -107,8 +120,8 @@ class HHDPatchDataset(Dataset):
 
         self.aug_transforms = transforms.Compose([
             transforms.RandomRotation(15),
-            transforms.RandomResizedCrop(self.target_size, scale=(0.9, 1.1)),
-            transforms.ColorJitter(brightness=0.1, contrast=0.1),
+            transforms.RandomResizedCrop(self.target_size, scale=(0.9, 1.1), ratio=(1.0, 1.0)),
+            transforms.ColorJitter(brightness=0.1, contrast=0.25),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: torch.clamp(x + torch.randn_like(x) * 0.05, 0, 1))
         ])
@@ -169,7 +182,7 @@ def collate_patches(batch):
 
 
 class DiTReg(nn.Module):
-    def __init__(self, name="microsoft/dit-base", p=0.1):
+    def __init__(self, name="microsoft/dit-base", p=0.5):
         super().__init__()
         self.backbone = AutoModel.from_pretrained(name)
         self.head = nn.Sequential(nn.Dropout(p), nn.Linear(self.backbone.config.hidden_size, 1))
@@ -179,7 +192,7 @@ class DiTReg(nn.Module):
         cls_token = out.last_hidden_state[:, 0]
         preds = self.head(cls_token).squeeze(1)
         if labels is None: return {"preds": preds}
-        return {"loss": nn.functional.l1_loss(preds, labels), "preds": preds}
+        return {"loss": nn.functional.mse_loss(preds, labels), "preds": preds}
 
 # --- Training and Evaluation Functions ---
 
@@ -225,61 +238,186 @@ def evaluate(model, loader, device):
     return {"MAE": mean_absolute_error(y_true, y_pred)}
 
 def compute_full_metrics(y_true, y_pred):
-    """Extended image-level metrics matching the reported CV table."""
+    """Extended image-level metrics (keys aligned with Exp 03/05)."""
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
     errors = np.abs(y_true - y_pred)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mape = float(np.mean(np.abs((y_true - y_pred) / y_true)) * 100)
+        if np.isnan(mape): mape = 0.0
     return {
         "MAE": float(mean_absolute_error(y_true, y_pred)),
         "RMSE": float(np.sqrt(mean_squared_error(y_true, y_pred))),
         "R2": float(r2_score(y_true, y_pred)),
-        "MAPE (%)": float(np.mean(np.abs((y_true - y_pred) / np.maximum(y_true, 1e-6))) * 100),
-        "Within ±2 Years (%)": float(np.mean(errors <= 2) * 100),
-        "Within ±5 Years (%)": float(np.mean(errors <= 5) * 100),
-        "Within ±10 Years (%)": float(np.mean(errors <= 10) * 100),
-        "Max Error": float(np.max(errors)),
-        "Median Error": float(np.median(errors)),
+        "MAPE": mape,
+        "Acc_2yr": float(np.mean(errors <= 2) * 100),
+        "Acc_5yr": float(np.mean(errors <= 5) * 100),
+        "Acc_10yr": float(np.mean(errors <= 10) * 100),
+        "Max_Error": float(np.max(errors)),
+        "Median_Error": float(np.median(errors)),
+        "Min_Error": float(np.min(errors)),
     }
+
+# --- Colab / output directory handling (matched to experiments 03, 05) ---
+
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
+    try:
+        import google.colab  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def resolve_output_dirs():
+    """On Colab, redirect model/result output to mounted Google Drive.
+
+    Everything under /content is wiped on a Colab runtime crash, which would
+    destroy the fold checkpoints mid-run. Persisting to Drive lets a rerun
+    resume from the last completed fold. Local runs keep the repo-relative defaults.
+    """
+    if not _in_colab():
+        return
+    drive_root = "/content/drive"
+    persist_base = os.path.join(drive_root, "MyDrive", "Age_Estimation", EXPERIMENT_DIRNAME)
+    try:
+        if not os.path.exists(os.path.join(drive_root, "MyDrive")):
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to persist trained models...")
+            drive.mount(drive_root)
+        if os.path.exists(os.path.join(drive_root, "MyDrive")):
+            CONFIG["MODELS_DIR"] = os.path.join(persist_base, "models")
+            CONFIG["RESULTS_DIR"] = os.path.join(persist_base, "results")
+            print(f"Persisting outputs to Google Drive: {persist_base}")
+            return
+    except Exception as exc:
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    print("WARNING: Drive unavailable; trained models will be LOST if the "
+          "Colab runtime crashes.")
+
+
+# --- Training helpers ---
+
+def _train_phase(model, loader, val_loader, optimizer, device, scaler, accum_steps,
+                 n_epochs, ckpt_path, best_mae):
+    """Run one training phase with ReduceLROnPlateau and EarlyStopping.
+
+    Saves the best model to ``ckpt_path`` when val MAE improves on ``best_mae``.
+    Returns the best val MAE achieved (may be unchanged if no improvement).
+    """
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=0.1, patience=5, verbose=True
+    )
+    patience_counter = 0
+    EARLY_STOP_PATIENCE = 10
+
+    for ep in range(1, n_epochs + 1):
+        loss = train_one_epoch(model, loader, optimizer, device, scaler, accum_steps)
+        metrics = evaluate(model, val_loader, device)
+        val_mae = metrics["MAE"]
+        scheduler.step(val_mae)
+
+        print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {val_mae:.3f}")
+
+        if val_mae < best_mae:
+            best_mae = val_mae
+            torch.save(model.state_dict(), ckpt_path)
+            print(f"    Val MAE improved to {best_mae:.3f}; saved to {ckpt_path}")
+            patience_counter = 0
+        else:
+            patience_counter += 1
+
+        if patience_counter >= EARLY_STOP_PATIENCE:
+            print(f"    Early stopping at epoch {ep} (no improvement for {EARLY_STOP_PATIENCE} epochs)")
+            break
+
+    return best_mae
+
+
+# --- Results Persistence (matched to experiment 03/05) ---
+
+def save_cv_results(all_fold_metrics, all_oof_records):
+    """Persist OOF predictions, per-fold metrics, and the mean +/- std CV summary.
+
+    ``oof_predictions.csv`` is the input consumed by reproduce_results.py's fast
+    path; ``cv_metrics_summary.csv`` reproduces the paper's individual-model CV
+    table (mean +/- std across folds).
+    """
+    out_dir = CONFIG["RESULTS_DIR"]
+    os.makedirs(out_dir, exist_ok=True)
+
+    oof_path = os.path.join(out_dir, "oof_predictions.csv")
+    pd.DataFrame(all_oof_records).to_csv(oof_path, index=False)
+    print(f"\nSaved OOF predictions to {oof_path} ({len(all_oof_records)} rows)")
+
+    per_fold_rows = []
+    for model_name, fms in all_fold_metrics.items():
+        for i, fm in enumerate(fms, start=1):
+            row = {"Model": model_name, "Fold": i}
+            row.update(fm)
+            per_fold_rows.append(row)
+    per_fold_path = os.path.join(out_dir, "cv_metrics_per_fold.csv")
+    pd.DataFrame(per_fold_rows).to_csv(per_fold_path, index=False)
+    print(f"Saved per-fold metrics to {per_fold_path}")
+
+    metric_keys = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr", "Acc_10yr",
+                   "Max_Error", "Median_Error", "Min_Error"]
+    summary_rows = []
+    print("\n────── CV SUMMARY (mean ± std across folds) ──────")
+    for model_name, fms in all_fold_metrics.items():
+        if not fms:
+            continue
+        row = {"Model": model_name}
+        print(f"\n{model_name}:")
+        for k in metric_keys:
+            arr = np.array([fm[k] for fm in fms], dtype=float)
+            row[f"{k}_mean"], row[f"{k}_std"] = arr.mean(), arr.std()
+            print(f"  {k:<13}: {arr.mean():.2f} ± {arr.std():.2f}")
+        summary_rows.append(row)
+    summary_path = os.path.join(out_dir, "cv_metrics_summary.csv")
+    pd.DataFrame(summary_rows).to_csv(summary_path, index=False)
+    print(f"\nSaved CV summary to {summary_path}")
+
 
 # --- Main CV Routine ---
 
 def run_full_cv():
+    resolve_output_dirs()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
     os.makedirs(CONFIG["MODELS_DIR"], exist_ok=True)
     os.makedirs(CONFIG["RESULTS_DIR"], exist_ok=True)
-    
+
     df = pd.read_csv(CONFIG["CSV_PATH"])
     sgkf = StratifiedGroupKFold(n_splits=CONFIG["N_SPLITS"], shuffle=True, random_state=CONFIG["SEED"])
+    splits = list(sgkf.split(df.index, df["AgeGroup"], df["WriterNumber"]))
 
-    # Uniform batch / accumulation across all models (matches the CV notebook recipe)
+    # Uniform batch / accumulation across all models
     batch_size = CONFIG["BATCH_SIZE"]
     accum_steps = CONFIG["GRAD_ACCUM_STEPS"]
 
+    all_fold_metrics = {}
+    all_oof_records = []
+
     for model_id in MODEL_IDS:
         safe_name = model_id.replace("/", "__")
-        print(f"\n🚀 Processing Model: {model_id}")
+        print(f"\n{'='*40}\nProcessing Model: {model_id}\n{'='*40}")
 
         proc = BeitImageProcessor.from_pretrained(model_id)
         model_root = Path(CONFIG["MODELS_DIR"]) / safe_name
         model_root.mkdir(parents=True, exist_ok=True)
 
-        fold_results = []
+        fold_metrics_list = []
 
-        for fold, (tr_idx, val_idx) in enumerate(sgkf.split(df.index, df["AgeGroup"], df["WriterNumber"]), 1):
-            fold_dir = model_root / f"fold_{fold}"
+        for fold, (tr_idx, val_idx) in enumerate(splits, 1):
+            fold_dir = model_root / f"fold_{fold:02d}"
             fold_dir.mkdir(parents=True, exist_ok=True)
 
             stage1_ckpt = fold_dir / "stage1_best.pt"
             final_ckpt = fold_dir / "final_best.pt"
-            metrics_file = fold_dir / "metrics.json"
+            done_path = fold_dir / "training.done"
 
-            # Resume: reuse cached fold metrics if present
-            if metrics_file.exists():
-                print(f"✅ {safe_name} Fold {fold} already evaluated. Loading metrics.")
-                fold_results.append(json.loads(metrics_file.read_text()))
-                continue
-
-            print(f"\n--- {safe_name} | Fold {fold} ---")
+            print(f"\n── {safe_name} | Fold {fold}/{CONFIG['N_SPLITS']} ──")
             train_df, val_df = df.iloc[tr_idx], df.iloc[val_idx]
 
             train_loader = DataLoader(HHDPatchDataset(train_df, CONFIG["DATA_DIR"], proc, True),
@@ -287,68 +425,96 @@ def run_full_cv():
             val_loader = DataLoader(HHDPatchDataset(val_df, CONFIG["DATA_DIR"], proc, False),
                                     batch_size=batch_size, shuffle=False, collate_fn=collate_patches)
 
-            model = DiTReg(name=model_id).to(device)
-            scaler = GradScaler()
-            best_mae = float("inf")
+            # Skip training only when fully completed (.done marker)
+            if done_path.exists() and (final_ckpt.exists() or stage1_ckpt.exists()):
+                print(f"Found completed {safe_name} Fold {fold}; loading for OOF evaluation.")
+            else:
+                model = DiTReg(name=model_id).to(device)
+                scaler = GradScaler()
 
-            # Train only if no completed checkpoint exists yet
-            if not final_ckpt.exists():
-                # Stage 1: Frozen Backbone
+                # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
                 if not stage1_ckpt.exists():
-                    print("❄️ Stage 1: Frozen Backbone")
-                    for p in model.backbone.parameters(): p.requires_grad = False
-                    opt = torch.optim.AdamW(model.head.parameters(), lr=CONFIG["LR_BASE"])
-                    for ep in range(1, CONFIG["EPOCHS_STAGE1"] + 1):
-                        loss = train_one_epoch(model, train_loader, opt, device, scaler, accum_steps)
-                        m = evaluate(model, val_loader, device)
-                        if m["MAE"] < best_mae:
-                            best_mae = m["MAE"]
-                            torch.save(model.state_dict(), stage1_ckpt)
-                            print(f"    Val MAE improved to {best_mae:.3f}; saved model to {stage1_ckpt}")
-                        print(f"  Ep {ep}: Loss {loss:.4f} | Val MAE {m['MAE']:.3f}")
-
-                # Stage 2: Full Fine-tuning
-                print("🔥 Stage 2: Unfrozen Backbone")
-                if stage1_ckpt.exists():
+                    print("Phase 1: Frozen Backbone")
+                    for p in model.backbone.parameters():
+                        p.requires_grad = False
+                    opt = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
+                    _train_phase(model, train_loader, val_loader, opt, device, scaler,
+                                 accum_steps, CONFIG["EPOCHS_PHASE1"], stage1_ckpt, float("inf"))
+                else:
+                    print("Phase 1 already completed. Loading weights.")
                     model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
-                for p in model.backbone.parameters(): p.requires_grad = True
-                opt = torch.optim.AdamW(model.parameters(), lr=CONFIG["LR_BASE"]/10)
 
-                best_mae = evaluate(model, val_loader, device)["MAE"]
-                for ep in range(1, CONFIG["EPOCHS_STAGE2"] + 1):
-                    loss = train_one_epoch(model, train_loader, opt, device, scaler, accum_steps)
-                    m = evaluate(model, val_loader, device)
-                    if m["MAE"] < best_mae:
-                        best_mae = m["MAE"]
-                        torch.save(model.state_dict(), final_ckpt)
-                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {final_ckpt}")
-                    print(f"  Ep {ep}: Loss {loss:.4f} | Val MAE {m['MAE']:.3f}")
+                # Evaluate Phase 1 best to get carry-forward threshold
+                phase1_metrics = evaluate(model, val_loader, device)
+                phase1_best_mae = phase1_metrics["MAE"]
+                print(f"  Phase 1 best Val MAE: {phase1_best_mae:.3f}")
 
-            # Evaluate the best checkpoint on this fold's validation split
-            if final_ckpt.exists():
-                model.load_state_dict(torch.load(final_ckpt, map_location=device))
+                # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
+                print("Phase 2: Fine-Tuning")
+                model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
+                for p in model.backbone.parameters():
+                    p.requires_grad = True
+                opt = torch.optim.Adam(model.parameters(), lr=CONFIG["LR_FT"])
+
+                _train_phase(model, train_loader, val_loader, opt, device, scaler,
+                             accum_steps, CONFIG["EPOCHS_PHASE2"], final_ckpt, phase1_best_mae)
+
+                # If Phase 2 never improved on Phase 1, copy stage1 as final
+                if not final_ckpt.exists():
+                    shutil.copy2(stage1_ckpt, final_ckpt)
+                    print(f"  Phase 2 did not improve; using Phase 1 checkpoint as final.")
+
+                # Mark training as fully complete
+                done_path.write_text(f"{safe_name} fold {fold} training complete\n")
+
+                del model
+                torch.cuda.empty_cache()
+                gc.collect()
+
+            # --- OOF evaluation (matched to Exp 03/05) ---
+            model = DiTReg(name=model_id).to(device)
+            model.load_state_dict(torch.load(final_ckpt, map_location=device))
+
             y_true, y_pred = _aggregate_preds(model, val_loader, device)
             fold_metrics = compute_full_metrics(y_true, y_pred)
-            metrics_file.write_text(json.dumps(fold_metrics, indent=2))
-            fold_results.append(fold_metrics)
-            print(f"📊 Fold {fold} MAE: {fold_metrics['MAE']:.3f}")
+            fold_metrics_list.append(fold_metrics)
+            print(f"Fold {fold}: MAE={fold_metrics['MAE']:.2f}, RMSE={fold_metrics['RMSE']:.2f}, R2={fold_metrics['R2']:.2f}")
+
+            # Collect per-image OOF records
+            model.eval()
+            img_preds_oof = defaultdict(list)
+            img_gts_oof = {}
+            for batch in val_loader:
+                if not batch:
+                    continue
+                px = batch["pixel_values"].to(device)
+                ids = batch["file_ids"]
+                labels = batch["labels"].cpu().numpy()
+                with torch.no_grad():
+                    preds = model(pixel_values=px)["preds"].cpu().numpy()
+                for p, l, fid in zip(preds, labels, ids):
+                    img_preds_oof[fid].append(p)
+                    img_gts_oof[fid] = l
+
+            true_map = dict(zip(val_df["File"], val_df["Age"]))
+            for iid, plist in img_preds_oof.items():
+                if iid in true_map:
+                    mean_pred = float(np.mean(plist))
+                    all_oof_records.append({
+                        "Model": safe_name, "Fold": fold, "ImageID": iid,
+                        "Prediction": mean_pred, "TrueAge": float(true_map[iid])
+                    })
 
             # Cleanup
             del model, train_loader, val_loader
             torch.cuda.empty_cache()
             gc.collect()
 
-        # Cross-validation summary (mean ± std across folds)
-        if fold_results:
-            keys = fold_results[0].keys()
-            summary = {k: {"mean": float(np.mean([f[k] for f in fold_results])),
-                           "std": float(np.std([f[k] for f in fold_results]))} for k in keys}
-            out = {"folds": fold_results, "summary": summary}
-            summary_path = Path(CONFIG["RESULTS_DIR"]) / f"{safe_name}_cv_summary.json"
-            summary_path.write_text(json.dumps(out, indent=2))
-            print(f"\n══════ {safe_name} CV SUMMARY ══════")
-            for k, v in summary.items():
-                print(f"  {k:<22}: {v['mean']:.3f} ± {v['std']:.3f}")
+        all_fold_metrics[safe_name] = fold_metrics_list
+
+    # Save all results
+    save_cv_results(all_fold_metrics, all_oof_records)
+
 
 if __name__ == "__main__":
     ensure_dataset(CONFIG["DATA_DIR"])

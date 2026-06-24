@@ -1,15 +1,21 @@
 """
-Experiment 09: Diffusion Transformers (DiT) for Age Estimation
+Experiment 06: Document Image Transformers (DiT) for Age Estimation
 
 Overview:
-This script trains Diffusion Transformer models (microsoft/dit-base, dit-large)
+This script trains Document Image Transformer models (microsoft/dit-base, dit-large)
 for the age estimation task. It treats the problem as a regression task on
 bags of patches extracted from high-resolution handwriting images.
 
 Key Features:
 - Architecture: DiT Backbone (via Hugging Face) + Linear Regression Head.
 - Data: Dynamic patch extraction with intensity filtering.
-- Training: Two-stage (Frozen -> Unfrozen) optimization.
+- Training: Two-stage (Frozen -> Fine-tuning) optimization aligned with Exp 01/03/04.
+
+Pipeline (matched to reference experiments):
+- Phase 1: Frozen backbone, Adam(1e-3), up to 50 epochs.
+- Phase 2: All layers unfrozen, Adam(1e-4), up to 10 epochs.
+- Both phases use ReduceLROnPlateau(factor=0.1, patience=5) and EarlyStopping(patience=10).
+- Best checkpoint is carried forward: Phase 2 only overwrites if it beats Phase 1.
 
 Requirements:
 pip install transformers torch torchvision pandas numpy scikit-learn
@@ -17,7 +23,7 @@ pip install transformers torch torchvision pandas numpy scikit-learn
 
 import os
 import gc
-import json
+import shutil
 import random
 import numpy as np
 import pandas as pd
@@ -46,29 +52,32 @@ def set_seed(seed):
 set_seed(SEED)
 
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
 from download_dataset import ensure_dataset
+
+EXPERIMENT_DIRNAME = "06_DiT"
 
 # --- Configuration ---
 CONFIG = {
     "PATCH_SIZE": 400,
     "STRIDE": 200,
     "STANDARD_SIZE": 800,
-    # Per-model training batch size (matches Notebook recipe):
+    # Per-model training batch size:
     # DiT-Base trains at 16, DiT-Large at 2 (memory-safe, more update steps).
     "BATCH_SIZE_BASE": 16,
     "BATCH_SIZE_LARGE": 2,
     "EVAL_BATCH_SIZE": 8,  # Inference batch (LayerNorm => no effect on results)
-    "EPOCHS_STAGE1": 15,
-    "EPOCHS_STAGE2": 30,
-    "LR_BASE": 1e-4,
-    "WEIGHT_DECAY_STAGE1": 1e-4,
-    "WEIGHT_DECAY_STAGE2": 1e-5,
+    "EPOCHS_PHASE1": 50,
+    "EPOCHS_PHASE2": 10,
+    "LR_INIT": 1e-3,
+    "LR_FT": 1e-4,
     "THR": 0.0054,
-    "DATA_DIR": "./data",
-    "CSV_PATH": "./data/NewAgeSplit.csv",
-    "MODELS_DIR": "./models/dit_experiment",
-    "RESULTS_DIR": "./results/dit_predictions",
+    "DATA_DIR": os.path.join(REPO_ROOT, "data"),
+    "CSV_PATH": os.path.join(REPO_ROOT, "data", "NewAgeSplit.csv"),
+    "MODELS_DIR": os.path.join(REPO_ROOT, "models", "experiment_06"),
+    "RESULTS_DIR": os.path.join(REPO_ROOT, "results", "experiment_06"),
     "VAL_PREDICTIONS_CSV": "val_image_level_predictions.csv",
     "TEST_PREDICTIONS_CSV": "test_image_level_predictions.csv",
     "SUMMARY_CSV": "ensemble_evaluation_summary.csv",
@@ -112,11 +121,11 @@ class HHDPatchDataset(Dataset):
         self.augment = augment
         self.target_size = (processor.size["height"], processor.size["width"])
 
-        # Augmentation pipeline
+        # Augmentation pipeline (matched to reference experiments)
         self.aug_transforms = transforms.Compose([
             transforms.RandomRotation(15),
-            transforms.RandomResizedCrop(self.target_size, scale=(0.9, 1.1)),
-            transforms.ColorJitter(brightness=0.1, contrast=0.1),
+            transforms.RandomResizedCrop(self.target_size, scale=(0.9, 1.1), ratio=(1.0, 1.0)),
+            transforms.ColorJitter(brightness=0.1, contrast=0.25),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: torch.clamp(x + torch.randn_like(x) * 0.05, 0, 1))
         ])
@@ -216,7 +225,7 @@ def collate_patches(batch: List[Any]) -> Dict[str, Any]:
 # --- Model ---
 
 class DiTReg(nn.Module):
-    def __init__(self, name: str = "microsoft/dit-base", p: float = 0.1):
+    def __init__(self, name: str = "microsoft/dit-base", p: float = 0.5):
         super().__init__()
         self.backbone = AutoModel.from_pretrained(name)
         self.head = nn.Sequential(
@@ -233,7 +242,7 @@ class DiTReg(nn.Module):
         
         out = {"preds": pred}
         if labels is not None:
-            out["loss"] = nn.functional.l1_loss(pred, labels) # MAE Loss
+            out["loss"] = nn.functional.mse_loss(pred, labels)
         return out
 
 # --- Training & Evaluation ---
@@ -312,23 +321,24 @@ MODEL_DISPLAY_NAMES = {
 }
 
 def compute_full_metrics(y_true, y_pred):
-    """Compute all evaluation metrics."""
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
+    """Compute all evaluation metrics (keys aligned with Exp 03/04/05)."""
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
     errors = np.abs(y_true - y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     r2 = r2_score(y_true, y_pred)
-    mape = np.mean(np.abs((y_true - y_pred) / np.where(y_true == 0, 1, y_true))) * 100
-    within_2 = np.mean(errors <= 2) * 100
-    within_5 = np.mean(errors <= 5) * 100
-    within_10 = np.mean(errors <= 10) * 100
-    max_err = np.max(errors)
-    median_err = np.median(errors)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+        if np.isnan(mape): mape = 0.0
     return {
-        "MAE": mae, "RMSE": rmse, "R2": r2, "MAPE (%)": mape,
-        "Within ±2 Years (%)": within_2, "Within ±5 Years (%)": within_5,
-        "Within ±10 Years (%)": within_10, "Max Error": max_err, "Median Error": median_err
+        "MAE": mae, "RMSE": rmse, "R2": r2, "MAPE": mape,
+        "Acc_2yr": float(np.mean(errors <= 2) * 100),
+        "Acc_5yr": float(np.mean(errors <= 5) * 100),
+        "Acc_10yr": float(np.mean(errors <= 10) * 100),
+        "Max_Error": float(np.max(errors)),
+        "Median_Error": float(np.median(errors)),
+        "Min_Error": float(np.min(errors)),
     }
 
 @torch.no_grad()
@@ -447,9 +457,85 @@ def evaluate_ensembles(test_predictions, true_age_dict, selected_weights):
 
     return pd.DataFrame(results_summary)
 
+# --- Colab / output directory handling (matched to experiments 01, 04, 05) ---
+
+def _in_colab():
+    """True when running on Google Colab, whose local disk is ephemeral."""
+    try:
+        import google.colab  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def resolve_output_dirs():
+    """On Colab, redirect model/result output to mounted Google Drive.
+
+    Everything under /content is wiped on a Colab runtime crash, which would
+    destroy the checkpoints mid-run. Persisting to Drive lets a rerun resume
+    from the last completed backbone. Local runs keep the repo-relative defaults.
+    """
+    if not _in_colab():
+        return
+    drive_root = "/content/drive"
+    persist_base = os.path.join(drive_root, "MyDrive", "Age_Estimation", EXPERIMENT_DIRNAME)
+    try:
+        if not os.path.exists(os.path.join(drive_root, "MyDrive")):
+            from google.colab import drive
+            print("Colab detected: mounting Google Drive to persist trained models...")
+            drive.mount(drive_root)
+        if os.path.exists(os.path.join(drive_root, "MyDrive")):
+            CONFIG["MODELS_DIR"] = os.path.join(persist_base, "models")
+            CONFIG["RESULTS_DIR"] = os.path.join(persist_base, "results")
+            print(f"Persisting outputs to Google Drive: {persist_base}")
+            return
+    except Exception as exc:
+        print(f"WARNING: could not mount Google Drive ({exc}).")
+    print("WARNING: Drive unavailable; trained models will be LOST if the "
+          "Colab runtime crashes.")
+
+
+# --- Training helpers ---
+
+def _train_phase(model, loader, val_loader, optimizer, device, n_epochs, ckpt_path, best_mae):
+    """Run one training phase with ReduceLROnPlateau and EarlyStopping.
+
+    Saves the best model to ``ckpt_path`` when val MAE improves on ``best_mae``.
+    Returns the best val MAE achieved (may be unchanged if no improvement).
+    """
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=0.1, patience=5, verbose=True
+    )
+    patience_counter = 0
+    EARLY_STOP_PATIENCE = 10
+
+    for ep in range(1, n_epochs + 1):
+        loss = train_one_epoch(model, loader, optimizer, device)
+        metrics = evaluate(model, val_loader, device)
+        val_mae = metrics["MAE"]
+        scheduler.step(val_mae)
+
+        print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {val_mae:.3f}")
+
+        if val_mae < best_mae:
+            best_mae = val_mae
+            torch.save(model.state_dict(), ckpt_path)
+            print(f"    Val MAE improved to {best_mae:.3f}; saved to {ckpt_path}")
+            patience_counter = 0
+        else:
+            patience_counter += 1
+
+        if patience_counter >= EARLY_STOP_PATIENCE:
+            print(f"    Early stopping at epoch {ep} (no improvement for {EARLY_STOP_PATIENCE} epochs)")
+            break
+
+    return best_mae
+
+
 # --- Main Logic ---
 
 def main():
+    resolve_output_dirs()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
@@ -464,83 +550,99 @@ def main():
     true_age_dict = dict(zip(df["File"], df["Age"]))
 
     # 2. Train models (existing checkpoints in MODELS_DIR are reused per-stage)
-    trained_models = {}
+    for model_id in MODELS_TO_TRAIN:
+        safe_name = model_id.replace("/", "__")
+        print(f"\n{'='*40}\nTraining {safe_name}\n{'='*40}")
 
-    if not trained_models:
-        for model_id in MODELS_TO_TRAIN:
-            safe_name = model_id.replace("/", "__")
-            print(f"\n{'='*40}\nTraining {safe_name}\n{'='*40}")
+        model_dir = Path(CONFIG["MODELS_DIR"]) / safe_name
+        model_dir.mkdir(parents=True, exist_ok=True)
 
-            model_dir = Path(CONFIG["MODELS_DIR"]) / safe_name
-            model_dir.mkdir(parents=True, exist_ok=True)
+        stage1_ckpt = model_dir / "stage1_best.pt"
+        final_ckpt = model_dir / "final_best.pt"
+        done_path = model_dir / "training.done"
 
-            proc = BeitImageProcessor.from_pretrained(model_id)
+        # Skip only when training fully completed (.done marker written after Phase 2).
+        if done_path.exists() and (final_ckpt.exists() or stage1_ckpt.exists()):
+            print(f"Found completed {safe_name}; will load from disk for inference.")
+            continue
+        if stage1_ckpt.exists() and not done_path.exists():
+            print(f"Found incomplete checkpoint for {safe_name} (no .done marker); "
+                  f"resuming from Stage 1 checkpoint.")
 
-            batch_size = get_batch_size(model_id)
-            loaders = {}
-            for split in ["train", "val", "test"]:
-                ds_subset = df[df["Set"].str.lower() == split]
-                is_train = (split == "train")
-                loaders[split] = DataLoader(
-                    HHDPatchDataset(ds_subset, CONFIG["DATA_DIR"], proc, augment=is_train),
-                    batch_size=batch_size if is_train else batch_size * 2,
-                    shuffle=is_train,
-                    num_workers=2,
-                    collate_fn=collate_patches
-                )
+        proc = BeitImageProcessor.from_pretrained(model_id)
+        batch_size = get_batch_size(model_id)
+        loaders = {}
+        for split in ["train", "val"]:
+            ds_subset = df[df["Set"].str.lower() == split]
+            is_train = (split == "train")
+            loaders[split] = DataLoader(
+                HHDPatchDataset(ds_subset, CONFIG["DATA_DIR"], proc, augment=is_train),
+                batch_size=batch_size if is_train else batch_size * 2,
+                shuffle=is_train,
+                num_workers=2,
+                collate_fn=collate_patches
+            )
 
-            model = DiTReg(name=model_id).to(device)
-            stage1_ckpt = model_dir / "stage1_best.pt"
-            final_ckpt = model_dir / "final_best.pt"
-            best_mae = float("inf")
+        model = DiTReg(name=model_id).to(device)
 
-            # Stage 1: Frozen Backbone
-            if not stage1_ckpt.exists():
-                print("Stage 1: Frozen Backbone")
-                for p in model.backbone.parameters(): p.requires_grad = False
-                optimizer = torch.optim.AdamW(model.head.parameters(), lr=CONFIG["LR_BASE"], weight_decay=CONFIG["WEIGHT_DECAY_STAGE1"])
-                for ep in range(1, CONFIG["EPOCHS_STAGE1"] + 1):
-                    loss = train_one_epoch(model, loaders["train"], optimizer, device)
-                    metrics = evaluate(model, loaders["val"], device)
-                    print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {metrics['MAE']:.3f}")
-                    if metrics["MAE"] < best_mae:
-                        best_mae = metrics["MAE"]
-                        torch.save(model.state_dict(), stage1_ckpt)
-                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {stage1_ckpt}")
-            else:
-                print("Stage 1 already completed. Loading weights.")
-                model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
-                metrics = evaluate(model, loaders["val"], device)
-                best_mae = metrics["MAE"]
+        # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
+        if not stage1_ckpt.exists():
+            print("Phase 1: Frozen Backbone")
+            for p in model.backbone.parameters():
+                p.requires_grad = False
+            optimizer = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
+            _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
+                         CONFIG["EPOCHS_PHASE1"], stage1_ckpt, float("inf"))
+        else:
+            print("Phase 1 already completed. Loading weights.")
+            model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
 
-            # Stage 2: Unfrozen
+        # Evaluate Phase 1 best to get carry-forward threshold
+        phase1_metrics = evaluate(model, loaders["val"], device)
+        phase1_best_mae = phase1_metrics["MAE"]
+        print(f"  Phase 1 best Val MAE: {phase1_best_mae:.3f}")
+
+        # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
+        if not done_path.exists():
+            print("Phase 2: Fine-Tuning")
+            # Reload from stage1 best and unfreeze all
+            model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
+            for p in model.backbone.parameters():
+                p.requires_grad = True
+            optimizer = torch.optim.Adam(model.parameters(), lr=CONFIG["LR_FT"])
+
+            # Carry Phase 1's best val_mae forward: Phase 2 only saves when it improves
+            _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
+                         CONFIG["EPOCHS_PHASE2"], final_ckpt, phase1_best_mae)
+
+            # If Phase 2 never improved on Phase 1, copy stage1 as final
             if not final_ckpt.exists():
-                print("Stage 2: Fine-Tuning")
-                for p in model.backbone.parameters(): p.requires_grad = True
-                optimizer = torch.optim.AdamW(model.parameters(), lr=CONFIG["LR_BASE"] / 10, weight_decay=CONFIG["WEIGHT_DECAY_STAGE2"])
-                for ep in range(1, CONFIG["EPOCHS_STAGE2"] + 1):
-                    loss = train_one_epoch(model, loaders["train"], optimizer, device)
-                    metrics = evaluate(model, loaders["val"], device)
-                    print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {metrics['MAE']:.3f}")
-                    if metrics["MAE"] < best_mae:
-                        best_mae = metrics["MAE"]
-                        torch.save(model.state_dict(), final_ckpt)
-                        print(f"    Val MAE improved to {best_mae:.3f}; saved model to {final_ckpt}")
+                shutil.copy2(stage1_ckpt, final_ckpt)
+                print(f"  Phase 2 did not improve; using Phase 1 checkpoint as final.")
 
-            if final_ckpt.exists():
-                model.load_state_dict(torch.load(final_ckpt, map_location=device))
-            trained_models[model_id] = model
+            # Mark training as fully complete
+            done_path.write_text(f"{safe_name} training complete\n")
 
-    if not trained_models:
-        print("No models available. Exiting.")
-        return
+        # Free GPU memory before next model
+        del model, loaders
+        torch.cuda.empty_cache()
+        gc.collect()
 
     # 3. Generate Predictions on Val and Test Sets
     all_predictions = {"val": {}, "test": {}}
 
-    for model_id, model in trained_models.items():
+    for model_id in MODELS_TO_TRAIN:
         safe_name = model_id.replace("/", "__")
+        model_dir = Path(CONFIG["MODELS_DIR"]) / safe_name
+        final_ckpt = model_dir / "final_best.pt"
+
+        if not final_ckpt.exists():
+            print(f"WARNING: No final checkpoint for {safe_name}, skipping predictions.")
+            continue
+
         proc = BeitImageProcessor.from_pretrained(model_id)
+        model = DiTReg(name=model_id).to(device)
+        model.load_state_dict(torch.load(final_ckpt, map_location=device))
 
         for split in ["val", "test"]:
             csv_path = os.path.join(CONFIG["RESULTS_DIR"], f"{safe_name}_{split}_preds.csv")
@@ -567,6 +669,15 @@ def main():
                 pd.DataFrame(rows).to_csv(csv_path, index=False)
                 print(f"  Saved to {csv_path}")
 
+        # Free model after generating predictions (memory management)
+        del model
+        torch.cuda.empty_cache()
+        gc.collect()
+
+    if not all_predictions["test"]:
+        print("No models available for evaluation. Exiting.")
+        return
+
     # 4. Print Individual Model Test Metrics
     print("\n=== Individual Model Test Metrics ===")
     for model_id, preds in all_predictions["test"].items():
@@ -589,6 +700,7 @@ def main():
     print("\n=== Final Evaluation Summary ===")
     print(summary_df)
     print(f"\nSummary saved to {summary_path}")
+
 
 if __name__ == "__main__":
     ensure_dataset(CONFIG["DATA_DIR"])
