@@ -46,7 +46,7 @@ from sklearn.model_selection import StratifiedGroupKFold
 from transformers import AutoModel, BeitImageProcessor
 from PIL import Image
 from tqdm.auto import tqdm
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -204,7 +204,7 @@ def train_one_epoch(model, loader, opt, device, scaler, accum_steps):
     for step, batch in enumerate(pbar):
         if not batch: continue
         px, lbl = batch["pixel_values"].to(device), batch["labels"].to(device)
-        with autocast():
+        with autocast('cuda'):
             out = model(pixel_values=px, labels=lbl)
             loss = out["loss"] / accum_steps
         scaler.scale(loss).backward()
@@ -430,7 +430,7 @@ def run_full_cv():
                 print(f"Found completed {safe_name} Fold {fold}; loading for OOF evaluation.")
             else:
                 model = DiTReg(name=model_id).to(device)
-                scaler = GradScaler()
+                scaler = GradScaler('cuda')
 
                 # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
                 if not stage1_ckpt.exists():
