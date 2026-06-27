@@ -1,0 +1,428 @@
+Cloning into 'Age_Estimation'...
+remote: Enumerating objects: 240, done.
+remote: Counting objects: 100% (240/240), done.
+remote: Compressing objects: 100% (171/171), done.
+remote: Total 240 (delta 100), reused 206 (delta 66), pack-reused 0 (from 0)
+Receiving objects: 100% (240/240), 335.22 KiB | 10.47 MiB/s, done.
+Resolving deltas: 100% (100/100), done.
+/content/Age_Estimation
+Dataset not found at /content/Age_Estimation/data. Downloading from Kaggle...
+Using Colab cache for faster access to the 'hhd-age' dataset.
+Downloaded to: /kaggle/input/hhd-age
+Dataset ready at /content/Age_Estimation/data
+Colab detected: mounting Google Drive to persist trained models...
+Mounted at /content/drive
+Persisting outputs to Google Drive: /content/drive/MyDrive/Age_Estimation/06_DiT
+Using device: cuda
+
+========================================
+Training microsoft__dit-base
+========================================
+/usr/local/lib/python3.12/dist-packages/huggingface_hub/utils/_auth.py:124: UserWarning: 
+The secret `HF_TOKEN` does not exist in your Colab secrets.
+To authenticate with the Hugging Face Hub, create a token in your settings tab (https://huggingface.co/settings/tokens), set it as secret in your Google Colab and restart your session.
+You will be able to reuse this secret in all of your notebooks.
+Please note that authentication is recommended but still optional to access public models or datasets.
+  warnings.warn(
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 30.6kB/s]
+config.json: 100%
+ 1.03k/1.03k [00:00<00:00, 129kB/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+pytorch_model.bin: 100%
+ 369M/369M [00:08<00:00, 3.37GB/s]
+Loading weights: 100%
+ 209/209 [00:00<00:00, 10110.60it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-base
+Key                     | Status     | 
+------------------------+------------+-
+lm_head.bias            | UNEXPECTED | 
+layernorm.weight        | UNEXPECTED | 
+lm_head.weight          | UNEXPECTED | 
+layernorm.bias          | UNEXPECTED | 
+pooler.layernorm.weight | MISSING    | 
+pooler.layernorm.bias   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Phase 1: Frozen Backbone
+Training:   0%|          | 0/41 [00:00<?, ?it/s]
+model.safetensors: 100%
+ 368M/368M [00:05<00:00, 163MB/s]
+  Ep 1: Train Loss 246.2509 | Val MAE 3.873
+    Val MAE improved to 3.873; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/stage1_best.pt
+  Ep 2: Train Loss 128.2672 | Val MAE 4.177
+  Ep 3: Train Loss 110.0694 | Val MAE 3.853
+    Val MAE improved to 3.853; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/stage1_best.pt
+  Ep 4: Train Loss 112.1230 | Val MAE 4.572
+  Ep 5: Train Loss 96.4294 | Val MAE 3.889
+  Ep 6: Train Loss 96.9425 | Val MAE 3.736
+    Val MAE improved to 3.736; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/stage1_best.pt
+  Ep 7: Train Loss 89.5410 | Val MAE 3.738
+  Ep 8: Train Loss 89.7740 | Val MAE 5.290
+  Ep 9: Train Loss 87.3611 | Val MAE 6.832
+  Ep 10: Train Loss 84.5469 | Val MAE 5.295
+  Ep 11: Train Loss 84.7620 | Val MAE 4.138
+  Ep 12: Train Loss 90.8718 | Val MAE 5.184
+  Ep 13: Train Loss 80.5028 | Val MAE 4.952
+  Ep 14: Train Loss 82.1367 | Val MAE 5.343
+  Ep 15: Train Loss 79.8213 | Val MAE 4.998
+  Ep 16: Train Loss 80.0347 | Val MAE 4.036
+    Early stopping at epoch 16 (no improvement for 10 epochs)
+  Phase 1 best Val MAE: 4.036
+Phase 2: Fine-Tuning
+  Ep 1: Train Loss 136.7011 | Val MAE 7.157
+  Ep 2: Train Loss 81.9920 | Val MAE 4.040
+  Ep 3: Train Loss 70.5206 | Val MAE 4.747
+  Ep 4: Train Loss 74.4064 | Val MAE 4.689
+  Ep 5: Train Loss 69.7402 | Val MAE 3.892
+    Val MAE improved to 3.892; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/final_best.pt
+  Ep 6: Train Loss 62.8204 | Val MAE 4.037
+  Ep 7: Train Loss 65.2792 | Val MAE 3.652
+    Val MAE improved to 3.652; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/final_best.pt
+  Ep 8: Train Loss 51.4890 | Val MAE 4.409
+  Ep 9: Train Loss 58.0521 | Val MAE 4.668
+  Ep 10: Train Loss 51.2081 | Val MAE 3.456
+    Val MAE improved to 3.456; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base/final_best.pt
+
+========================================
+Training microsoft__dit-large
+========================================
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 38.8kB/s]
+config.json: 100%
+ 1.03k/1.03k [00:00<00:00, 124kB/s]
+pytorch_model.bin: 100%
+ 1.25G/1.25G [00:22<00:00, 103MB/s]
+Loading weights: 100%
+ 413/413 [00:00<00:00, 11815.42it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-large
+Key                     | Status     | 
+------------------------+------------+-
+lm_head.bias            | UNEXPECTED | 
+layernorm.weight        | UNEXPECTED | 
+lm_head.weight          | UNEXPECTED | 
+layernorm.bias          | UNEXPECTED | 
+pooler.layernorm.weight | MISSING    | 
+pooler.layernorm.bias   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Phase 1: Frozen Backbone
+Training:   0%|          | 0/324 [00:00<?, ?it/s]
+model.safetensors: 100%
+ 1.25G/1.25G [00:22<00:00, 120MB/s]
+  Ep 1: Train Loss 1165.7379 | Val MAE 6.998
+    Val MAE improved to 6.998; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large/stage1_best.pt
+  Ep 2: Train Loss 180.4377 | Val MAE 14.868
+  Ep 3: Train Loss 127.2287 | Val MAE 5.451
+    Val MAE improved to 5.451; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large/stage1_best.pt
+  Ep 4: Train Loss 138.7131 | Val MAE 13.747
+  Ep 5: Train Loss 129.6219 | Val MAE 4.723
+    Val MAE improved to 4.723; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large/stage1_best.pt
+  Ep 6: Train Loss 152.0624 | Val MAE 5.742
+  Ep 7: Train Loss 164.8005 | Val MAE 7.944
+  Ep 8: Train Loss 141.7753 | Val MAE 6.117
+  Ep 9: Train Loss 152.8959 | Val MAE 9.132
+  Ep 10: Train Loss 138.6017 | Val MAE 8.034
+  Ep 11: Train Loss 148.0439 | Val MAE 6.668
+  Ep 12: Train Loss 88.5987 | Val MAE 3.970
+    Val MAE improved to 3.970; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large/stage1_best.pt
+  Ep 13: Train Loss 88.6873 | Val MAE 4.762
+  Ep 14: Train Loss 88.2440 | Val MAE 4.495
+  Ep 15: Train Loss 93.3180 | Val MAE 4.901
+  Ep 16: Train Loss 90.3590 | Val MAE 4.974
+  Ep 17: Train Loss 85.6805 | Val MAE 4.433
+  Ep 18: Train Loss 86.7316 | Val MAE 3.985
+  Ep 19: Train Loss 81.2296 | Val MAE 4.046
+  Ep 20: Train Loss 80.9697 | Val MAE 4.096
+  Ep 21: Train Loss 80.1974 | Val MAE 4.337
+  Ep 22: Train Loss 80.4684 | Val MAE 4.031
+    Early stopping at epoch 22 (no improvement for 10 epochs)
+  Phase 1 best Val MAE: 4.031
+Phase 2: Fine-Tuning
+  Ep 1: Train Loss 123.3760 | Val MAE 12.743
+  Ep 2: Train Loss 83.1132 | Val MAE 4.104
+  Ep 3: Train Loss 67.0449 | Val MAE 4.082
+  Ep 4: Train Loss 75.1097 | Val MAE 4.713
+  Ep 5: Train Loss 63.4311 | Val MAE 5.776
+  Ep 6: Train Loss 63.7285 | Val MAE 4.182
+  Ep 7: Train Loss 58.3927 | Val MAE 3.311
+    Val MAE improved to 3.311; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large/final_best.pt
+  Ep 8: Train Loss 48.4724 | Val MAE 5.690
+  Ep 9: Train Loss 58.3344 | Val MAE 4.504
+  Ep 10: Train Loss 42.2991 | Val MAE 4.284
+
+========================================
+Training microsoft__dit-base-finetuned-rvlcdip
+========================================
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 40.3kB/s]
+config.json: 100%
+ 1.79k/1.79k [00:00<00:00, 229kB/s]
+pytorch_model.bin: 100%
+ 343M/343M [00:04<00:00, 1.63GB/s]
+Loading weights: 100%
+ 210/210 [00:00<00:00, 8311.82it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-base-finetuned-rvlcdip
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Phase 1: Frozen Backbone
+Training:   0%|          | 0/41 [00:00<?, ?it/s]
+model.safetensors: 100%
+ 343M/343M [00:10<00:00, 60.3MB/s]
+  Ep 1: Train Loss 778.6992 | Val MAE 4.842
+    Val MAE improved to 4.842; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base-finetuned-rvlcdip/stage1_best.pt
+  Ep 2: Train Loss 180.7510 | Val MAE 3.062
+    Val MAE improved to 3.062; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base-finetuned-rvlcdip/stage1_best.pt
+  Ep 3: Train Loss 141.8508 | Val MAE 3.538
+  Ep 4: Train Loss 123.5140 | Val MAE 2.966
+    Val MAE improved to 2.966; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base-finetuned-rvlcdip/stage1_best.pt
+  Ep 5: Train Loss 111.5193 | Val MAE 3.855
+  Ep 6: Train Loss 102.8522 | Val MAE 6.572
+  Ep 7: Train Loss 96.7842 | Val MAE 3.595
+  Ep 8: Train Loss 87.0091 | Val MAE 3.015
+  Ep 9: Train Loss 85.3909 | Val MAE 3.209
+  Ep 10: Train Loss 78.2717 | Val MAE 4.006
+  Ep 11: Train Loss 78.1459 | Val MAE 3.117
+  Ep 12: Train Loss 76.4180 | Val MAE 4.197
+  Ep 13: Train Loss 75.7700 | Val MAE 3.073
+  Ep 14: Train Loss 75.5556 | Val MAE 3.165
+    Early stopping at epoch 14 (no improvement for 10 epochs)
+  Phase 1 best Val MAE: 3.165
+Phase 2: Fine-Tuning
+  Ep 1: Train Loss 104.8183 | Val MAE 3.574
+  Ep 2: Train Loss 73.2283 | Val MAE 4.810
+  Ep 3: Train Loss 71.0810 | Val MAE 4.124
+  Ep 4: Train Loss 58.8692 | Val MAE 4.037
+  Ep 5: Train Loss 63.3453 | Val MAE 3.802
+  Ep 6: Train Loss 55.1763 | Val MAE 3.974
+  Ep 7: Train Loss 47.7789 | Val MAE 3.574
+  Ep 8: Train Loss 38.7422 | Val MAE 3.197
+  Ep 9: Train Loss 34.0511 | Val MAE 3.144
+    Val MAE improved to 3.144; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base-finetuned-rvlcdip/final_best.pt
+  Ep 10: Train Loss 32.7893 | Val MAE 3.044
+    Val MAE improved to 3.044; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-base-finetuned-rvlcdip/final_best.pt
+
+========================================
+Training microsoft__dit-large-finetuned-rvlcdip
+========================================
+preprocessor_config.json: 100%
+ 302/302 [00:00<00:00, 34.5kB/s]
+config.json: 100%
+ 1.79k/1.79k [00:00<00:00, 206kB/s]
+pytorch_model.bin: 100%
+ 1.21G/1.21G [00:10<00:00, 229MB/s]
+Loading weights: 100%
+ 414/414 [00:00<00:00, 9726.93it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-large-finetuned-rvlcdip
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Phase 1: Frozen Backbone
+Training:   0%|          | 0/324 [00:00<?, ?it/s]
+model.safetensors: 100%
+ 1.21G/1.21G [00:11<00:00, 229MB/s]
+  Ep 1: Train Loss 194.6051 | Val MAE 5.847
+    Val MAE improved to 5.847; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 2: Train Loss 121.6754 | Val MAE 5.273
+    Val MAE improved to 5.273; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 3: Train Loss 121.1875 | Val MAE 18.021
+  Ep 4: Train Loss 115.8626 | Val MAE 9.992
+  Ep 5: Train Loss 112.0568 | Val MAE 7.503
+  Ep 6: Train Loss 99.2477 | Val MAE 6.403
+  Ep 7: Train Loss 114.2377 | Val MAE 4.981
+    Val MAE improved to 4.981; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 8: Train Loss 108.8440 | Val MAE 4.418
+    Val MAE improved to 4.418; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 9: Train Loss 106.8188 | Val MAE 3.468
+    Val MAE improved to 3.468; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 10: Train Loss 115.6448 | Val MAE 3.772
+  Ep 11: Train Loss 104.1017 | Val MAE 3.664
+  Ep 12: Train Loss 109.0396 | Val MAE 9.620
+  Ep 13: Train Loss 117.1828 | Val MAE 14.077
+  Ep 14: Train Loss 103.5477 | Val MAE 6.424
+  Ep 15: Train Loss 105.8550 | Val MAE 6.502
+  Ep 16: Train Loss 76.4168 | Val MAE 3.428
+    Val MAE improved to 3.428; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 17: Train Loss 73.5591 | Val MAE 4.533
+  Ep 18: Train Loss 74.9735 | Val MAE 4.350
+  Ep 19: Train Loss 73.8146 | Val MAE 3.746
+  Ep 20: Train Loss 74.4662 | Val MAE 3.428
+    Val MAE improved to 3.428; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 21: Train Loss 73.2769 | Val MAE 4.775
+  Ep 22: Train Loss 73.7833 | Val MAE 5.162
+  Ep 23: Train Loss 71.0453 | Val MAE 3.473
+  Ep 24: Train Loss 68.9760 | Val MAE 3.481
+  Ep 25: Train Loss 69.8721 | Val MAE 3.393
+    Val MAE improved to 3.393; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/stage1_best.pt
+  Ep 26: Train Loss 69.4337 | Val MAE 3.492
+  Ep 27: Train Loss 69.4371 | Val MAE 3.405
+  Ep 28: Train Loss 70.3802 | Val MAE 3.505
+  Ep 29: Train Loss 69.2361 | Val MAE 3.693
+  Ep 30: Train Loss 69.5528 | Val MAE 3.491
+  Ep 31: Train Loss 70.0306 | Val MAE 3.491
+  Ep 32: Train Loss 69.1568 | Val MAE 3.471
+  Ep 33: Train Loss 69.4321 | Val MAE 3.472
+  Ep 34: Train Loss 68.9102 | Val MAE 3.463
+  Ep 35: Train Loss 69.1797 | Val MAE 3.478
+    Early stopping at epoch 35 (no improvement for 10 epochs)
+  Phase 1 best Val MAE: 3.478
+Phase 2: Fine-Tuning
+  Ep 1: Train Loss 93.9316 | Val MAE 6.421
+  Ep 2: Train Loss 81.0095 | Val MAE 6.404
+  Ep 3: Train Loss 66.9142 | Val MAE 4.003
+  Ep 4: Train Loss 66.3642 | Val MAE 5.481
+  Ep 5: Train Loss 54.2076 | Val MAE 3.957
+  Ep 6: Train Loss 48.4874 | Val MAE 4.138
+  Ep 7: Train Loss 47.5461 | Val MAE 3.878
+  Ep 8: Train Loss 48.8696 | Val MAE 3.472
+    Val MAE improved to 3.472; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/final_best.pt
+  Ep 9: Train Loss 37.7927 | Val MAE 4.105
+  Ep 10: Train Loss 37.1477 | Val MAE 3.363
+    Val MAE improved to 3.363; saved to /content/drive/MyDrive/Age_Estimation/06_DiT/models/microsoft__dit-large-finetuned-rvlcdip/final_best.pt
+Loading weights: 100%
+ 209/209 [00:00<00:00, 8097.34it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-base
+Key                     | Status     | 
+------------------------+------------+-
+lm_head.bias            | UNEXPECTED | 
+layernorm.weight        | UNEXPECTED | 
+lm_head.weight          | UNEXPECTED | 
+layernorm.bias          | UNEXPECTED | 
+pooler.layernorm.weight | MISSING    | 
+pooler.layernorm.bias   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Generating val predictions for DiT-Base...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-base_val_preds.csv
+Generating test predictions for DiT-Base...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-base_test_preds.csv
+Loading weights: 100%
+ 413/413 [00:00<00:00, 11979.66it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-large
+Key                     | Status     | 
+------------------------+------------+-
+lm_head.bias            | UNEXPECTED | 
+layernorm.weight        | UNEXPECTED | 
+lm_head.weight          | UNEXPECTED | 
+layernorm.bias          | UNEXPECTED | 
+pooler.layernorm.weight | MISSING    | 
+pooler.layernorm.bias   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Generating val predictions for DiT-Large...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-large_val_preds.csv
+Generating test predictions for DiT-Large...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-large_test_preds.csv
+Loading weights: 100%
+ 210/210 [00:00<00:00, 8148.12it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-base-finetuned-rvlcdip
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Generating val predictions for DiT-Base (RVL-CDIP)...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-base-finetuned-rvlcdip_val_preds.csv
+Generating test predictions for DiT-Base (RVL-CDIP)...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-base-finetuned-rvlcdip_test_preds.csv
+Loading weights: 100%
+ 414/414 [00:00<00:00, 11318.81it/s]
+[transformers] BeitModel LOAD REPORT from: microsoft/dit-large-finetuned-rvlcdip
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Generating val predictions for DiT-Large (RVL-CDIP)...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-large-finetuned-rvlcdip_val_preds.csv
+Generating test predictions for DiT-Large (RVL-CDIP)...
+  Saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/microsoft__dit-large-finetuned-rvlcdip_test_preds.csv
+
+=== Individual Model Test Metrics ===
+  DiT-Base: MAE=3.120, RMSE=5.633, R2=0.207
+  DiT-Large: MAE=3.090, RMSE=5.605, R2=0.215
+  DiT-Base (RVL-CDIP): MAE=2.845, RMSE=5.084, R2=0.354
+  DiT-Large (RVL-CDIP): MAE=3.042, RMSE=5.075, R2=0.356
+
+Model ranking by Val MAE:
+  DiT-Base (RVL-CDIP): 3.044
+  DiT-Large: 3.311
+  DiT-Large (RVL-CDIP): 3.363
+  DiT-Base: 3.456
+
+Best 2 (DiT-Base (RVL-CDIP), DiT-Large):
+  Grid Search (Val MAE=3.045): [DiT-Base (RVL-CDIP)=0.90, DiT-Large=0.10]
+  MAE-based: [DiT-Base (RVL-CDIP)=0.52, DiT-Large=0.48]
+
+Best 3 (DiT-Base (RVL-CDIP), DiT-Large, DiT-Large (RVL-CDIP)):
+  Grid Search (Val MAE=3.055): [DiT-Base (RVL-CDIP)=0.80, DiT-Large=0.10, DiT-Large (RVL-CDIP)=0.10]
+  MAE-based: [DiT-Base (RVL-CDIP)=0.35, DiT-Large=0.33, DiT-Large (RVL-CDIP)=0.32]
+
+Full Ensemble (DiT-Base (RVL-CDIP), DiT-Large, DiT-Large (RVL-CDIP), DiT-Base):
+  Grid Search (Val MAE=3.092): [DiT-Base (RVL-CDIP)=0.70, DiT-Large=0.10, DiT-Large (RVL-CDIP)=0.10, DiT-Base=0.10]
+  MAE-based: [DiT-Base (RVL-CDIP)=0.27, DiT-Large=0.25, DiT-Large (RVL-CDIP)=0.24, DiT-Base=0.24]
+
+=== Ensemble Evaluation on Test Set ===
+  Best 2 (Grid Search): Test MAE = 2.863
+  Best 2 (MAE-based): Test MAE = 2.943
+  Best 3 (Grid Search): Test MAE = 2.872
+  Best 3 (MAE-based): Test MAE = 2.964
+  Full Ensemble (Grid Search): Test MAE = 2.897
+  Full Ensemble (MAE-based): Test MAE = 2.991
+
+=== Final Evaluation Summary ===
+  Ensemble Group       Method  \
+0         Best 2  Grid Search   
+1         Best 2    MAE-based   
+2         Best 3  Grid Search   
+3         Best 3    MAE-based   
+4  Full Ensemble  Grid Search   
+5  Full Ensemble    MAE-based   
+
+                                             Weights       MAE      RMSE  \
+0  {'DiT-Base (RVL-CDIP)': np.float64(0.9), 'DiT-...  2.863496  5.111692   
+1  {'DiT-Base (RVL-CDIP)': 0.5209, 'DiT-Large': 0...  2.943098  5.268669   
+2  {'DiT-Base (RVL-CDIP)': np.float64(0.8), 'DiT-...  2.872411  5.090637   
+3  {'DiT-Base (RVL-CDIP)': 0.354, 'DiT-Large': 0....  2.963815  5.170870   
+4  {'DiT-Base (RVL-CDIP)': np.float64(0.7), 'DiT-...  2.896912  5.141194   
+5  {'DiT-Base (RVL-CDIP)': 0.2699, 'DiT-Large': 0...  2.991088  5.264448   
+
+         R2       MAPE    Acc_2yr    Acc_5yr   Acc_10yr  Max_Error  \
+0  0.346876  16.760985  67.241379  82.758621  93.103448  25.200981   
+1  0.306146  16.875430  66.379310  82.758621  93.965517  25.816694   
+2  0.352245  16.817011  66.379310  82.758621  93.103448  24.494055   
+3  0.331666  17.161789  64.655172  82.758621  93.103448  25.990815   
+4  0.339315  16.978644  66.379310  82.758621  92.241379  24.615060   
+5  0.307257  17.430302  66.379310  81.896552  92.241379  25.763581   
+
+   Median_Error  Min_Error  
+0      1.129074   0.052648  
+1      1.354159   0.023093  
+2      1.170761   0.131372  
+3      1.438104   0.054012  
+4      1.135861   0.094145  
+5      1.344183   0.021265  
+
+Summary saved to /content/drive/MyDrive/Age_Estimation/06_DiT/results/ensemble_evaluation_summary.csv

@@ -1,4 +1,4 @@
-# Experiment 09 — Document Image Transformers (DiT): Results
+# Experiment 06 — Document Image Transformers (DiT): Results
 
 > **Role in paper:** Table 3 (bottom section) and Table 4 — DiT individual models and
 > ensemble results on the official HHD split.
@@ -13,15 +13,22 @@
 | Input size | 224×224 (via BeitImageProcessor) |
 | Label scaling | No |
 | Augmentation | Rotation (±15°), brightness/contrast, Gaussian noise |
-| Batch size | 16 (DiT-Base) / 2 (DiT-Large) |
-| Training epochs | 15 (frozen backbone) |
-| Training LR | 1e-4 |
-| Fine-tune epochs | 30 |
-| Fine-tune LR | 1e-5 |
-| Weight decay | 1e-4 (frozen) / 1e-5 (fine-tune) |
-| Optimizer | AdamW |
+| Physical batch size | 16 (DiT-Base) / 2 (DiT-Large) |
+| Effective image batch size | 16 (via gradient accumulation; matches `07_DiT_CrossVal`) |
+| Training epochs | 50 (frozen backbone) |
+| Training LR | 1e-3 |
+| Fine-tune epochs | 10 |
+| Fine-tune LR | 1e-4 |
+| Loss | MSE |
+| Optimizer | Adam |
 | Pretrained weights | IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants) |
 | Framework | PyTorch + HuggingFace Transformers |
+
+> **Note:** The configuration above is the unified protocol shared with experiments
+> 01/03/04/05 and `07_DiT_CrossVal` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, effective image
+> batch size 16). The result tables below predate this alignment and **must be regenerated**
+> by re-running `train_dit.py` under the current configuration before the numbers are quoted
+> in the paper.
 
 ---
 

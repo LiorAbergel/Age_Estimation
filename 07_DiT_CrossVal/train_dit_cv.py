@@ -29,7 +29,7 @@ pip install transformers torch torchvision pandas numpy scikit-learn
 """
 
 import os
-import shutil
+import csv
 import random
 import gc
 from collections import defaultdict
@@ -66,8 +66,9 @@ CONFIG = {
     "THR": 0.0054,  # Empty patch threshold
     "SEED": 42,
     "N_SPLITS": 5,
-    "BATCH_SIZE": 1,        # Image batch size (patches expand ~8-12x per image)
-    "GRAD_ACCUM_STEPS": 4,  # Simulate a larger effective batch without extra memory
+    "TARGET_EFFECTIVE_BATCH_SIZE": 16,
+    "BATCH_SIZE_BASE": 16,
+    "BATCH_SIZE_LARGE": 2,
     "EPOCHS_PHASE1": 50,
     "EPOCHS_PHASE2": 10,
     "DATA_DIR": os.path.join(REPO_ROOT, "data"),
@@ -92,6 +93,16 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 set_seed(CONFIG["SEED"])
+
+def get_batch_size(model_id):
+    return CONFIG["BATCH_SIZE_LARGE"] if "large" in model_id else CONFIG["BATCH_SIZE_BASE"]
+
+def get_accum_steps(model_id):
+    batch_size = get_batch_size(model_id)
+    target = CONFIG["TARGET_EFFECTIVE_BATCH_SIZE"]
+    if target % batch_size != 0:
+        raise ValueError(f"TARGET_EFFECTIVE_BATCH_SIZE={target} must be divisible by batch_size={batch_size}")
+    return target // batch_size
 
 # --- Image Processing ---
 
@@ -199,21 +210,28 @@ class DiTReg(nn.Module):
 def train_one_epoch(model, loader, opt, device, scaler, accum_steps):
     model.train()
     total_loss, count = 0.0, 0
+    pending_steps = 0
     pbar = tqdm(loader, desc="Training", leave=False)
     opt.zero_grad()
-    for step, batch in enumerate(pbar):
+    for batch in pbar:
         if not batch: continue
         px, lbl = batch["pixel_values"].to(device), batch["labels"].to(device)
         with autocast('cuda'):
             out = model(pixel_values=px, labels=lbl)
             loss = out["loss"] / accum_steps
         scaler.scale(loss).backward()
-        if (step + 1) % accum_steps == 0:
+        pending_steps += 1
+        if pending_steps == accum_steps:
             scaler.step(opt)
             scaler.update()
             opt.zero_grad()
-        total_loss += loss.item() * accum_steps * lbl.size(0)
+            pending_steps = 0
+        total_loss += out["loss"].item() * lbl.size(0)
         count += lbl.size(0)
+    if pending_steps > 0:
+        scaler.step(opt)
+        scaler.update()
+        opt.zero_grad()
     return total_loss / count if count > 0 else 0.0
 
 @torch.no_grad()
@@ -233,9 +251,24 @@ def _aggregate_preds(model, loader, device):
     y_pred = np.array([np.mean(img_preds[f]) for f in img_preds])
     return y_true, y_pred
 
-def evaluate(model, loader, device):
-    y_true, y_pred = _aggregate_preds(model, loader, device)
-    return {"MAE": mean_absolute_error(y_true, y_pred)}
+@torch.no_grad()
+def evaluate_patch_mae(model, loader, device):
+    """Patch-level validation MAE, used for checkpoint selection / early stopping.
+
+    Matches the CNN/ViT experiments, where the best model is chosen on the
+    patch-level validation metric. Page-level metrics (the reported numbers) are
+    computed separately from the aggregated OOF predictions.
+    """
+    model.eval()
+    tot_abs, n = 0.0, 0
+    for batch in tqdm(loader, desc="Evaluating", leave=False):
+        if not batch: continue
+        px = batch["pixel_values"].to(device)
+        labels = batch["labels"].cpu().numpy().reshape(-1)
+        preds = model(pixel_values=px)["preds"].cpu().numpy().reshape(-1)
+        tot_abs += float(np.abs(preds - labels).sum())
+        n += labels.shape[0]
+    return {"MAE": tot_abs / n if n else 0.0}
 
 def compute_full_metrics(y_true, y_pred):
     """Extended image-level metrics (keys aligned with Exp 03/05)."""
@@ -298,8 +331,27 @@ def resolve_output_dirs():
 
 # --- Training helpers ---
 
+# Per-epoch training log, mirroring the ViT/CNN experiments' training_log.csv.
+LOG_FIELDNAMES = ["model", "phase", "epoch", "train_loss", "val_mae", "lr"]
+
+def _log_epoch(log_path, row, write_header):
+    """Append one epoch row to the training-log CSV, flushing immediately.
+
+    Phase 1 ("frozen") starts a fresh file with a header; Phase 2 ("fine_tune")
+    appends, so a single CSV spans both phases per fold (like exp 04/05).
+    """
+    if log_path is None:
+        return
+    mode = "w" if write_header else "a"
+    with open(log_path, mode, newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=LOG_FIELDNAMES, extrasaction="ignore", restval="")
+        if write_header:
+            writer.writeheader()
+        writer.writerow(row)
+
+
 def _train_phase(model, loader, val_loader, optimizer, device, scaler, accum_steps,
-                 n_epochs, ckpt_path, best_mae):
+                 n_epochs, ckpt_path, best_mae, log_path=None, model_name="", phase=""):
     """Run one training phase with ReduceLROnPlateau and EarlyStopping.
 
     Saves the best model to ``ckpt_path`` when val MAE improves on ``best_mae``.
@@ -313,9 +365,17 @@ def _train_phase(model, loader, val_loader, optimizer, device, scaler, accum_ste
 
     for ep in range(1, n_epochs + 1):
         loss = train_one_epoch(model, loader, optimizer, device, scaler, accum_steps)
-        metrics = evaluate(model, val_loader, device)
+        metrics = evaluate_patch_mae(model, val_loader, device)
         val_mae = metrics["MAE"]
+        current_lr = optimizer.param_groups[0]["lr"]
         scheduler.step(val_mae)
+
+        write_header = log_path is not None and (
+            (phase == "frozen" and ep == 1) or not os.path.exists(log_path))
+        _log_epoch(log_path,
+                   {"model": model_name, "phase": phase, "epoch": ep,
+                    "train_loss": loss, "val_mae": val_mae, "lr": current_lr},
+                   write_header=write_header)
 
         print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {val_mae:.3f}")
 
@@ -392,10 +452,6 @@ def run_full_cv():
     sgkf = StratifiedGroupKFold(n_splits=CONFIG["N_SPLITS"], shuffle=True, random_state=CONFIG["SEED"])
     splits = list(sgkf.split(df.index, df["AgeGroup"], df["WriterNumber"]))
 
-    # Uniform batch / accumulation across all models
-    batch_size = CONFIG["BATCH_SIZE"]
-    accum_steps = CONFIG["GRAD_ACCUM_STEPS"]
-
     all_fold_metrics = {}
     all_oof_records = []
 
@@ -404,6 +460,9 @@ def run_full_cv():
         print(f"\n{'='*40}\nProcessing Model: {model_id}\n{'='*40}")
 
         proc = BeitImageProcessor.from_pretrained(model_id)
+        batch_size = get_batch_size(model_id)
+        accum_steps = get_accum_steps(model_id)
+        print(f"Image batch size: {batch_size}; gradient accumulation: {accum_steps}; effective image batch size: {batch_size * accum_steps}")
         model_root = Path(CONFIG["MODELS_DIR"]) / safe_name
         model_root.mkdir(parents=True, exist_ok=True)
 
@@ -413,9 +472,10 @@ def run_full_cv():
             fold_dir = model_root / f"fold_{fold:02d}"
             fold_dir.mkdir(parents=True, exist_ok=True)
 
-            stage1_ckpt = fold_dir / "stage1_best.pt"
-            final_ckpt = fold_dir / "final_best.pt"
-            done_path = fold_dir / "training.done"
+            log_name = f"{safe_name}_fold{fold:02d}"
+            best_ckpt = fold_dir / f"{log_name}_best_model.pt"
+            done_path = fold_dir / f"{log_name}.done"
+            log_path = str(fold_dir / f"{log_name}_training_log.csv")
 
             print(f"\n── {safe_name} | Fold {fold}/{CONFIG['N_SPLITS']} ──")
             train_df, val_df = df.iloc[tr_idx], df.iloc[val_idx]
@@ -425,47 +485,41 @@ def run_full_cv():
             val_loader = DataLoader(HHDPatchDataset(val_df, CONFIG["DATA_DIR"], proc, False),
                                     batch_size=batch_size, shuffle=False, collate_fn=collate_patches)
 
-            # Skip training only when fully completed (.done marker)
-            if done_path.exists() and (final_ckpt.exists() or stage1_ckpt.exists()):
+            # Skip training only when fully completed: the .done marker is written
+            # after Phase 2.  A lone checkpoint (no .done) means a crashed run, so we
+            # retrain from scratch (same mechanism as the ViT/CNN experiments).
+            if done_path.exists() and best_ckpt.exists():
                 print(f"Found completed {safe_name} Fold {fold}; loading for OOF evaluation.")
             else:
+                if best_ckpt.exists():
+                    print(f"Found incomplete checkpoint for {safe_name} Fold {fold} (no .done marker); retraining from scratch.")
                 model = DiTReg(name=model_id).to(device)
                 scaler = GradScaler('cuda')
 
                 # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
-                if not stage1_ckpt.exists():
-                    print("Phase 1: Frozen Backbone")
-                    for p in model.backbone.parameters():
-                        p.requires_grad = False
-                    opt = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
-                    _train_phase(model, train_loader, val_loader, opt, device, scaler,
-                                 accum_steps, CONFIG["EPOCHS_PHASE1"], stage1_ckpt, float("inf"))
-                else:
-                    print("Phase 1 already completed. Loading weights.")
-                    model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
-
-                # Evaluate Phase 1 best to get carry-forward threshold
-                phase1_metrics = evaluate(model, val_loader, device)
-                phase1_best_mae = phase1_metrics["MAE"]
+                print("Phase 1: Frozen Backbone")
+                for p in model.backbone.parameters():
+                    p.requires_grad = False
+                opt = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
+                phase1_best_mae = _train_phase(model, train_loader, val_loader, opt, device, scaler,
+                             accum_steps, CONFIG["EPOCHS_PHASE1"], best_ckpt, float("inf"),
+                             log_path=log_path, model_name=log_name, phase="frozen")
                 print(f"  Phase 1 best Val MAE: {phase1_best_mae:.3f}")
 
                 # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
+                # Reload Phase 1 best, unfreeze all, and carry the best val MAE forward so the
+                # single best-model checkpoint is overwritten only when Phase 2 improves on it.
                 print("Phase 2: Fine-Tuning")
-                model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
+                model.load_state_dict(torch.load(best_ckpt, map_location=device))
                 for p in model.backbone.parameters():
                     p.requires_grad = True
                 opt = torch.optim.Adam(model.parameters(), lr=CONFIG["LR_FT"])
-
                 _train_phase(model, train_loader, val_loader, opt, device, scaler,
-                             accum_steps, CONFIG["EPOCHS_PHASE2"], final_ckpt, phase1_best_mae)
-
-                # If Phase 2 never improved on Phase 1, copy stage1 as final
-                if not final_ckpt.exists():
-                    shutil.copy2(stage1_ckpt, final_ckpt)
-                    print(f"  Phase 2 did not improve; using Phase 1 checkpoint as final.")
+                             accum_steps, CONFIG["EPOCHS_PHASE2"], best_ckpt, phase1_best_mae,
+                             log_path=log_path, model_name=log_name, phase="fine_tune")
 
                 # Mark training as fully complete
-                done_path.write_text(f"{safe_name} fold {fold} training complete\n")
+                done_path.write_text(f"{log_name} training complete\n")
 
                 del model
                 torch.cuda.empty_cache()
@@ -473,7 +527,7 @@ def run_full_cv():
 
             # --- OOF evaluation (matched to Exp 03/05) ---
             model = DiTReg(name=model_id).to(device)
-            model.load_state_dict(torch.load(final_ckpt, map_location=device))
+            model.load_state_dict(torch.load(best_ckpt, map_location=device))
 
             y_true, y_pred = _aggregate_preds(model, val_loader, device)
             fold_metrics = compute_full_metrics(y_true, y_pred)

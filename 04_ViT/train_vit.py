@@ -194,7 +194,7 @@ def patch_data_tf_dataset_from_df(labels_df_subset, data_dir, patch_size, step_s
         
     return ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
-def patch_data_tf_dataset_with_ids(labels_df, dataset_type, final_size, batch_size=64):
+def patch_data_tf_dataset_with_ids(labels_df, dataset_type, final_size, batch_size=128):
     df = labels_df[labels_df['Set'] == dataset_type].reset_index(drop=True)
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
     ds = ds.map(process_row_with_id, num_parallel_calls=tf.data.AUTOTUNE)

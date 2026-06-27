@@ -1,4 +1,4 @@
-# Experiment 07 — ViT Cross-Validation: Results
+# Experiment 05 — ViT Cross-Validation: Results
 
 > **Role in paper:** Table 2 (middle section) — ViT individual models, 5-fold stratified group CV.
 
@@ -12,14 +12,21 @@
 | Input size | 256×256 (SwinV2, MobileViT) or 224×224 (ConvNeXtV2, TinyViT) — after patch extraction |
 | Label scaling | No |
 | Augmentation | Rotation (±15°), zoom (up to 10%), brightness/contrast, Gaussian noise |
-| Batch size | 64 |
+| Batch size | 128 |
 | Training epochs | 50 (frozen backbone) |
 | Training LR | 1e-3 |
-| Fine-tune epochs | 10 (Colab) / 30 (repo script) |
+| Fine-tune epochs | 10 |
 | Fine-tune LR | 1e-4 |
 | CV strategy | StratifiedGroupKFold, k=5 (stratify=AgeGroup, group=WriterNumber) |
 | Pretrained weights | ImageNet-1K |
 | Framework | TensorFlow / `keras_cv_attention_models` (requires `TF_USE_LEGACY_KERAS=1`) |
+
+> **Note:** Batch size was changed from 64 to **128** to match `04_ViT` and the CNN
+> experiments (01/03), so all CNN/ViT experiments now train at an effective patch batch of
+> 128. The result tables below were produced with the old batch size of 64 and **must be
+> regenerated** by re-running `train_vit_cv.py` under the current configuration. Before
+> re-running, delete the stale checkpoints under `models/05_ViT_CrossVal/` (the script has no
+> config-signature guard and will otherwise skip completed folds).
 
 ---
 

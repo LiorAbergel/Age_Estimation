@@ -22,8 +22,8 @@ pip install transformers torch torchvision pandas numpy scikit-learn
 """
 
 import os
+import csv
 import gc
-import shutil
 import random
 import numpy as np
 import pandas as pd
@@ -64,11 +64,10 @@ CONFIG = {
     "PATCH_SIZE": 400,
     "STRIDE": 200,
     "STANDARD_SIZE": 800,
-    # Per-model training batch size:
-    # DiT-Base trains at 16, DiT-Large at 2 (memory-safe, more update steps).
+    "TARGET_EFFECTIVE_BATCH_SIZE": 16,
     "BATCH_SIZE_BASE": 16,
     "BATCH_SIZE_LARGE": 2,
-    "EVAL_BATCH_SIZE": 8,  # Inference batch (LayerNorm => no effect on results)
+    "EVAL_BATCH_SIZE": 8,
     "EPOCHS_PHASE1": 50,
     "EPOCHS_PHASE2": 10,
     "LR_INIT": 1e-3,
@@ -95,8 +94,14 @@ MODELS_TO_TRAIN = [
 # --- Utils ---
 
 def get_batch_size(model_id):
-    """Per-model training batch size matching the Notebook recipe."""
     return CONFIG["BATCH_SIZE_LARGE"] if "large" in model_id else CONFIG["BATCH_SIZE_BASE"]
+
+def get_accum_steps(model_id):
+    batch_size = get_batch_size(model_id)
+    target = CONFIG["TARGET_EFFECTIVE_BATCH_SIZE"]
+    if target % batch_size != 0:
+        raise ValueError(f"TARGET_EFFECTIVE_BATCH_SIZE={target} must be divisible by batch_size={batch_size}")
+    return target // batch_size
 
 def calculate_resized_dimensions(height, width):
     aspect_ratio = width / height
@@ -247,68 +252,59 @@ class DiTReg(nn.Module):
 
 # --- Training & Evaluation ---
 
-def train_one_epoch(model, loader, opt, device):
+def train_one_epoch(model, loader, opt, device, accum_steps):
     model.train()
     total_loss, total_samples = 0.0, 0
-    
-    # Gradient accumulation for stability if batch size is small
-    ACCUM_STEPS = 1 
-    
+    pending_steps = 0
+
     pbar = tqdm(loader, desc="Training", leave=False)
     opt.zero_grad()
-    
-    for i, batch in enumerate(pbar):
+
+    for batch in pbar:
         if not batch: continue
-        
+
         px = batch["pixel_values"].to(device)
         lbl = batch["labels"].to(device)
 
         out = model(pixel_values=px, labels=lbl)
-        loss = out["loss"] / ACCUM_STEPS
+        loss = out["loss"] / accum_steps
         loss.backward()
+        pending_steps += 1
 
-        if (i + 1) % ACCUM_STEPS == 0:
+        if pending_steps == accum_steps:
             opt.step()
             opt.zero_grad()
+            pending_steps = 0
 
         bs = lbl.size(0)
-        total_loss += out["loss"].item() * ACCUM_STEPS * bs
+        total_loss += out["loss"].item() * bs
         total_samples += bs
-        pbar.set_postfix(loss=f"{out['loss'].item()*ACCUM_STEPS:.4f}")
+        pbar.set_postfix(loss=f"{out['loss'].item():.4f}")
+
+    if pending_steps > 0:
+        opt.step()
+        opt.zero_grad()
 
     return total_loss / total_samples if total_samples > 0 else 0.0
 
 @torch.no_grad()
-def evaluate(model, loader, device):
+def evaluate_patch_mae(model, loader, device):
+    """Patch-level validation MAE, used for checkpoint selection / early stopping.
+
+    Matches the CNN/ViT experiments, where the best model is chosen on the
+    patch-level validation metric. Page-level metrics (the reported numbers) are
+    computed separately from the aggregated prediction CSVs.
+    """
     model.eval()
-    img_preds = defaultdict(list)
-    img_gts = {}
-    
+    tot_abs, n = 0.0, 0
     for batch in tqdm(loader, desc="Evaluating", leave=False):
         if not batch: continue
         px = batch["pixel_values"].to(device)
-        ids = batch["ids"]
-        labels = batch["labels"].cpu().numpy()
-
-        preds = model(pixel_values=px)["preds"].cpu().numpy()
-
-        for p, l, fid in zip(preds, labels, ids):
-            img_preds[fid].append(p)
-            img_gts[fid] = l
-
-    # Aggregate patch predictions to image level
-    final_preds, final_gts = [], []
-    for fid in img_preds:
-        final_preds.append(np.mean(img_preds[fid]))
-        final_gts.append(img_gts[fid])
-
-    final_gts = np.array(final_gts)
-    final_preds = np.array(final_preds)
-    
-    mae = mean_absolute_error(final_gts, final_preds)
-    rmse = np.sqrt(mean_squared_error(final_gts, final_preds))
-    
-    return {"MAE": mae, "RMSE": rmse}
+        labels = batch["labels"].cpu().numpy().reshape(-1)
+        preds = model(pixel_values=px)["preds"].cpu().numpy().reshape(-1)
+        tot_abs += float(np.abs(preds - labels).sum())
+        n += labels.shape[0]
+    return {"MAE": tot_abs / n if n else 0.0}
 
 # --- Ensemble Logic ---
 
@@ -497,7 +493,27 @@ def resolve_output_dirs():
 
 # --- Training helpers ---
 
-def _train_phase(model, loader, val_loader, optimizer, device, n_epochs, ckpt_path, best_mae):
+# Per-epoch training log, mirroring the ViT/CNN experiments' training_log.csv.
+LOG_FIELDNAMES = ["model", "phase", "epoch", "train_loss", "val_mae", "lr"]
+
+def _log_epoch(log_path, row, write_header):
+    """Append one epoch row to the training-log CSV, flushing immediately.
+
+    Phase 1 ("frozen") starts a fresh file with a header; Phase 2 ("fine_tune")
+    appends, so a single CSV spans both phases per model (like exp 04/05).
+    """
+    if log_path is None:
+        return
+    mode = "w" if write_header else "a"
+    with open(log_path, mode, newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=LOG_FIELDNAMES, extrasaction="ignore", restval="")
+        if write_header:
+            writer.writeheader()
+        writer.writerow(row)
+
+
+def _train_phase(model, loader, val_loader, optimizer, device, accum_steps, n_epochs, ckpt_path, best_mae,
+                 log_path=None, model_name="", phase=""):
     """Run one training phase with ReduceLROnPlateau and EarlyStopping.
 
     Saves the best model to ``ckpt_path`` when val MAE improves on ``best_mae``.
@@ -510,10 +526,18 @@ def _train_phase(model, loader, val_loader, optimizer, device, n_epochs, ckpt_pa
     EARLY_STOP_PATIENCE = 10
 
     for ep in range(1, n_epochs + 1):
-        loss = train_one_epoch(model, loader, optimizer, device)
-        metrics = evaluate(model, val_loader, device)
+        loss = train_one_epoch(model, loader, optimizer, device, accum_steps)
+        metrics = evaluate_patch_mae(model, val_loader, device)
         val_mae = metrics["MAE"]
+        current_lr = optimizer.param_groups[0]["lr"]
         scheduler.step(val_mae)
+
+        write_header = log_path is not None and (
+            (phase == "frozen" and ep == 1) or not os.path.exists(log_path))
+        _log_epoch(log_path,
+                   {"model": model_name, "phase": phase, "epoch": ep,
+                    "train_loss": loss, "val_mae": val_mae, "lr": current_lr},
+                   write_header=write_header)
 
         print(f"  Ep {ep}: Train Loss {loss:.4f} | Val MAE {val_mae:.3f}")
 
@@ -557,20 +581,23 @@ def main():
         model_dir = Path(CONFIG["MODELS_DIR"]) / safe_name
         model_dir.mkdir(parents=True, exist_ok=True)
 
-        stage1_ckpt = model_dir / "stage1_best.pt"
-        final_ckpt = model_dir / "final_best.pt"
-        done_path = model_dir / "training.done"
+        best_ckpt = model_dir / f"{safe_name}_best_model.pt"
+        done_path = model_dir / f"{safe_name}.done"
+        log_path = str(model_dir / f"{safe_name}_training_log.csv")
 
-        # Skip only when training fully completed (.done marker written after Phase 2).
-        if done_path.exists() and (final_ckpt.exists() or stage1_ckpt.exists()):
+        # Skip only when training fully completed: the .done marker is written
+        # after Phase 2.  A lone checkpoint (no .done) means a crashed run, so we
+        # retrain from scratch (same mechanism as the ViT/CNN experiments).
+        if done_path.exists() and best_ckpt.exists():
             print(f"Found completed {safe_name}; will load from disk for inference.")
             continue
-        if stage1_ckpt.exists() and not done_path.exists():
-            print(f"Found incomplete checkpoint for {safe_name} (no .done marker); "
-                  f"resuming from Stage 1 checkpoint.")
+        if best_ckpt.exists():
+            print(f"Found incomplete checkpoint for {safe_name} (no .done marker); retraining from scratch.")
 
         proc = BeitImageProcessor.from_pretrained(model_id)
         batch_size = get_batch_size(model_id)
+        accum_steps = get_accum_steps(model_id)
+        print(f"Image batch size: {batch_size}; gradient accumulation: {accum_steps}; effective image batch size: {batch_size * accum_steps}")
         loaders = {}
         for split in ["train", "val"]:
             ds_subset = df[df["Set"].str.lower() == split]
@@ -586,42 +613,29 @@ def main():
         model = DiTReg(name=model_id).to(device)
 
         # --- Phase 1: Frozen Backbone (Adam @ LR_INIT) ---
-        if not stage1_ckpt.exists():
-            print("Phase 1: Frozen Backbone")
-            for p in model.backbone.parameters():
-                p.requires_grad = False
-            optimizer = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
-            _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
-                         CONFIG["EPOCHS_PHASE1"], stage1_ckpt, float("inf"))
-        else:
-            print("Phase 1 already completed. Loading weights.")
-            model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
-
-        # Evaluate Phase 1 best to get carry-forward threshold
-        phase1_metrics = evaluate(model, loaders["val"], device)
-        phase1_best_mae = phase1_metrics["MAE"]
+        print("Phase 1: Frozen Backbone")
+        for p in model.backbone.parameters():
+            p.requires_grad = False
+        optimizer = torch.optim.Adam(model.head.parameters(), lr=CONFIG["LR_INIT"])
+        phase1_best_mae = _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
+                     accum_steps, CONFIG["EPOCHS_PHASE1"], best_ckpt, float("inf"),
+                     log_path=log_path, model_name=safe_name, phase="frozen")
         print(f"  Phase 1 best Val MAE: {phase1_best_mae:.3f}")
 
         # --- Phase 2: Fine-Tuning (Adam @ LR_FT) ---
-        if not done_path.exists():
-            print("Phase 2: Fine-Tuning")
-            # Reload from stage1 best and unfreeze all
-            model.load_state_dict(torch.load(stage1_ckpt, map_location=device))
-            for p in model.backbone.parameters():
-                p.requires_grad = True
-            optimizer = torch.optim.Adam(model.parameters(), lr=CONFIG["LR_FT"])
+        # Reload Phase 1 best, unfreeze all, and carry the best val MAE forward so the
+        # single best-model checkpoint is overwritten only when Phase 2 improves on it.
+        print("Phase 2: Fine-Tuning")
+        model.load_state_dict(torch.load(best_ckpt, map_location=device))
+        for p in model.backbone.parameters():
+            p.requires_grad = True
+        optimizer = torch.optim.Adam(model.parameters(), lr=CONFIG["LR_FT"])
+        _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
+                     accum_steps, CONFIG["EPOCHS_PHASE2"], best_ckpt, phase1_best_mae,
+                     log_path=log_path, model_name=safe_name, phase="fine_tune")
 
-            # Carry Phase 1's best val_mae forward: Phase 2 only saves when it improves
-            _train_phase(model, loaders["train"], loaders["val"], optimizer, device,
-                         CONFIG["EPOCHS_PHASE2"], final_ckpt, phase1_best_mae)
-
-            # If Phase 2 never improved on Phase 1, copy stage1 as final
-            if not final_ckpt.exists():
-                shutil.copy2(stage1_ckpt, final_ckpt)
-                print(f"  Phase 2 did not improve; using Phase 1 checkpoint as final.")
-
-            # Mark training as fully complete
-            done_path.write_text(f"{safe_name} training complete\n")
+        # Mark training as fully complete
+        done_path.write_text(f"{safe_name} training complete\n")
 
         # Free GPU memory before next model
         del model, loaders
@@ -634,15 +648,15 @@ def main():
     for model_id in MODELS_TO_TRAIN:
         safe_name = model_id.replace("/", "__")
         model_dir = Path(CONFIG["MODELS_DIR"]) / safe_name
-        final_ckpt = model_dir / "final_best.pt"
+        best_ckpt = model_dir / f"{safe_name}_best_model.pt"
 
-        if not final_ckpt.exists():
-            print(f"WARNING: No final checkpoint for {safe_name}, skipping predictions.")
+        if not best_ckpt.exists():
+            print(f"WARNING: No best-model checkpoint for {safe_name}, skipping predictions.")
             continue
 
         proc = BeitImageProcessor.from_pretrained(model_id)
         model = DiTReg(name=model_id).to(device)
-        model.load_state_dict(torch.load(final_ckpt, map_location=device))
+        model.load_state_dict(torch.load(best_ckpt, map_location=device))
 
         for split in ["val", "test"]:
             csv_path = os.path.join(CONFIG["RESULTS_DIR"], f"{safe_name}_{split}_preds.csv")

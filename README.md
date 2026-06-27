@@ -104,7 +104,7 @@ All experiments share a common preprocessing pipeline:
 - Image resizing to 800px height (aspect ratio preserved)
 - Patch extraction: 400x400 pixels, stride 200
 - Pixel normalization to [0, 1]
-- Augmentation: rotation (+/-15 degrees), zoom (up to 10%), Gaussian noise, and brightness and/or contrast (varies by experiment)
+- Augmentation: rotation (+/-15 degrees), zoom (up to 10%), Gaussian noise, brightness adjustment, and contrast adjustment
 - Empty patch filtering: intensity threshold = 0.0054
 
 **CNN experiments (`01_CNN_Ensemble`, `03_CNN_CrossVal`):**
@@ -120,16 +120,18 @@ All experiments share a common preprocessing pipeline:
 - Pretrained weights: ImageNet-1K (all four models; `pretrained="imagenet"` in `keras_cv_attention_models`)
 - Regression head: GlobalAveragePooling2D, Dropout (0.5), Dense (1, linear)
 - Training: 50 epochs frozen backbone + 10 epochs fine-tuning
-- Batch size: 64
+- Batch size: 128 (`04_ViT` and `05_ViT_CrossVal`)
 - Optimizer: Adam (1e-3 frozen, 1e-4 fine-tuning)
 
 **DiT experiments (`06_DiT`, `07_DiT_CrossVal`):**
 - Models: DiT-Base, DiT-Large, DiT-Base (RVL-CDIP), DiT-Large (RVL-CDIP)
 - Pretrained weights: IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants)
 - Input: 224x224 via BeitImageProcessor
-- Training: 15 epochs frozen backbone + 30 epochs fine-tuning
-- Batch size: 4 (`06_DiT`), dynamic with gradient accumulation + FP16 (`07_DiT_CrossVal`)
-- Optimizer: AdamW (1e-4 frozen, 1e-5 fine-tuning)
+- Regression head: CLS token, Dropout (0.5), Dense (1, linear)
+- Training: 50 epochs frozen backbone + 10 epochs fine-tuning
+- Physical batch size: 16 (Base variants) / 2 (Large variants)
+- Effective image batch size: 16 in both `06_DiT` and `07_DiT_CrossVal` via gradient accumulation where needed
+- Optimizer: Adam (1e-3 frozen, 1e-4 fine-tuning)
 
 ## Results Summary
 

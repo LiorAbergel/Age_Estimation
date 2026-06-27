@@ -66,7 +66,7 @@ from download_dataset import ensure_dataset
 CONFIG = {
     "PATCH_SIZE": (400, 400),
     "STRIDE": 200,
-    "BATCH_SIZE": 64,
+    "BATCH_SIZE": 128,
     "THR": 0.0054,  # Intensity threshold for empty patches
     "EPOCHS_INIT": 50,
     "EPOCHS_FT": 10,
@@ -208,7 +208,7 @@ def patch_data_tf_dataset_from_df(labels_df_subset, data_dir, patch_size, step_s
         
     return ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
-def patch_data_tf_dataset_with_ids(labels_df_subset, final_size, batch_size=64):
+def patch_data_tf_dataset_with_ids(labels_df_subset, final_size, batch_size=128):
     ds = tf.data.Dataset.from_tensor_slices(dict(labels_df_subset))
     ds = ds.map(process_row_with_id, num_parallel_calls=tf.data.AUTOTUNE)
     ds = ds.flat_map(lambda p, l, i: tf.data.Dataset.zip((

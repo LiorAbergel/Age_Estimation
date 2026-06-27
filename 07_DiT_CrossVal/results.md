@@ -14,16 +14,25 @@
 | Input size | 224×224 (via BeitImageProcessor) |
 | Label scaling | No |
 | Augmentation | Rotation (±15°), brightness/contrast, Gaussian noise |
-| Batch size | 1 image/step, gradient accumulation ×4 (effective ≈ 4 images) |
+| Physical batch size | 16 (DiT-Base) / 2 (DiT-Large) |
+| Effective image batch size | 16 (via gradient accumulation; matches `06_DiT`) |
 | Mixed precision | FP16 (if GPU supports it) |
-| Training epochs | 15 (frozen backbone) |
-| Training LR | 1e-4 |
-| Fine-tune epochs | 30 |
-| Fine-tune LR | 1e-5 |
-| Optimizer | AdamW |
+| Training epochs | 50 (frozen backbone) |
+| Training LR | 1e-3 |
+| Fine-tune epochs | 10 |
+| Fine-tune LR | 1e-4 |
+| Loss | MSE |
+| Optimizer | Adam |
 | CV strategy | StratifiedGroupKFold, k=5 (stratify=AgeGroup, group=WriterNumber) |
 | Pretrained weights | IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants) |
 | Framework | PyTorch + HuggingFace Transformers |
+
+> **Note:** The configuration above is the unified protocol shared with experiments
+> 01/03/04/05 and `06_DiT` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, effective image batch size 16).
+> Earlier runs used an effective batch of ≈4 images, which made this experiment non-comparable
+> to `06_DiT`; that flaw is now fixed. The result tables below predate the alignment and **must
+> be regenerated** by re-running `train_dit_cv.py` under the current configuration before the
+> numbers are quoted in the paper.
 
 ---
 
