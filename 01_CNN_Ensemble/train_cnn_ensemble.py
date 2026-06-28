@@ -78,7 +78,7 @@ BATCH_SIZE = 128          # used for the published results; lower if VRAM-limite
 EPOCHS_FROZEN = 50
 EPOCHS_FINE_TUNE = 10
 FROZEN_LR = 1e-3
-FINE_TUNE_LR = 1e-4
+FINE_TUNE_LR = 1e-5
 DROPOUT_RATE = 0.5
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"
@@ -673,7 +673,7 @@ def main(argv=None):
 
     # Cache patch-level predictions, then aggregate to per-image pivots
     val_patch_df = cache_patch_predictions(model_names, models_dir, val_ds, results_dir / "val_patch_level_predictions.csv")
-    test_patch_df = cache_patch_predictions(model_names, models_dir, test_ds, results_dir / "patch_level_predictions.csv")
+    test_patch_df = cache_patch_predictions(model_names, models_dir, test_ds, results_dir / "test_patch_level_predictions.csv")
 
     val_pivot = image_level_pivot(val_patch_df)
     test_pivot = image_level_pivot(test_patch_df)

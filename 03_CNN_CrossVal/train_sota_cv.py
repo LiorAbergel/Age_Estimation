@@ -215,7 +215,6 @@ def compute_evaluation_metrics(true_images, predicted_images):
         "MAPE": mape,
         "Acc_2yr": np.mean(errors <= 2) * 100,
         "Acc_5yr": np.mean(errors <= 5) * 100,
-        "Acc_10yr": np.mean(errors <= 10) * 100,
         "Max_Error": float(np.max(errors)),
         "Median_Error": float(np.median(errors)),
         "Min_Error": float(np.min(errors)),
@@ -436,72 +435,72 @@ def predict_on_test_set(models_dict, test_df):
     test_ds = patch_data_tf_dataset_with_ids_from_df(
         test_df, CONFIG["DATA_DIR"], CONFIG["PATCH_SIZE"], CONFIG["STRIDE"], CONFIG["BATCH_SIZE"], augment=False
     )
-    
+
     os.makedirs(CONFIG["RESULTS_DIR"], exist_ok=True)
-    all_image_preds = defaultdict(list) # {ImageID: [pred1, pred2, ...]}
+    true_map = dict(zip(test_df['File'], test_df['Age']))
+    all_image_preds = defaultdict(list)  # {ImageID: [pred1, pred2, ...]}
 
     for model_name, folds_to_run in models_dict.items():
         for fold in folds_to_run:
             ckpt_path = os.path.join(CONFIG["MODELS_DIR"], model_name, f"{model_name}_fold{fold}_best_model.keras")
-            
+
             if not os.path.exists(ckpt_path):
                 print(f"Warning: Checkpoint not found {ckpt_path}, skipping.")
                 continue
-                
+
             print(f"Predicting with {model_name} Fold {fold}...")
             model = load_model(ckpt_path)
-            
-            # Predict
+
             fold_preds = defaultdict(list)
             for patches, _, img_ids in test_ds:
                 p = model.predict(patches, verbose=0).ravel()
                 for img_id_bytes, val in zip(img_ids.numpy(), p):
-                    img_id = img_id_bytes.decode('utf-8')
-                    fold_preds[img_id].append(float(val))
-            
-            # Aggregate patch -> image for this fold
+                    fold_preds[img_id_bytes.decode('utf-8')].append(float(val))
+
+            # Aggregate patch -> image; include TrueAge and AbsError
             csv_data = []
             for img_id, p_list in fold_preds.items():
-                mean_p = np.mean(p_list)
+                mean_p = round(float(np.mean(p_list)), 4)
                 all_image_preds[img_id].append(mean_p)
-                csv_data.append([model_name, fold, img_id, mean_p])
-                
-            # Save fold CSV
+                true_age = true_map.get(img_id)
+                abs_error = round(abs(mean_p - true_age), 4) if true_age is not None else ""
+                csv_data.append([model_name, fold, img_id, true_age, mean_p, abs_error])
+
             csv_path = os.path.join(CONFIG["RESULTS_DIR"], f"{model_name}_fold{fold}_preds.csv")
             with open(csv_path, 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(['Model', 'Fold', 'ImageID', 'Prediction'])
+                writer.writerow(['Model', 'Fold', 'ImageID', 'TrueAge', 'Prediction', 'AbsError'])
                 writer.writerows(csv_data)
-            
+
             del model
             gc.collect()
             tf.keras.backend.clear_session()
 
-    # --- Create Ensemble ---
+    # --- Ensemble predictions ---
     print("\nCalculating Ensemble Metrics...")
     ensemble_data = []
-    y_true = []
-    y_pred = []
-    
-    # Map True Labels
-    true_map = dict(zip(test_df['File'], test_df['Age']))
-    
+    y_true, y_pred = [], []
+
     for img_id, pred_list in all_image_preds.items():
         if img_id in true_map:
-            final_pred = np.mean(pred_list)
+            final_pred = round(float(np.mean(pred_list)), 4)
+            true_age = true_map[img_id]
+            error = round(final_pred - true_age, 4)
             y_pred.append(final_pred)
-            y_true.append(true_map[img_id])
-            ensemble_data.append([img_id, final_pred, true_map[img_id]])
-            
-    # Save Ensemble CSV
+            y_true.append(true_age)
+            ensemble_data.append([img_id, true_age, final_pred, error, abs(error)])
+
     ens_csv = os.path.join(CONFIG["RESULTS_DIR"], "ensemble_final.csv")
-    pd.DataFrame(ensemble_data, columns=['ImageID', 'Pred_Age', 'True_Age']).to_csv(ens_csv, index=False)
-    
-    # Final Metrics
+    pd.DataFrame(ensemble_data, columns=['ImageID', 'True_Age', 'Pred_Age', 'Error', 'AbsError']).to_csv(ens_csv, index=False)
+
     if len(y_true) > 0:
         final_metrics = compute_evaluation_metrics(np.array(y_true), np.array(y_pred))
         print(f"🏆 Final Ensemble MAE: {final_metrics['MAE']:.2f} years")
         print(f"🏆 Final Ensemble RMSE: {final_metrics['RMSE']:.2f} years")
+        ens_metrics_row = {"Model": "Ensemble", **{k: round(v, 4) for k, v in final_metrics.items()}}
+        ens_metrics_csv = os.path.join(CONFIG["RESULTS_DIR"], "ensemble_metrics.csv")
+        pd.DataFrame([ens_metrics_row]).to_csv(ens_metrics_csv, index=False)
+        print(f"Saved ensemble metrics to {ens_metrics_csv}")
     else:
         print("No predictions generated for metrics calculation.")
 
@@ -558,19 +557,21 @@ def save_cv_results(all_fold_metrics, all_oof_records):
     pd.DataFrame(all_oof_records).to_csv(oof_path, index=False)
     print(f"\nSaved OOF predictions to {oof_path} ({len(all_oof_records)} rows)")
 
+    metric_keys = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr",
+                   "Max_Error", "Median_Error", "Min_Error"]
+
     per_fold_rows = []
     for model_name, fms in all_fold_metrics.items():
         for i, fm in enumerate(fms, start=1):
             row = {"Model": model_name, "Fold": i}
-            row.update(fm)
+            row.update({k: round(fm[k], 4) for k in metric_keys if k in fm})
             per_fold_rows.append(row)
     per_fold_path = os.path.join(out_dir, "cv_metrics_per_fold.csv")
     pd.DataFrame(per_fold_rows).to_csv(per_fold_path, index=False)
     print(f"Saved per-fold metrics to {per_fold_path}")
 
-    metric_keys = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr", "Acc_10yr",
-                   "Max_Error", "Median_Error", "Min_Error"]
     summary_rows = []
+    readable_rows = []
     print("\n────── CV SUMMARY (mean ± std across folds) ──────")
     for model_name, fms in all_fold_metrics.items():
         if not fms:
@@ -579,12 +580,20 @@ def save_cv_results(all_fold_metrics, all_oof_records):
         print(f"\n{model_name}:")
         for k in metric_keys:
             arr = np.array([fm[k] for fm in fms], dtype=float)
-            row[f"{k}_mean"], row[f"{k}_std"] = arr.mean(), arr.std()
+            mean_val, std_val = round(float(arr.mean()), 4), round(float(arr.std()), 4)
+            row[f"{k}_mean"] = mean_val
+            row[f"{k}_std"] = std_val
+            readable_rows.append({"Model": model_name, "Metric": k,
+                                   "Mean": mean_val, "Std": std_val,
+                                   "Mean_Std": f"{arr.mean():.2f} ± {arr.std():.2f}"})
             print(f"  {k:<13}: {arr.mean():.2f} ± {arr.std():.2f}")
         summary_rows.append(row)
     summary_path = os.path.join(out_dir, "cv_metrics_summary.csv")
     pd.DataFrame(summary_rows).to_csv(summary_path, index=False)
     print(f"\nSaved CV summary to {summary_path}")
+    readable_path = os.path.join(out_dir, "cv_metrics_readable.csv")
+    pd.DataFrame(readable_rows).to_csv(readable_path, index=False)
+    print(f"Saved readable CV summary to {readable_path}")
 
 
 def main():

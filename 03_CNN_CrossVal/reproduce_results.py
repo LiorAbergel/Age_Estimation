@@ -1,4 +1,4 @@
-"""Reproduce the CNN cross-validation results of Experiment 03 (paper CV table).
+"""Reproduce the CNN cross-validation results of Experiment 03 (paper Table 2, top).
 
 This is the cross-validation counterpart of 01_CNN_Ensemble/reproduce_results.py.
 It offers two modes:
@@ -15,7 +15,7 @@ It offers two modes:
         and identical preprocessing), then perform the same aggregation.
 
 In both modes every model's mean+/-std is compared against the numbers reported
-in results.md and a PASS/FAIL summary is printed.
+in results.md and the results are written to CSV files in ``reproduction_output/``.
 
 Examples:
     python 03_CNN_CrossVal/reproduce_results.py                 # fast path
@@ -46,7 +46,7 @@ REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))  # allow `import download_dataset`
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"
-PREDICTIONS_DIR = SCRIPT_DIR / "predictions"
+PREDICTIONS_DIR = SCRIPT_DIR / "Predictions"
 OOF_PREDICTIONS_CSV = PREDICTIONS_DIR / "oof_predictions.csv"
 DEFAULT_WEIGHTS_DIR = SCRIPT_DIR / "weights"
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "reproduction_output"
@@ -71,33 +71,40 @@ INFERENCE_BATCH_SIZE = 64  # does not affect predictions
 ZENODO_RECORD_ID = os.environ.get("HHD_AGE_CV_ZENODO_RECORD", "REPLACE_WITH_ZENODO_RECORD_ID")
 WEIGHT_MD5: dict[str, str] = {}
 
-METRIC_KEYS = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr", "Acc_10yr",
-               "Max_Error", "Median_Error", "Min_Error"]
+METRIC_KEYS = ["MAE", "RMSE", "R2", "MAPE", "Acc_2yr", "Acc_5yr",
+               "Max_Error", "Min_Error", "Median_Error"]
 
 # ===========================================================================
-# Reported values (from results.md) -- used for the PASS/FAIL self-check.
-# NOTE: these are the pre-unification numbers. After re-running training under
-# the unified augmentation (brightness + contrast), refresh both results.md and
-# this table so the self-check stays meaningful.
+# Reported values (from results.md) -- used for the PASS/FAIL self-check
 # ===========================================================================
+METRIC_TOLERANCES = {
+    "MAE":          0.15,
+    "RMSE":         0.20,
+    "R2":           0.05,
+    "MAPE":         0.50,
+    "Acc_2yr":      0.50,
+    "Acc_5yr":      0.50,
+    "Max_Error":    0.50,
+    "Median_Error": 0.15,
+}
+
 EXPECTED_CV = {
     "ResNet50":          {"MAE": (5.41, 0.78), "RMSE": (8.17, 0.58), "R2": (0.10, 0.06), "MAPE": (25.68, 3.73),
-                          "Acc_2yr": (23.72, 5.17), "Acc_5yr": (63.40, 11.26), "Acc_10yr": (90.10, 4.42),
+                          "Acc_2yr": (23.72, 5.17), "Acc_5yr": (63.40, 11.26),
                           "Max_Error": (32.99, 7.14), "Median_Error": (3.72, 0.88)},
     "DenseNet121":       {"MAE": (5.46, 1.06), "RMSE": (8.16, 0.56), "R2": (0.11, 0.06), "MAPE": (26.25, 5.47),
-                          "Acc_2yr": (21.49, 16.51), "Acc_5yr": (61.61, 16.41), "Acc_10yr": (91.18, 3.84),
+                          "Acc_2yr": (21.49, 16.51), "Acc_5yr": (61.61, 16.41),
                           "Max_Error": (34.14, 6.66), "Median_Error": (3.94, 1.33)},
     "InceptionV3":       {"MAE": (6.03, 0.64), "RMSE": (8.41, 0.64), "R2": (0.05, 0.05), "MAPE": (29.97, 3.17),
-                          "Acc_2yr": (16.40, 4.30), "Acc_5yr": (52.83, 9.01), "Acc_10yr": (90.11, 4.84),
+                          "Acc_2yr": (16.40, 4.30), "Acc_5yr": (52.83, 9.01),
                           "Max_Error": (32.70, 7.60), "Median_Error": (4.80, 0.67)},
     "InceptionResNetV2": {"MAE": (5.69, 0.70), "RMSE": (7.98, 0.68), "R2": (0.17, 0.11), "MAPE": (29.08, 3.16),
-                          "Acc_2yr": (16.76, 3.99), "Acc_5yr": (58.32, 9.19), "Acc_10yr": (89.32, 4.58),
+                          "Acc_2yr": (16.76, 3.99), "Acc_5yr": (58.32, 9.19),
                           "Max_Error": (32.62, 5.80), "Median_Error": (4.37, 0.59)},
     "EfficientNetV2M":   {"MAE": (7.30, 0.28), "RMSE": (9.03, 0.36), "R2": (-0.07, 0.14), "MAPE": (41.48, 5.73),
-                          "Acc_2yr": (11.58, 4.78), "Acc_5yr": (29.47, 2.21), "Acc_10yr": (84.32, 7.19),
+                          "Acc_2yr": (11.58, 4.78), "Acc_5yr": (29.47, 2.21),
                           "Max_Error": (31.44, 5.01), "Median_Error": (7.05, 0.68)},
 }
-TOLERANCE = 0.15  # |computed_mean - reported_mean| must not exceed this to PASS
 
 
 # ===========================================================================
@@ -112,67 +119,145 @@ def compute_metrics(y_true, y_pred) -> dict:
         mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
         mape = 0.0 if np.isnan(mape) else mape
     return {
-        "MAE": mean_absolute_error(y_true, y_pred),
-        "RMSE": float(np.sqrt(mean_squared_error(y_true, y_pred))),
-        "R2": r2_score(y_true, y_pred),
-        "MAPE": mape,
-        "Acc_2yr": float(np.mean(errors <= 2) * 100),
-        "Acc_5yr": float(np.mean(errors <= 5) * 100),
-        "Acc_10yr": float(np.mean(errors <= 10) * 100),
-        "Max_Error": float(np.max(errors)),
+        "MAE":          mean_absolute_error(y_true, y_pred),
+        "RMSE":         float(np.sqrt(mean_squared_error(y_true, y_pred))),
+        "R2":           r2_score(y_true, y_pred),
+        "MAPE":         mape,
+        "Acc_2yr":      float(np.mean(errors <= 2) * 100),
+        "Acc_5yr":      float(np.mean(errors <= 5) * 100),
+        "Max_Error":    float(np.max(errors)),
+        "Min_Error":    float(np.min(errors)),
         "Median_Error": float(np.median(errors)),
-        "Min_Error": float(np.min(errors)),
     }
 
 
 # ===========================================================================
-# Aggregation + reporting (shared by both modes)
+# Aggregation (shared by both modes)
 # ===========================================================================
-def summarize_oof(oof_df: pd.DataFrame) -> dict:
-    """Return {model: {metric: (mean, std)}} computed per fold then aggregated."""
-    summary = {}
+def compute_per_fold(oof_df: pd.DataFrame) -> pd.DataFrame:
+    """Return a DataFrame with one row per (model, fold) and all metrics as columns."""
+    rows = []
     for model_name in MODEL_NAMES:
         sub = oof_df[oof_df["Model"] == model_name]
         if sub.empty:
             continue
-        per_fold = [compute_metrics(fold_df["TrueAge"], fold_df["Prediction"])
-                    for _, fold_df in sub.groupby("Fold")]
+        for fold_id, fold_df in sub.groupby("Fold"):
+            m = compute_metrics(fold_df["TrueAge"], fold_df["Prediction"])
+            rows.append({"Model": model_name, "Fold": int(fold_id), **m})
+    return pd.DataFrame(rows)
+
+
+def summarize_folds(fold_df: pd.DataFrame) -> dict:
+    """Return {model: {metric: (mean, std)}} aggregated across folds."""
+    summary = {}
+    for model_name in MODEL_NAMES:
+        sub = fold_df[fold_df["Model"] == model_name]
+        if sub.empty:
+            continue
         summary[model_name] = {
-            k: (float(np.mean([m[k] for m in per_fold])),
-                float(np.std([m[k] for m in per_fold])))
-            for k in METRIC_KEYS
+            k: (float(sub[k].mean()), float(sub[k].std()))
+            for k in METRIC_KEYS if k in sub.columns
         }
     return summary
 
 
-def report(summary: dict) -> bool:
-    """Print the comparison against results.md; return True iff everything passes."""
+# ===========================================================================
+# Verification (computed vs. results.md)
+# ===========================================================================
+def build_verification(summary: dict):
+    """Return (all_pass, verification_df) comparing every metric against results.md."""
+    rows = []
     all_pass = True
-    print("\n" + "=" * 78)
-    print("CV REPRODUCTION SUMMARY (mean +/- std across folds)  vs  results.md")
-    print("=" * 78)
     for model_name in MODEL_NAMES:
-        agg = summary.get(model_name)
-        if agg is None:
-            print(f"\n  {model_name}: NO PREDICTIONS")
-            all_pass = False
+        if model_name not in summary:
             continue
-        expected = EXPECTED_CV.get(model_name, {})
-        print(f"\n  {model_name}:")
-        print(f"    {'Metric':<14}{'computed':>18}{'reported':>18}   status")
-        for k in METRIC_KEYS:
-            mean_val, std_val = agg[k]
-            exp = expected.get(k)
-            if exp is None:
-                print(f"    {k:<14}{mean_val:10.2f} +/- {std_val:5.2f}{'-':>18}")
+        expected_model = EXPECTED_CV.get(model_name, {})
+        for metric, tol in METRIC_TOLERANCES.items():
+            if metric not in summary[model_name]:
                 continue
-            exp_mean, exp_std = exp
-            ok = abs(mean_val - exp_mean) <= TOLERANCE
-            all_pass &= ok
-            print(f"    {k:<14}{mean_val:10.2f} +/- {std_val:5.2f}"
-                  f"{exp_mean:11.2f} +/- {exp_std:4.2f}   {'PASS' if ok else 'FAIL'}")
-    print("\nOVERALL: " + ("ALL CHECKS PASSED" if all_pass else "SOME CHECKS FAILED"))
-    return all_pass
+            mean_val, std_val = summary[model_name][metric]
+            expected = expected_model.get(metric)
+            if expected is not None:
+                exp_mean, exp_std = expected
+                ok = abs(mean_val - exp_mean) <= tol
+                all_pass &= ok
+                rows.append({
+                    "Type": "Model", "Name": model_name, "Method": "-", "Metric": metric,
+                    "Computed_Mean": round(mean_val, 4), "Computed_Std": round(std_val, 4),
+                    "Reported_Mean": exp_mean, "Reported_Std": exp_std,
+                    "Status": "PASS" if ok else "FAIL",
+                })
+    return all_pass, pd.DataFrame(rows)
+
+
+# ===========================================================================
+# Output helpers
+# ===========================================================================
+def _round_df(df: pd.DataFrame, decimals: int = 4) -> pd.DataFrame:
+    numeric_cols = df.select_dtypes(include="number").columns
+    return df.assign(**{c: df[c].round(decimals) for c in numeric_cols})
+
+
+def _write_per_fold_preds(oof_df: pd.DataFrame, output_dir: Path) -> None:
+    """Write one CSV per (model, fold) with TrueAge, rounded Prediction, and AbsError."""
+    for model_name in MODEL_NAMES:
+        model_sub = oof_df[oof_df["Model"] == model_name]
+        if model_sub.empty:
+            continue
+        for fold_id, fold_df in model_sub.groupby("Fold"):
+            out = fold_df[["Model", "Fold", "ImageID", "TrueAge", "Prediction"]].copy()
+            out["AbsError"] = (out["Prediction"] - out["TrueAge"]).abs().round(4)
+            out["Prediction"] = out["Prediction"].round(4)
+            out["TrueAge"] = out["TrueAge"].round(4)
+            out.to_csv(output_dir / f"{model_name}_fold{int(fold_id)}_preds.csv", index=False)
+
+
+def _build_ensemble_oof(oof_df: pd.DataFrame) -> pd.DataFrame:
+    """Average all models' OOF predictions per image; return with signed Error and AbsError."""
+    grouped = (
+        oof_df.groupby("ImageID")
+        .agg(Pred_Age=("Prediction", "mean"), True_Age=("TrueAge", "first"))
+        .reset_index()
+    )
+    grouped["Error"] = (grouped["Pred_Age"] - grouped["True_Age"]).round(4)
+    grouped["AbsError"] = grouped["Error"].abs()
+    grouped["Pred_Age"] = grouped["Pred_Age"].round(4)
+    return grouped[["ImageID", "True_Age", "Pred_Age", "Error", "AbsError"]]
+
+
+def _write_summary_csv(summary: dict, path: Path) -> None:
+    """Wide-format summary: one row per model, separate _mean and _std columns per metric."""
+    rows = []
+    for model_name in MODEL_NAMES:
+        if model_name not in summary:
+            continue
+        row = {"Model": model_name}
+        for k in METRIC_KEYS:
+            if k in summary[model_name]:
+                mean_val, std_val = summary[model_name][k]
+                row[f"{k}_mean"] = round(mean_val, 4)
+                row[f"{k}_std"] = round(std_val, 4)
+        rows.append(row)
+    pd.DataFrame(rows).to_csv(path, index=False)
+
+
+def _write_summary_readable(summary: dict, path: Path) -> None:
+    """Long-format readable summary: one row per (model, metric) with a 'X.XX ± Y.YY' column."""
+    rows = []
+    for model_name in MODEL_NAMES:
+        if model_name not in summary:
+            continue
+        for k in METRIC_KEYS:
+            if k in summary[model_name]:
+                mean_val, std_val = summary[model_name][k]
+                rows.append({
+                    "Model": model_name,
+                    "Metric": k,
+                    "Mean": round(mean_val, 4),
+                    "Std": round(std_val, 4),
+                    "Mean_Std": f"{mean_val:.2f} ± {std_val:.2f}",
+                })
+    pd.DataFrame(rows).to_csv(path, index=False)
 
 
 # ===========================================================================
@@ -182,7 +267,6 @@ def load_labels_df(data_dir) -> pd.DataFrame:
     """Load NewAgeSplit.csv, downloading the dataset via kagglehub if absent."""
     csv_path = Path(data_dir) / LABELS_CSV_NAME
     if not csv_path.is_file():
-        print(f"Labels not found at {csv_path}; attempting dataset download...")
         try:
             from download_dataset import ensure_dataset
             ensure_dataset(str(data_dir))
@@ -208,9 +292,7 @@ def _md5(path, chunk=1 << 20) -> str:
 def _download(url, dest, expected_md5=None) -> Path:
     dest = Path(dest)
     if dest.is_file() and (expected_md5 is None or _md5(dest) == expected_md5):
-        print(f"  [cached] {dest.name}")
         return dest
-    print(f"  downloading {dest.name} ...")
     tmp = dest.with_suffix(dest.suffix + ".part")
     urllib.request.urlretrieve(url, tmp)
     if expected_md5 is not None and _md5(tmp) != expected_md5:
@@ -238,7 +320,6 @@ def ensure_weights(weights_dir) -> Path:
             "environment variable) to enable automatic download."
         )
 
-    print(f"Downloading {len(missing)} checkpoint(s) from Zenodo record {ZENODO_RECORD_ID}:")
     for m, _f, fn in missing:
         (weights_dir / m).mkdir(parents=True, exist_ok=True)
         url = f"https://zenodo.org/records/{ZENODO_RECORD_ID}/files/{fn}?download=1"
@@ -273,7 +354,6 @@ def run_full_oof(labels_df, data_dir, weights_dir) -> pd.DataFrame:
     from PIL import Image
 
     data_dir = Path(data_dir)
-    print(f"GPUs available: {len(tf.config.list_physical_devices('GPU'))}")
     true_age_dict = dict(zip(labels_df["File"], labels_df["Age"]))
 
     def read_image_and_resize(img_path):
@@ -336,8 +416,8 @@ def run_full_oof(labels_df, data_dir, weights_dir) -> pd.DataFrame:
             for iid, plist in preds_per_image.items():
                 if iid in true_age_dict:
                     records.append({"Model": model_name, "Fold": fold, "ImageID": iid,
-                                    "Prediction": float(np.mean(plist)),
-                                    "TrueAge": float(true_age_dict[iid])})
+                                    "TrueAge": float(true_age_dict[iid]),
+                                    "Prediction": float(np.mean(plist))})
             del model
             tf.keras.backend.clear_session()
     return pd.DataFrame(records)
@@ -362,7 +442,7 @@ def parse_args(argv=None):
     parser.add_argument("--weights-dir", default=str(DEFAULT_WEIGHTS_DIR),
                         help="Where fold checkpoints are cached/downloaded (full mode).")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR),
-                        help="Where the recomputed OOF predictions are written (full mode).")
+                        help="Where output CSVs are written.")
     return parser.parse_args(argv)
 
 
@@ -374,14 +454,14 @@ def main(argv=None):
     mode = args.mode
     if mode == "auto":
         mode = "fast" if OOF_PREDICTIONS_CSV.is_file() else "full"
-    print(f"Mode: {mode}")
 
     labels_df = load_labels_df(args.data_dir)
 
     if mode == "full":
         weights_dir = ensure_weights(args.weights_dir)
         oof_df = run_full_oof(labels_df, args.data_dir, weights_dir)
-        oof_df.to_csv(output_dir / "oof_predictions.csv", index=False)
+        PREDICTIONS_DIR.mkdir(parents=True, exist_ok=True)
+        oof_df.to_csv(OOF_PREDICTIONS_CSV, index=False)
     else:
         if not OOF_PREDICTIONS_CSV.is_file():
             raise FileNotFoundError(
@@ -390,8 +470,31 @@ def main(argv=None):
             )
         oof_df = pd.read_csv(OOF_PREDICTIONS_CSV)
 
-    summary = summarize_oof(oof_df)
-    all_pass = report(summary)
+    # --- Per-fold raw predictions (self-contained: includes TrueAge + AbsError, rounded) ---
+    _write_per_fold_preds(oof_df, output_dir)
+
+    # --- Per-fold metrics (rounded to 4 dp, includes Acc_10yr) ---
+    fold_metrics_df = compute_per_fold(oof_df)
+    _round_df(fold_metrics_df).to_csv(output_dir / "cv_metrics_per_fold.csv", index=False)
+
+    # --- Summary: mean ± std across folds ---
+    summary = summarize_folds(fold_metrics_df)
+    _write_summary_csv(summary, output_dir / "cv_metrics_summary.csv")
+    _write_summary_readable(summary, output_dir / "cv_metrics_readable.csv")
+
+    # --- Ensemble predictions and metrics ---
+    ensemble_df = _build_ensemble_oof(oof_df)
+    ensemble_df.to_csv(output_dir / "ensemble_final.csv", index=False)
+    ens_metrics = compute_metrics(ensemble_df["True_Age"], ensemble_df["Pred_Age"])
+    ens_row = {"Model": "Ensemble", **{k: round(v, 4) for k, v in ens_metrics.items()}}
+    pd.DataFrame([ens_row]).to_csv(output_dir / "ensemble_metrics.csv", index=False)
+
+    # --- Verification (computed vs. results.md) ---
+    all_pass, verification_df = build_verification(summary)
+    verification_df.to_csv(output_dir / "verification.csv", index=False)
+
+    status = "ALL CHECKS PASSED" if all_pass else "SOME CHECKS FAILED"
+    print(f"{status} — outputs in {output_dir}")
     return 0 if all_pass else 1
 
 

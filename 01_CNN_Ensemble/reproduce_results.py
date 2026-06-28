@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import itertools
+import json
 import os
 import sys
 import urllib.request
@@ -89,24 +90,35 @@ WEIGHT_MD5: dict[str, str] = {}
 # ===========================================================================
 # Reported values (from results.md) -- used for the PASS/FAIL self-check
 # ===========================================================================
-EXPECTED_INDIVIDUAL_MAE = {
-    "ResNet50": 3.23,
-    "InceptionResNetV2": 3.64,
-    "DenseNet121": 3.97,
-    "InceptionV3": 5.06,
-    "EfficientNetV2M": 7.17,
+METRIC_TOLERANCES = {
+    "MAE":                  0.02,
+    "RMSE":                 0.02,
+    "R2":                   0.02,
+    "MAPE (%)":             0.10,
+    "Within ±2 Years (%)":  0.10,
+    "Within ±5 Years (%)":  0.10,
+    "Max Error":            0.10,
+    "Median Error":         0.02,
 }
-EXPECTED_ENSEMBLE_MAE = {
-    ("Best 3", "MAE-based"): 2.86,
-    ("Best 3", "Grid Search"): 2.86,
-    ("Best 4", "Grid Search"): 2.93,
-    ("Full Ensemble", "Grid Search"): 3.01,
-    ("Best 4", "MAE-based"): 3.14,
-    ("Best 2", "Grid Search"): 3.24,
-    ("Best 2", "MAE-based"): 3.35,
-    ("Full Ensemble", "MAE-based"): 3.77,
+
+EXPECTED_INDIVIDUAL_METRICS = {
+    "ResNet50":         {"MAE": 3.12, "RMSE": 6.38, "R2": -0.02, "MAPE (%)": 16.14, "Within ±2 Years (%)": 50.86, "Within ±5 Years (%)": 93.97, "Max Error": 34.55, "Median Error": 1.89},
+    "InceptionResNetV2":{"MAE": 4.00, "RMSE": 6.50, "R2": -0.06, "MAPE (%)": 22.59, "Within ±2 Years (%)": 26.72, "Within ±5 Years (%)": 81.90, "Max Error": 32.71, "Median Error": 2.69},
+    "DenseNet121":      {"MAE": 3.80, "RMSE": 6.45, "R2": -0.04, "MAPE (%)": 20.70, "Within ±2 Years (%)": 38.79, "Within ±5 Years (%)": 86.21, "Max Error": 29.61, "Median Error": 2.82},
+    "InceptionV3":      {"MAE": 3.31, "RMSE": 6.20, "R2":  0.04, "MAPE (%)": 18.05, "Within ±2 Years (%)": 48.28, "Within ±5 Years (%)": 87.07, "Max Error": 33.98, "Median Error": 2.04},
+    "EfficientNetV2M":  {"MAE": 2.77, "RMSE": 6.28, "R2":  0.01, "MAPE (%)": 13.45, "Within ±2 Years (%)": 66.38, "Within ±5 Years (%)": 93.97, "Max Error": 34.36, "Median Error": 1.25},
 }
-MAE_TOLERANCE = 0.02  # |computed - reported| must not exceed this to PASS
+
+EXPECTED_ENSEMBLE_METRICS = {
+    ("Full Ensemble", "Grid Search"):{"MAE": 2.73, "RMSE": 6.09, "R2": 0.07, "MAPE (%)": 13.93, "Within ±2 Years (%)": 72.41, "Within ±5 Years (%)": 88.79, "Max Error": 32.42, "Median Error": 1.22},
+    ("Best 4",        "Grid Search"):{"MAE": 2.73, "RMSE": 6.05, "R2": 0.08, "MAPE (%)": 14.13, "Within ±2 Years (%)": 71.55, "Within ±5 Years (%)": 87.07, "Max Error": 31.78, "Median Error": 1.20},
+    ("Best 3",        "Grid Search"):{"MAE": 2.75, "RMSE": 6.05, "R2": 0.08, "MAPE (%)": 14.12, "Within ±2 Years (%)": 71.55, "Within ±5 Years (%)": 87.07, "Max Error": 31.35, "Median Error": 1.15},
+    ("Best 3",        "MAE-based"):  {"MAE": 2.76, "RMSE": 6.11, "R2": 0.07, "MAPE (%)": 14.16, "Within ±2 Years (%)": 70.69, "Within ±5 Years (%)": 88.79, "Max Error": 32.34, "Median Error": 1.11},
+    ("Full Ensemble", "MAE-based"):  {"MAE": 2.76, "RMSE": 6.13, "R2": 0.06, "MAPE (%)": 14.12, "Within ±2 Years (%)": 67.24, "Within ±5 Years (%)": 89.66, "Max Error": 33.08, "Median Error": 1.12},
+    ("Best 4",        "MAE-based"):  {"MAE": 2.82, "RMSE": 6.10, "R2": 0.07, "MAPE (%)": 14.66, "Within ±2 Years (%)": 59.48, "Within ±5 Years (%)": 87.07, "Max Error": 32.75, "Median Error": 1.13},
+    ("Best 2",        "Grid Search"):{"MAE": 3.18, "RMSE": 6.38, "R2": -0.02, "MAPE (%)": 16.60, "Within ±2 Years (%)": 50.86, "Within ±5 Years (%)": 93.10, "Max Error": 34.36, "Median Error": 1.91},
+    ("Best 2",        "MAE-based"):  {"MAE": 3.45, "RMSE": 6.39, "R2": -0.02, "MAPE (%)": 18.66, "Within ±2 Years (%)": 44.83, "Within ±5 Years (%)": 89.66, "Max Error": 33.71, "Median Error": 2.15},
+}
 
 
 # ===========================================================================
@@ -127,8 +139,8 @@ def compute_metrics(y_true, y_pred) -> dict:
         "MAPE (%)": mape,
         "Within ±2 Years (%)": float(np.mean(errors <= 2) * 100),
         "Within ±5 Years (%)": float(np.mean(errors <= 5) * 100),
-        "Within ±10 Years (%)": float(np.mean(errors <= 10) * 100),
         "Max Error": float(np.max(errors)),
+        "Min Error": float(np.min(errors)),
         "Median Error": float(np.median(errors)),
     }
 
@@ -191,31 +203,34 @@ def grid_search_weights(group_models, val_pivot, true_age_dict, step=GRID_STEP):
     return best_weights, best_mae
 
 
-def select_and_evaluate(val_pivot, test_pivot, true_age_dict) -> pd.DataFrame:
+def select_and_evaluate(val_pivot, test_pivot, true_age_dict):
     """Select ensemble weights on validation and evaluate on test (leakage-free).
 
-    Returns one row per (group, weighting method), sorted by test MAE.
+    Returns (summary_df, val_maes). summary_df has one row per (group, method),
+    sorted by test MAE. val_maes is a {model: val_MAE} dict used to build individual
+    model val metrics.
     """
     val_maes = individual_maes(val_pivot, true_age_dict)
-    print("\nValidation MAE per model (ranking / MAE-based weights):")
-    for model in MODEL_NAMES:
-        if model in val_maes:
-            print(f"  {model:<20} {val_maes[model]:.4f}")
-
     rows = []
     for group, models in ENSEMBLE_GROUPS.items():
         grid_w, grid_val_mae = grid_search_weights(models, val_pivot, true_age_dict)
-        print(f"  [{group}] grid-search best validation MAE: {grid_val_mae:.4f}")
-        methods = (("Grid Search", grid_w), ("MAE-based", mae_based_weights(models, val_maes)))
-        for method, weights in methods:
+        mae_w = mae_based_weights(models, val_maes)
+        val_true_m, val_pred_m = _ensemble_arrays(val_pivot, mae_w, models, true_age_dict)
+        mae_based_val_mae = mean_absolute_error(val_true_m, val_pred_m)
+        methods = (
+            ("Grid Search", grid_w, grid_val_mae),
+            ("MAE-based", mae_w, mae_based_val_mae),
+        )
+        for method, weights, val_mae in methods:
             y_true, y_pred = _ensemble_arrays(test_pivot, weights, models, true_age_dict)
             rows.append({
                 "Ensemble Group": group,
                 "Method": method,
-                "Weights": {m: round(float(weights[m]), 2) for m in models},
+                "Val_MAE": val_mae,
+                "Weights": json.dumps({m: round(float(weights[m]), 4) for m in models}),
                 **compute_metrics(y_true, y_pred),
             })
-    return pd.DataFrame(rows).sort_values("MAE").reset_index(drop=True)
+    return pd.DataFrame(rows).sort_values("MAE").reset_index(drop=True), val_maes
 
 
 def individual_metrics_from_pivot(test_pivot, true_age_dict) -> dict:
@@ -413,42 +428,49 @@ def _pivot_from_predictions(per_model_preds) -> pd.DataFrame:
 
 
 # ===========================================================================
-# Reporting
+# Verification (computed vs. results.md)
 # ===========================================================================
-def report(summary, individual_metrics) -> bool:
-    """Print the comparison against results.md; return True iff everything passes."""
+def build_verification(summary, individual_metrics):
+    """Return (all_pass, verification_df) comparing every metric against results.md."""
+    rows = []
     all_pass = True
 
-    print("\n" + "=" * 78)
-    print("REPRODUCTION SUMMARY (computed vs. results.md)")
-    print("=" * 78)
-
-    print("\nIndividual models (test set):")
-    print(f"  {'Model':<20}{'MAE':>8}{'reported':>10}   status")
     for model in MODEL_NAMES:
         if model not in individual_metrics:
             continue
-        mae = individual_metrics[model]["MAE"]
-        expected = EXPECTED_INDIVIDUAL_MAE[model]
-        ok = abs(mae - expected) <= MAE_TOLERANCE
-        all_pass &= ok
-        print(f"  {model:<20}{mae:>8.2f}{expected:>10.2f}   {'PASS' if ok else 'FAIL'}")
+        expected_model = EXPECTED_INDIVIDUAL_METRICS.get(model, {})
+        for metric, tol in METRIC_TOLERANCES.items():
+            computed_val = individual_metrics[model].get(metric)
+            if computed_val is None:
+                continue
+            expected_val = expected_model.get(metric)
+            if expected_val is not None:
+                ok = abs(computed_val - expected_val) <= tol
+                all_pass &= ok
+                rows.append({
+                    "Type": "Model", "Name": model, "Method": "-", "Metric": metric,
+                    "Computed": round(computed_val, 4), "Reported": expected_val,
+                    "Status": "PASS" if ok else "FAIL",
+                })
 
-    print("\nEnsembles (weights selected on val, evaluated on test):")
-    print(f"  {'Group':<16}{'Method':<13}{'MAE':>7}{'reported':>10}   status   weights")
     for _, row in summary.iterrows():
-        expected = EXPECTED_ENSEMBLE_MAE.get((row["Ensemble Group"], row["Method"]))
-        ok = expected is None or abs(row["MAE"] - expected) <= MAE_TOLERANCE
-        all_pass &= ok
-        expected_str = "   -" if expected is None else f"{expected:>10.2f}"
-        status = " - " if expected is None else ("PASS" if ok else "FAIL")
-        print(f"  {row['Ensemble Group']:<16}{row['Method']:<13}{row['MAE']:>7.2f}"
-              f"{expected_str}   {status}   {row['Weights']}")
+        key = (row["Ensemble Group"], row["Method"])
+        expected_ens = EXPECTED_ENSEMBLE_METRICS.get(key, {})
+        for metric, tol in METRIC_TOLERANCES.items():
+            if metric not in row:
+                continue
+            computed_val = float(row[metric])
+            expected_val = expected_ens.get(metric)
+            if expected_val is not None:
+                ok = abs(computed_val - expected_val) <= tol
+                all_pass &= ok
+                rows.append({
+                    "Type": "Ensemble", "Name": row["Ensemble Group"], "Method": row["Method"],
+                    "Metric": metric, "Computed": round(computed_val, 4), "Reported": expected_val,
+                    "Status": "PASS" if ok else "FAIL",
+                })
 
-    best = summary.iloc[0]
-    print(f"\nBest configuration: {best['Ensemble Group']} ({best['Method']}) -> MAE {best['MAE']:.2f}")
-    print("\nOVERALL: " + ("ALL CHECKS PASSED" if all_pass else "SOME CHECKS FAILED"))
-    return all_pass
+    return all_pass, pd.DataFrame(rows)
 
 
 # ===========================================================================
@@ -483,7 +505,6 @@ def main(argv=None):
     mode = args.mode
     if mode == "auto":
         mode = "fast" if csvs_available else "full"
-    print(f"Mode: {mode}")
 
     labels_df = load_labels_df(args.data_dir)
     true_age_dict = dict(zip(labels_df["File"], labels_df["Age"]))
@@ -505,13 +526,37 @@ def main(argv=None):
         test_pivot = pd.read_csv(TEST_PREDICTIONS_CSV)
         individual_metrics = individual_metrics_from_pivot(test_pivot, true_age_dict)
 
-    summary = select_and_evaluate(val_pivot, test_pivot, true_age_dict)
+    summary, val_maes = select_and_evaluate(val_pivot, test_pivot, true_age_dict)
 
-    summary_path = output_dir / "ensemble_summary.csv"
-    summary.to_csv(summary_path, index=False)
+    # --- Individual model metrics CSV (test set) ---
+    ind_rows = [{"Model": m, **individual_metrics[m]}
+                for m in MODEL_NAMES if m in individual_metrics]
+    ind_metrics_path = output_dir / "individual_model_metrics.csv"
+    pd.DataFrame(ind_rows).to_csv(ind_metrics_path, index=False)
 
-    all_pass = report(summary, individual_metrics)
-    print(f"\nSummary written to {summary_path}")
+    # --- Validation MAE per model (shows the basis for MAE-based weight selection) ---
+    val_mae_path = output_dir / "val_mae_per_model.csv"
+    pd.DataFrame([{"Model": m, "Val_MAE": round(val_maes[m], 4)}
+                  for m in MODEL_NAMES if m in val_maes]).to_csv(val_mae_path, index=False)
+
+    # --- Ensemble metrics CSV ---
+    ensemble_path = output_dir / "ensemble_metrics.csv"
+    summary.to_csv(ensemble_path, index=False)
+
+    # --- Verification CSV (computed vs. results.md) ---
+    all_pass, verification_df = build_verification(summary, individual_metrics)
+    verification_path = output_dir / "verification.csv"
+    verification_df.to_csv(verification_path, index=False)
+
+    # --- Add TrueAge to prediction CSVs in predictions/ ---
+    for csv_path, pivot in [(VAL_PREDICTIONS_CSV, val_pivot), (TEST_PREDICTIONS_CSV, test_pivot)]:
+        df = pivot.copy()
+        if "TrueAge" not in df.columns:
+            df.insert(1, "TrueAge", df["ImageID"].map(true_age_dict))
+            df.to_csv(csv_path, index=False)
+
+    status = "ALL CHECKS PASSED" if all_pass else "SOME CHECKS FAILED"
+    print(f"{status} — outputs in {output_dir}")
     return 0 if all_pass else 1
 
 
