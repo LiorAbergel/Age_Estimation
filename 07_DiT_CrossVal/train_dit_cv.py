@@ -18,8 +18,8 @@ Key Features:
 - Dynamic Resizing and Patching logic matching SOTA CNN experiments.
 
 Pipeline (matched to reference experiments 03/05):
-- Phase 1: Frozen backbone, Adam(1e-3), up to 50 epochs.
-- Phase 2: All layers unfrozen, Adam(1e-4), up to 10 epochs.
+- Phase 1: Frozen backbone, Adam(1e-4), up to 50 epochs.
+- Phase 2: All layers unfrozen, Adam(1e-5), up to 10 epochs.
 - Both phases use ReduceLROnPlateau(factor=0.1, patience=5) and EarlyStopping(patience=10).
 - Best checkpoint is carried forward: Phase 2 only overwrites if it beats Phase 1.
 - Out-of-fold predictions collected for each fold (matched to Exp 03/05).
@@ -61,8 +61,8 @@ CONFIG = {
     "PATCH_SIZE": 400,
     "STRIDE": 200,
     "STANDARD_SIZE": 800,
-    "LR_INIT": 1e-3,
-    "LR_FT": 1e-4,
+    "LR_INIT": 1e-4,   # frozen-head LR (DiT needs ~10x lower than CNN/ViT to fine-tune stably)
+    "LR_FT": 1e-5,     # fine-tune LR (1e-4 catastrophically destabilizes the pretrained backbone)
     "THR": 0.0054,  # Empty patch threshold
     "SEED": 42,
     "N_SPLITS": 5,

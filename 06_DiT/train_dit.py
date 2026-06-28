@@ -12,8 +12,8 @@ Key Features:
 - Training: Two-stage (Frozen -> Fine-tuning) optimization aligned with Exp 01/03/04.
 
 Pipeline (matched to reference experiments):
-- Phase 1: Frozen backbone, Adam(1e-3), up to 50 epochs.
-- Phase 2: All layers unfrozen, Adam(1e-4), up to 10 epochs.
+- Phase 1: Frozen backbone, Adam(1e-4), up to 50 epochs.
+- Phase 2: All layers unfrozen, Adam(1e-5), up to 10 epochs.
 - Both phases use ReduceLROnPlateau(factor=0.1, patience=5) and EarlyStopping(patience=10).
 - Best checkpoint is carried forward: Phase 2 only overwrites if it beats Phase 1.
 
@@ -72,8 +72,8 @@ CONFIG = {
     "EVAL_BATCH_SIZE": 128,              # inference patch batch (no effect on results)
     "EPOCHS_PHASE1": 50,
     "EPOCHS_PHASE2": 10,
-    "LR_INIT": 1e-3,
-    "LR_FT": 1e-4,
+    "LR_INIT": 1e-4,   # frozen-head LR (DiT needs ~10x lower than CNN/ViT to fine-tune stably)
+    "LR_FT": 1e-5,     # fine-tune LR (1e-4 catastrophically destabilizes the pretrained backbone)
     "THR": 0.0054,
     "DATA_DIR": os.path.join(REPO_ROOT, "data"),
     "CSV_PATH": os.path.join(REPO_ROOT, "data", "NewAgeSplit.csv"),
