@@ -200,8 +200,11 @@ class DiTReg(nn.Module):
 
     def forward(self, pixel_values, labels=None):
         out = self.backbone(pixel_values=pixel_values)
-        cls_token = out.last_hidden_state[:, 0]
-        preds = self.head(cls_token).squeeze(1)
+        # Global average pooling over patch tokens (exclude CLS at index 0),
+        # matching the GlobalAveragePooling head used by the CNN/ViT experiments
+        # and the BEiT-recommended mean-pooling (its CLS token is not pretrained).
+        pooled = out.last_hidden_state[:, 1:].mean(dim=1)
+        preds = self.head(pooled).squeeze(1)
         if labels is None: return {"preds": preds}
         return {"loss": nn.functional.mse_loss(preds, labels), "preds": preds}
 

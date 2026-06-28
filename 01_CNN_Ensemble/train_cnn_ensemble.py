@@ -78,7 +78,7 @@ BATCH_SIZE = 128          # used for the published results; lower if VRAM-limite
 EPOCHS_FROZEN = 50
 EPOCHS_FINE_TUNE = 10
 FROZEN_LR = 1e-3
-FINE_TUNE_LR = 1e-5
+FINE_TUNE_LR = 1e-4
 DROPOUT_RATE = 0.5
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"

@@ -1,0 +1,12 @@
+\begin{table}[htbp]
+\centering
+\caption{Paired bootstrap differences in MAE on the official HHD test split.}
+\label{tab:paired-bootstrap}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+system\_A & system\_B & delta\_MAE\_A\_minus\_B & ci\_low & ci\_high & p\_bootstrap & significant & n\_aligned & B \\
+\midrule
+CNN\_Best3Grid & ResNet50 & -0.373 & -0.633 & -0.102 & 0.008 & 1 & 116 & 10000 \\
+\bottomrule
+\end{tabular}
+\end{table}

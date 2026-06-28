@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\centering
+\caption{Age-group error analysis on the official HHD test split.}
+\label{tab:error-by-age-group}
+\begin{tabular}{lrrrr}
+\toprule
+system & age\_group & n & MAE & RMSE \\
+\midrule
+CNN\_Best3Grid & <=15 & 62 & 2.221 & 3.117 \\
+CNN\_Best3Grid & 16-25 & 48 & 0.992 & 1.189 \\
+CNN\_Best3Grid & 26-50 & 5 & 20.425 & 22.801 \\
+CNN\_Best3Grid & >50 & 1 & 31.346 & 31.346 \\
+\bottomrule
+\end{tabular}
+\end{table}

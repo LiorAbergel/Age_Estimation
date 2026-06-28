@@ -1,0 +1,1 @@
+Official test split size is 116. Writers/pages with age <=25: 110 (94.8%). Writers/pages with age >50: 1 (0.9%).

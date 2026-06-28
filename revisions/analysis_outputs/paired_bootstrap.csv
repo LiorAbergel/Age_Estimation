@@ -1,0 +1,2 @@
+system_A,system_B,delta_MAE_A_minus_B,ci_low,ci_high,p_bootstrap,significant,n_aligned,B
+CNN_Best3Grid,ResNet50,-0.3726480861603112,-0.6331321716065006,-0.10209389585790143,0.0084,True,116,10000
