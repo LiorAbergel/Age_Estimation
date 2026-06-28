@@ -39,7 +39,7 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 from typing import Dict, List, Any
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import IterableDataset, DataLoader
 from torchvision import transforms
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import StratifiedGroupKFold
@@ -66,9 +66,12 @@ CONFIG = {
     "THR": 0.0054,  # Empty patch threshold
     "SEED": 42,
     "N_SPLITS": 5,
-    "TARGET_EFFECTIVE_BATCH_SIZE": 16,
-    "BATCH_SIZE_BASE": 16,
-    "BATCH_SIZE_LARGE": 2,
+    # Patch-level batching: the DataLoader batches *patches* (like the CNN/ViT
+    # flat_map -> batch(128) pipeline), so the effective optimizer step is 128 patches.
+    "TARGET_EFFECTIVE_BATCH_SIZE": 128,  # effective patches per optimizer step
+    "BATCH_SIZE_BASE": 128,              # physical patch batch for DiT-Base (accum 1)
+    "BATCH_SIZE_LARGE": 16,              # physical patch batch for DiT-Large (accum 8)
+    "EVAL_BATCH_SIZE": 128,              # inference patch batch (no effect on results)
     "EPOCHS_PHASE1": 50,
     "EPOCHS_PHASE2": 10,
     "DATA_DIR": os.path.join(REPO_ROOT, "data"),
@@ -121,71 +124,88 @@ def calculate_resized_dimensions(height, width):
 
     return adjust_dimension(new_height), adjust_dimension(new_width)
 
-class HHDPatchDataset(Dataset):
+class HHDPatchStream(IterableDataset):
+    """Streams individual patches (one image at a time) so the DataLoader batches
+    *patches*, not images -- mirroring the CNN/ViT ``flat_map(...).batch(N)``
+    pipeline (fixed image order, no shuffle). DiT-Large reaches the same effective
+    patch batch via gradient accumulation. Memory stays low (one image in flight).
+    """
     def __init__(self, df, root, processor, augment=False):
         self.df = df.reset_index(drop=True)
         self.root = Path(root)
-        self.proc = processor
         self.augment = augment
-        self.target_size = (processor.size["height"], processor.size["width"])
+        target_size = (processor.size["height"], processor.size["width"])
+        # Replaces the per-image processor() call; identical ImageNet/BEiT normalization.
+        normalize = transforms.Normalize(processor.image_mean, processor.image_std)
 
         self.aug_transforms = transforms.Compose([
             transforms.RandomRotation(15),
-            transforms.RandomResizedCrop(self.target_size, scale=(0.9, 1.1), ratio=(1.0, 1.0)),
+            transforms.RandomResizedCrop(target_size, scale=(0.9, 1.1), ratio=(1.0, 1.0)),
             transforms.ColorJitter(brightness=0.1, contrast=0.25),
             transforms.ToTensor(),
-            transforms.Lambda(lambda x: torch.clamp(x + torch.randn_like(x) * 0.05, 0, 1))
+            transforms.Lambda(lambda x: torch.clamp(x + torch.randn_like(x) * 0.05, 0, 1)),
+            normalize,
         ])
         self.val_transforms = transforms.Compose([
-            transforms.Resize(self.target_size),
-            transforms.ToTensor()
+            transforms.Resize(target_size),
+            transforms.ToTensor(),
+            normalize,
         ])
 
-    def __len__(self): return len(self.df)
-
-    def __getitem__(self, idx):
-        row = self.df.iloc[idx]
+    def _valid_patches(self, row):
+        """Return this image's non-empty 400x400 patches as (N,3,H,W), or None."""
         img_path = self.root / str(row["Set"]).lower() / row["File"]
-        if not img_path.exists(): return None
-
+        if not img_path.exists():
+            return None
         try:
             img = Image.open(img_path).convert("RGB")
-            w, h = img.size
-            new_h, new_w = calculate_resized_dimensions(h, w)
-            if new_h < CONFIG["PATCH_SIZE"] or new_w < CONFIG["PATCH_SIZE"]:
-                new_h = max(new_h, CONFIG["PATCH_SIZE"])
-                new_w = max(new_w, CONFIG["PATCH_SIZE"])
-            img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
-            img_t = transforms.ToTensor()(img)
+        except Exception:
+            return None
 
-            # Unfold to patches
-            patches_h = img_t.unfold(1, CONFIG["PATCH_SIZE"], CONFIG["STRIDE"])
-            patches = patches_h.unfold(2, CONFIG["PATCH_SIZE"], CONFIG["STRIDE"])
-            patches = patches.permute(1, 2, 0, 3, 4).reshape(-1, 3, CONFIG["PATCH_SIZE"], CONFIG["PATCH_SIZE"])
+        w, h = img.size
+        new_h, new_w = calculate_resized_dimensions(h, w)
+        if new_h < CONFIG["PATCH_SIZE"] or new_w < CONFIG["PATCH_SIZE"]:
+            new_h = max(new_h, CONFIG["PATCH_SIZE"])
+            new_w = max(new_w, CONFIG["PATCH_SIZE"])
+        img_t = transforms.ToTensor()(img.resize((new_w, new_h), Image.Resampling.LANCZOS))
 
-            # Filter background patches
-            mask = patches.mean(dim=[1, 2, 3]) > CONFIG["THR"]
-            valid_patches = patches[mask]
-            if valid_patches.size(0) == 0: return None
+        # Unfold to (N_Patches, 3, PatchH, PatchW)
+        patches_h = img_t.unfold(1, CONFIG["PATCH_SIZE"], CONFIG["STRIDE"])
+        patches = patches_h.unfold(2, CONFIG["PATCH_SIZE"], CONFIG["STRIDE"])
+        patches = patches.permute(1, 2, 0, 3, 4).reshape(-1, 3, CONFIG["PATCH_SIZE"], CONFIG["PATCH_SIZE"])
 
-            processed = []
-            for i in range(valid_patches.size(0)):
-                p_pil = transforms.ToPILImage()(valid_patches[i])
-                processed.append(self.aug_transforms(p_pil) if self.augment else self.val_transforms(p_pil))
+        valid = patches[patches.mean(dim=[1, 2, 3]) > CONFIG["THR"]]
+        return valid if valid.size(0) > 0 else None
 
-            final_patches = torch.stack(processed)
-            final_patches = self.proc(images=final_patches, return_tensors="pt", do_rescale=False, do_resize=False)["pixel_values"]
-            
-            return {"pixel_values": final_patches, "label": torch.tensor(row["Age"], dtype=torch.float32), "id": row["File"]}
-        except: return None
+    def __iter__(self):
+        # Shard images across workers so no patch is yielded twice.
+        worker = torch.utils.data.get_worker_info()
+        indices = range(len(self.df))
+        if worker is not None:
+            indices = list(indices)[worker.id::worker.num_workers]
+
+        tfm = self.aug_transforms if self.augment else self.val_transforms
+        for idx in indices:
+            row = self.df.iloc[idx]
+            valid = self._valid_patches(row)
+            if valid is None:
+                continue
+            label = torch.tensor(float(row["Age"]), dtype=torch.float32)
+            fid = row["File"]
+            for i in range(valid.size(0)):
+                yield {"pixel_values": tfm(transforms.ToPILImage()(valid[i])),
+                       "label": label, "id": fid}
+
 
 def collate_patches(batch):
-    batch = [b for b in batch if b is not None]
-    if not batch: return {}
+    """Stack individual patch samples into one fixed-size patch batch."""
+    batch = [b for b in batch if b]
+    if not batch:
+        return {}
     return {
-        "pixel_values": torch.cat([item["pixel_values"] for item in batch], dim=0),
-        "labels": torch.cat([item["label"].repeat(item["pixel_values"].size(0)) for item in batch], dim=0),
-        "file_ids": [fid for item in batch for fid in [item["id"]] * item["pixel_values"].size(0)]
+        "pixel_values": torch.stack([b["pixel_values"] for b in batch]),
+        "labels": torch.stack([b["label"] for b in batch]),
+        "file_ids": [b["id"] for b in batch],
     }
 
 # --- Model ---
@@ -465,7 +485,7 @@ def run_full_cv():
         proc = BeitImageProcessor.from_pretrained(model_id)
         batch_size = get_batch_size(model_id)
         accum_steps = get_accum_steps(model_id)
-        print(f"Image batch size: {batch_size}; gradient accumulation: {accum_steps}; effective image batch size: {batch_size * accum_steps}")
+        print(f"Patch batch size: {batch_size}; gradient accumulation: {accum_steps}; effective patch batch size: {batch_size * accum_steps}")
         model_root = Path(CONFIG["MODELS_DIR"]) / safe_name
         model_root.mkdir(parents=True, exist_ok=True)
 
@@ -483,10 +503,10 @@ def run_full_cv():
             print(f"\n── {safe_name} | Fold {fold}/{CONFIG['N_SPLITS']} ──")
             train_df, val_df = df.iloc[tr_idx], df.iloc[val_idx]
 
-            train_loader = DataLoader(HHDPatchDataset(train_df, CONFIG["DATA_DIR"], proc, True),
-                                      batch_size=batch_size, shuffle=True, collate_fn=collate_patches)
-            val_loader = DataLoader(HHDPatchDataset(val_df, CONFIG["DATA_DIR"], proc, False),
-                                    batch_size=batch_size, shuffle=False, collate_fn=collate_patches)
+            train_loader = DataLoader(HHDPatchStream(train_df, CONFIG["DATA_DIR"], proc, True),
+                                      batch_size=batch_size, num_workers=2, collate_fn=collate_patches)
+            val_loader = DataLoader(HHDPatchStream(val_df, CONFIG["DATA_DIR"], proc, False),
+                                    batch_size=CONFIG["EVAL_BATCH_SIZE"], num_workers=2, collate_fn=collate_patches)
 
             # Skip training only when fully completed: the .done marker is written
             # after Phase 2.  A lone checkpoint (no .done) means a crashed run, so we
