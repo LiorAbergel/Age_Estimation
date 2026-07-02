@@ -1,4 +1,4 @@
-"""SOTA CNN ensemble with advanced augmentation (paper Table 3, top).
+"""CNN ensemble (paper Table 3, top).
 
 Trains five ImageNet-pretrained CNN backbones as age regressors on offline
 handwriting patches, caches their patch-level predictions, and combines the
@@ -233,7 +233,7 @@ def create_dataset(data_dir, labels_df, split, batch_size, augment=False, includ
 # ===========================================================================
 # Model
 # ===========================================================================
-def build_sota_model(base_model_fn, input_shape=(*PATCH_SIZE, 3), dropout_rate=DROPOUT_RATE):
+def build_cnn_model(base_model_fn, input_shape=(*PATCH_SIZE, 3), dropout_rate=DROPOUT_RATE):
     """ImageNet backbone -> GlobalAveragePooling -> Dropout -> linear regression head."""
     base_model = base_model_fn(weights="imagenet", include_top=False, input_shape=input_shape)
     base_model.trainable = False
@@ -372,7 +372,7 @@ def train_models(train_ds, val_ds, models_dir, epochs_frozen, epochs_fine_tune) 
             print(f"Found incomplete checkpoint for {name} (no '{done_path.name}' "
                   f"marker); retraining from scratch.")
 
-        model, base_model = build_sota_model(architecture)
+        model, base_model = build_cnn_model(architecture)
         log_path = models_dir / f"{name}_training_log.csv"
         best_logger = BestModelLogger(save_path, monitor="val_mae")
         callbacks = [

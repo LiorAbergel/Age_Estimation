@@ -61,8 +61,8 @@ CONFIG = {
     "PATCH_SIZE": 400,
     "STRIDE": 200,
     "STANDARD_SIZE": 800,
-    "LR_INIT": 1e-4,   # frozen-head LR (DiT needs ~10x lower than CNN/ViT to fine-tune stably)
-    "LR_FT": 1e-5,     # fine-tune LR (1e-4 catastrophically destabilizes the pretrained backbone)
+    "LR_INIT": 1e-3,   # frozen-head LR (same as CNN/ViT aligned pipeline)
+    "LR_FT": 1e-4,     # fine-tune LR (same as CNN/ViT aligned pipeline)
     "THR": 0.0054,  # Empty patch threshold
     "SEED": 42,
     "N_SPLITS": 5,

@@ -145,6 +145,11 @@ def compute_metrics(y_true, y_pred) -> dict:
     }
 
 
+def _round_df(df: pd.DataFrame, decimals: int = 2) -> pd.DataFrame:
+    numeric_cols = df.select_dtypes(include="number").columns
+    return df.assign(**{c: df[c].round(decimals) for c in numeric_cols})
+
+
 # ===========================================================================
 # Ensemble weighting (shared by both modes)
 # ===========================================================================
@@ -227,7 +232,7 @@ def select_and_evaluate(val_pivot, test_pivot, true_age_dict):
                 "Ensemble Group": group,
                 "Method": method,
                 "Val_MAE": val_mae,
-                "Weights": json.dumps({m: round(float(weights[m]), 4) for m in models}),
+                "Weights": json.dumps({m: round(float(weights[m]), 2) for m in models}),
                 **compute_metrics(y_true, y_pred),
             })
     return pd.DataFrame(rows).sort_values("MAE").reset_index(drop=True), val_maes
@@ -449,7 +454,7 @@ def build_verification(summary, individual_metrics):
                 all_pass &= ok
                 rows.append({
                     "Type": "Model", "Name": model, "Method": "-", "Metric": metric,
-                    "Computed": round(computed_val, 4), "Reported": expected_val,
+                    "Computed": round(computed_val, 2), "Reported": expected_val,
                     "Status": "PASS" if ok else "FAIL",
                 })
 
@@ -466,7 +471,7 @@ def build_verification(summary, individual_metrics):
                 all_pass &= ok
                 rows.append({
                     "Type": "Ensemble", "Name": row["Ensemble Group"], "Method": row["Method"],
-                    "Metric": metric, "Computed": round(computed_val, 4), "Reported": expected_val,
+                    "Metric": metric, "Computed": round(computed_val, 2), "Reported": expected_val,
                     "Status": "PASS" if ok else "FAIL",
                 })
 
@@ -529,19 +534,19 @@ def main(argv=None):
     summary, val_maes = select_and_evaluate(val_pivot, test_pivot, true_age_dict)
 
     # --- Individual model metrics CSV (test set) ---
-    ind_rows = [{"Model": m, **individual_metrics[m]}
+    ind_rows = [{"Model": m, **{k: round(v, 2) for k, v in individual_metrics[m].items()}}
                 for m in MODEL_NAMES if m in individual_metrics]
     ind_metrics_path = output_dir / "individual_model_metrics.csv"
     pd.DataFrame(ind_rows).to_csv(ind_metrics_path, index=False)
 
     # --- Validation MAE per model (shows the basis for MAE-based weight selection) ---
     val_mae_path = output_dir / "val_mae_per_model.csv"
-    pd.DataFrame([{"Model": m, "Val_MAE": round(val_maes[m], 4)}
+    pd.DataFrame([{"Model": m, "Val_MAE": round(val_maes[m], 2)}
                   for m in MODEL_NAMES if m in val_maes]).to_csv(val_mae_path, index=False)
 
     # --- Ensemble metrics CSV ---
     ensemble_path = output_dir / "ensemble_metrics.csv"
-    summary.to_csv(ensemble_path, index=False)
+    _round_df(summary).to_csv(ensemble_path, index=False)
 
     # --- Verification CSV (computed vs. results.md) ---
     all_pass, verification_df = build_verification(summary, individual_metrics)

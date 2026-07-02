@@ -64,7 +64,7 @@ pip install -r requirements_tf.txt
 pip install -r requirements_torch.txt
 ```
 
-**Note:** The ViT experiments (`04_ViT`, `05_ViT_CrossVal`) require setting `TF_USE_LEGACY_KERAS=1` before running, as the `keras_cv_attention_models` library depends on legacy Keras.
+**Note:** The ViT experiments (`04_ViT_Ensemble`, `05_ViT_CrossVal`) require setting `TF_USE_LEGACY_KERAS=1` before running, as the `keras_cv_attention_models` library depends on legacy Keras.
 
 ## Experiments
 
@@ -81,7 +81,7 @@ The table below maps each experiment folder to the corresponding paper sections 
 | `06_DiT` | Table 3 (bottom), Table 4 | DiT ensembles and hybrid ensemble on official HHD split |
 | `02_CNN_GradCAM` | Figure 5, Section 4.3 | Grad-CAM visualizations |
 
-`04_ViT` is a development experiment (initial ViT exploration on the official HHD split) and is not reported in the paper.
+`04_ViT_Ensemble` is a development experiment (ViT ensemble exploration on the official HHD split) and is not reported in the paper.
 
 ### Running an Experiment
 
@@ -93,7 +93,7 @@ python <experiment_folder>/<script_name>.py
 
 For example:
 ```bash
-python 03_CNN_CrossVal/train_sota_cv.py
+python 03_CNN_CrossVal/train_cnn_cv.py
 ```
 
 Results for each experiment are documented in `results.md` within the experiment folder, including the full training configuration and all evaluation metrics.
@@ -115,22 +115,22 @@ All experiments share a common preprocessing pipeline:
 - Batch size: 128
 - Optimizer: Adam (1e-3 frozen, 1e-4 fine-tuning)
 
-**ViT experiments (`04_ViT`, `05_ViT_CrossVal`):**
+**ViT experiments (`04_ViT_Ensemble`, `05_ViT_CrossVal`):**
 - Models: SwinV2-Tiny (256x256), MobileViT-XXS (256x256), ConvNeXtV2-Tiny (224x224), TinyViT-11M (224x224)
 - Pretrained weights: ImageNet-1K (all four models; `pretrained="imagenet"` in `keras_cv_attention_models`)
 - Regression head: GlobalAveragePooling2D, Dropout (0.5), Dense (1, linear)
 - Training: 50 epochs frozen backbone + 10 epochs fine-tuning
-- Batch size: 128 (`04_ViT` and `05_ViT_CrossVal`)
+- Batch size: 128 (`04_ViT_Ensemble` and `05_ViT_CrossVal`)
 - Optimizer: Adam (1e-3 frozen, 1e-4 fine-tuning)
 
 **DiT experiments (`06_DiT`, `07_DiT_CrossVal`):**
 - Models: DiT-Base, DiT-Large, DiT-Base (RVL-CDIP), DiT-Large (RVL-CDIP)
 - Pretrained weights: IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants)
 - Input: 224x224 via BeitImageProcessor
-- Regression head: CLS token, Dropout (0.5), Dense (1, linear)
+- Regression head: Global mean-pooling (patch tokens), Dropout (0.5), Dense (1, linear)
 - Training: 50 epochs frozen backbone + 10 epochs fine-tuning
-- Physical batch size: 16 (Base variants) / 2 (Large variants)
-- Effective image batch size: 16 in both `06_DiT` and `07_DiT_CrossVal` via gradient accumulation where needed
+- Physical batch size: 128 (Base variants) / 16 (Large variants)
+- Effective patch batch size: 128 patches/step in both `06_DiT` and `07_DiT_CrossVal` via gradient accumulation where needed
 - Optimizer: Adam (1e-3 frozen, 1e-4 fine-tuning)
 
 ## Results Summary
@@ -144,28 +144,35 @@ See each experiment's `results.md` for full metrics and ensemble configurations.
 | ViT | MobileViT-XXS | 6.00 ± 0.76 | 0.08 ± 0.05 |
 | DiT | DiT-Large (RVL-CDIP) | 3.47 ± 0.54 | 0.46 ± 0.15 |
 
+> **Note:** DiT results (Tables 2 and 3) need to be regenerated under the aligned pipeline (1e-3/1e-4 LR); see `06_DiT/results.md` and `07_DiT_CrossVal/results.md` for details.
+
 Best results on the official HHD split (Table 3 in the paper):
 
 | Configuration | MAE (years) | R² |
 |--------------|-------------|----|
-| CNN: Best 3 Ensemble (MAE-based) | 2.86 | 0.14 |
-| DiT: Best 2 Ensemble (Grid Search) | 2.33 | 0.42 |
+| CNN: Full Ensemble (Grid Search) | 2.73 | 0.07 |
+| DiT: Best 2 Ensemble (Grid Search) | 2.86 | 0.35 |
 
 ## Repository Structure
 
 ```
 Age_Estimation/
-  01_CNN_Ensemble/                         # CNN ensembles with augmentation (Table 3 top)
+  01_CNN_Ensemble/                         # CNN ensembles (Table 3 top)
     train_cnn_ensemble.py                  # Training pipeline (5 CNN backbones + ensembles)
-    reproduce_results.py                   # Reproduce results.md (CSV fast path / Zenodo weights)
-    results.md                             # Training config + evaluation metrics
+    reproduce_results.py                   # Reproduce results (CSV fast path / Zenodo weights)
+    predictions/                           # Per-image predictions (test & val)
+    results/                               # Results documentation
+      results.md                           # New results (pipeline-aligned)
+      original_results.md                  # Original results (from paper)
+      results_comparison.md                # Original vs. new comparison
+    reproduction_output/                   # Generated CSVs from reproduce_results.py
   02_CNN_GradCAM/                          # Grad-CAM visualizations (Figure 5)
     visualize_gradcam.py
     results.md
   03_CNN_CrossVal/                         # CNN 5-fold stratified group CV (Table 2 top)
-    train_sota_cv.py
+    train_cnn_cv.py
     results.md
-  04_ViT/                                  # ViT initial exploration (development, not in paper)
+  04_ViT_Ensemble/                        # ViT ensemble (development, not in paper)
     train_vit.py
     results.md
   05_ViT_CrossVal/                         # ViT 5-fold stratified group CV (Table 2 middle)

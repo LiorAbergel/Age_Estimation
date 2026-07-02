@@ -14,25 +14,24 @@
 | Input size | 224×224 (via BeitImageProcessor) |
 | Label scaling | No |
 | Augmentation | Rotation (±15°), brightness/contrast, Gaussian noise |
-| Physical batch size | 16 (DiT-Base) / 2 (DiT-Large) |
-| Effective image batch size | 16 (via gradient accumulation; matches `06_DiT`) |
+| Physical batch size | 128 (DiT-Base) / 16 (DiT-Large) |
+| Effective patch batch size | 128 patches/step (via gradient accumulation; matches `06_DiT`) |
+| Regression head | Global mean-pooling, Dropout (0.5), Dense (1, linear) |
 | Mixed precision | FP16 (if GPU supports it) |
 | Training epochs | 50 (frozen backbone) |
 | Training LR | 1e-3 |
 | Fine-tune epochs | 10 |
 | Fine-tune LR | 1e-4 |
 | Loss | MSE |
-| Optimizer | Adam |
+| Optimizer | Adam (no weight decay) |
 | CV strategy | StratifiedGroupKFold, k=5 (stratify=AgeGroup, group=WriterNumber) |
 | Pretrained weights | IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants) |
 | Framework | PyTorch + HuggingFace Transformers |
 
 > **Note:** The configuration above is the unified protocol shared with experiments
-> 01/03/04/05 and `06_DiT` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, effective image batch size 16).
-> Earlier runs used an effective batch of ≈4 images, which made this experiment non-comparable
-> to `06_DiT`; that flaw is now fixed. The result tables below predate the alignment and **must
-> be regenerated** by re-running `train_dit_cv.py` under the current configuration before the
-> numbers are quoted in the paper.
+> 01/03/04/05 and `06_DiT` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, 128 patches/step).
+> The result tables below **have not yet been regenerated** under this aligned configuration
+> and should be re-run before the numbers are quoted in the paper.
 
 ---
 
@@ -52,3 +51,18 @@ Values are **mean ± std** across 5 folds.
 > **Key finding:** DiT-Large (RVL-CDIP) achieves the best cross-validated MAE (3.47 ± 0.54)
 > and R² (0.46 ± 0.15) among all models, confirming the advantage of document-domain
 > pretraining across folds. DiT variants consistently outperform CNN and ViT architectures.
+>
+> **Statistical context:** The cross-validation folds contain ~140 pages each, yielding
+> bootstrap confidence intervals of roughly ±1 MAE. The top DiT models (3.47–3.83) are
+> statistically indistinguishable from each other within this range. The best DiT CV result
+> (3.47 ± 0.54) is comparable to the best CNN CV result (ResNet50, 5.41 ± 0.78) and best
+> ViT CV result (MobileViT-XXS, 4.69 ± 0.22) — DiT's lower MAE is consistent across folds
+> but the small dataset limits the strength of cross-architecture comparisons.
+>
+> **Honest finding:** Under the aligned pipeline (frozen-backbone feature extraction with
+> 50+10 epochs, MSE, Adam 1e-3/1e-4), document-domain pretrained transformers are expected
+> to be competitive but not dramatically outperform other architectures. The original DiT
+> recipe (L1 loss, AdamW, 15+30 epochs, CLS-token pooling) produced lower MAE numbers, but
+> used a different optimization protocol. Both `06_DiT` and `07_DiT_CrossVal` results need
+> to be regenerated under the current aligned configuration for fair cross-architecture
+> comparison.

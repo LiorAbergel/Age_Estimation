@@ -21,8 +21,8 @@ Defaults are resolved relative to the repository root:
 - `data/NewAgeSplit.csv`
 - `01_CNN_Ensemble/predictions/test_image_predictions.csv`
 - `01_CNN_Ensemble/predictions/val_image_predictions.csv`
-- `04_ViT/predictions/test_image_predictions.csv`
-- `04_ViT/predictions/val_image_predictions.csv`
+- `04_ViT_Ensemble/predictions/test_image_predictions.csv`
+- `04_ViT_Ensemble/predictions/val_image_predictions.csv`
 - `results/experiment_06/*_{val,test}_preds.csv`
 - `05_ViT_CrossVal/new_results/*_fold*_preds.csv`
 
@@ -43,4 +43,4 @@ The script writes raw and paper-ready outputs under `revisions/analysis_outputs/
 - `figure6_age_group_mae.png`
 - `figure6_age_group_mae.pdf`
 
-Figure 6 includes available CNN, DiT, and ViT official-split systems. ViT is included automatically once `04_ViT/predictions/test_image_predictions.csv` exists or a custom path is passed with `--vit-test-preds`.
+Figure 6 includes available CNN, DiT, and ViT official-split systems. ViT is included automatically once `04_ViT_Ensemble/predictions/test_image_predictions.csv` exists or a custom path is passed with `--vit-test-preds`.

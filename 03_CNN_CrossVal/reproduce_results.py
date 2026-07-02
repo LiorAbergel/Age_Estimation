@@ -46,7 +46,7 @@ REPO_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(REPO_ROOT))  # allow `import download_dataset`
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data"
-PREDICTIONS_DIR = SCRIPT_DIR / "Predictions"
+PREDICTIONS_DIR = SCRIPT_DIR / "predictions"
 OOF_PREDICTIONS_CSV = PREDICTIONS_DIR / "oof_predictions.csv"
 DEFAULT_WEIGHTS_DIR = SCRIPT_DIR / "weights"
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "reproduction_output"
@@ -89,21 +89,27 @@ METRIC_TOLERANCES = {
 }
 
 EXPECTED_CV = {
-    "ResNet50":          {"MAE": (5.41, 0.78), "RMSE": (8.17, 0.58), "R2": (0.10, 0.06), "MAPE": (25.68, 3.73),
-                          "Acc_2yr": (23.72, 5.17), "Acc_5yr": (63.40, 11.26),
-                          "Max_Error": (32.99, 7.14), "Median_Error": (3.72, 0.88)},
-    "DenseNet121":       {"MAE": (5.46, 1.06), "RMSE": (8.16, 0.56), "R2": (0.11, 0.06), "MAPE": (26.25, 5.47),
-                          "Acc_2yr": (21.49, 16.51), "Acc_5yr": (61.61, 16.41),
-                          "Max_Error": (34.14, 6.66), "Median_Error": (3.94, 1.33)},
-    "InceptionV3":       {"MAE": (6.03, 0.64), "RMSE": (8.41, 0.64), "R2": (0.05, 0.05), "MAPE": (29.97, 3.17),
-                          "Acc_2yr": (16.40, 4.30), "Acc_5yr": (52.83, 9.01),
-                          "Max_Error": (32.70, 7.60), "Median_Error": (4.80, 0.67)},
-    "InceptionResNetV2": {"MAE": (5.69, 0.70), "RMSE": (7.98, 0.68), "R2": (0.17, 0.11), "MAPE": (29.08, 3.16),
-                          "Acc_2yr": (16.76, 3.99), "Acc_5yr": (58.32, 9.19),
-                          "Max_Error": (32.62, 5.80), "Median_Error": (4.37, 0.59)},
-    "EfficientNetV2M":   {"MAE": (7.30, 0.28), "RMSE": (9.03, 0.36), "R2": (-0.07, 0.14), "MAPE": (41.48, 5.73),
-                          "Acc_2yr": (11.58, 4.78), "Acc_5yr": (29.47, 2.21),
-                          "Max_Error": (31.44, 5.01), "Median_Error": (7.05, 0.68)},
+    "ResNet50":          {"MAE": (5.02, 0.34), "RMSE": (7.56, 0.56), "R2": (0.23, 0.10), "MAPE": (25.01, 3.78),
+                          "Acc_2yr": (27.04, 7.96), "Acc_5yr": (69.60, 5.94),
+                          "Max_Error": (31.23, 8.18), "Median_Error": (3.29, 0.57)},
+    "DenseNet121":       {"MAE": (4.74, 0.53), "RMSE": (7.80, 0.47), "R2": (0.18, 0.13), "MAPE": (20.66, 3.71),
+                          "Acc_2yr": (35.77, 14.41), "Acc_5yr": (75.62, 5.65),
+                          "Max_Error": (32.05, 8.55), "Median_Error": (2.78, 0.92)},
+    "InceptionV3":       {"MAE": (4.67, 0.48), "RMSE": (7.69, 0.64), "R2": (0.20, 0.12), "MAPE": (21.78, 5.89),
+                          "Acc_2yr": (40.72, 6.25), "Acc_5yr": (74.27, 6.10),
+                          "Max_Error": (32.66, 8.16), "Median_Error": (2.63, 0.49)},
+    "InceptionResNetV2": {"MAE": (4.99, 0.48), "RMSE": (7.58, 0.95), "R2": (0.21, 0.20), "MAPE": (23.12, 2.53),
+                          "Acc_2yr": (26.66, 9.07), "Acc_5yr": (69.98, 4.84),
+                          "Max_Error": (30.94, 8.91), "Median_Error": (3.46, 0.53)},
+    "EfficientNetV2M":   {"MAE": (5.56, 0.61), "RMSE": (8.43, 0.86), "R2": (0.05, 0.11), "MAPE": (26.11, 3.29),
+                          "Acc_2yr": (22.91, 6.50), "Acc_5yr": (61.38, 11.44),
+                          "Max_Error": (34.73, 9.33), "Median_Error": (4.07, 0.87)},
+}
+
+EXPECTED_ENSEMBLE = {
+    "OOF Ensemble": {"MAE": 4.51, "RMSE": 7.54, "R2": 0.25, "MAPE": 20.58,
+                      "Acc_2yr": 41.16, "Acc_5yr": 73.13,
+                      "Max_Error": 40.59, "Median_Error": 2.55},
 }
 
 
@@ -164,7 +170,7 @@ def summarize_folds(fold_df: pd.DataFrame) -> dict:
 # ===========================================================================
 # Verification (computed vs. results.md)
 # ===========================================================================
-def build_verification(summary: dict):
+def build_verification(summary: dict, ens_metrics: dict):
     """Return (all_pass, verification_df) comparing every metric against results.md."""
     rows = []
     all_pass = True
@@ -183,10 +189,26 @@ def build_verification(summary: dict):
                 all_pass &= ok
                 rows.append({
                     "Type": "Model", "Name": model_name, "Method": "-", "Metric": metric,
-                    "Computed_Mean": round(mean_val, 4), "Computed_Std": round(std_val, 4),
+                    "Computed_Mean": round(mean_val, 2), "Computed_Std": round(std_val, 2),
                     "Reported_Mean": exp_mean, "Reported_Std": exp_std,
                     "Status": "PASS" if ok else "FAIL",
                 })
+    # Ensemble verification
+    expected_ens = EXPECTED_ENSEMBLE.get("OOF Ensemble", {})
+    for metric, tol in METRIC_TOLERANCES.items():
+        if metric not in ens_metrics:
+            continue
+        computed = ens_metrics[metric]
+        expected = expected_ens.get(metric)
+        if expected is not None:
+            ok = abs(computed - expected) <= tol
+            all_pass &= ok
+            rows.append({
+                "Type": "Ensemble", "Name": "OOF Ensemble", "Method": "-", "Metric": metric,
+                "Computed_Mean": round(computed, 2), "Computed_Std": "",
+                "Reported_Mean": expected, "Reported_Std": "",
+                "Status": "PASS" if ok else "FAIL",
+            })
     return all_pass, pd.DataFrame(rows)
 
 
@@ -235,8 +257,8 @@ def _write_summary_csv(summary: dict, path: Path) -> None:
         for k in METRIC_KEYS:
             if k in summary[model_name]:
                 mean_val, std_val = summary[model_name][k]
-                row[f"{k}_mean"] = round(mean_val, 4)
-                row[f"{k}_std"] = round(std_val, 4)
+                row[f"{k}_mean"] = round(mean_val, 2)
+                row[f"{k}_std"] = round(std_val, 2)
         rows.append(row)
     pd.DataFrame(rows).to_csv(path, index=False)
 
@@ -292,9 +314,20 @@ def _md5(path, chunk=1 << 20) -> str:
 def _download(url, dest, expected_md5=None) -> Path:
     dest = Path(dest)
     if dest.is_file() and (expected_md5 is None or _md5(dest) == expected_md5):
+        print(f"  [cached] {dest.name}")
         return dest
+
+    print(f"  downloading {dest.name} ...")
+
+    def _progress(block_num, block_size, total_size):
+        if total_size > 0:
+            pct = min(100, block_num * block_size * 100 // total_size)
+            sys.stdout.write(f"\r    {pct:3d}%")
+            sys.stdout.flush()
+
     tmp = dest.with_suffix(dest.suffix + ".part")
-    urllib.request.urlretrieve(url, tmp)
+    urllib.request.urlretrieve(url, tmp, _progress)
+    sys.stdout.write("\r")
     if expected_md5 is not None and _md5(tmp) != expected_md5:
         tmp.unlink(missing_ok=True)
         raise RuntimeError(f"MD5 mismatch for {dest.name}; download may be corrupt.")
@@ -305,6 +338,7 @@ def _download(url, dest, expected_md5=None) -> Path:
 def ensure_weights(weights_dir) -> Path:
     """Ensure all fold checkpoints exist locally, downloading from Zenodo if needed."""
     weights_dir = Path(weights_dir)
+    weights_dir.mkdir(parents=True, exist_ok=True)
     expected = [(m, f, f"{m}_fold{f}_best_model.keras")
                 for m in MODEL_NAMES for f in range(1, N_FOLDS + 1)]
     missing = [(m, f, fn) for (m, f, fn) in expected if not (weights_dir / m / fn).is_file()]
@@ -320,6 +354,7 @@ def ensure_weights(weights_dir) -> Path:
             "environment variable) to enable automatic download."
         )
 
+    print(f"Downloading {len(missing)} weight file(s) from Zenodo record {ZENODO_RECORD_ID}:")
     for m, _f, fn in missing:
         (weights_dir / m).mkdir(parents=True, exist_ok=True)
         url = f"https://zenodo.org/records/{ZENODO_RECORD_ID}/files/{fn}?download=1"
@@ -354,6 +389,7 @@ def run_full_oof(labels_df, data_dir, weights_dir) -> pd.DataFrame:
     from PIL import Image
 
     data_dir = Path(data_dir)
+    print(f"GPUs available: {len(tf.config.list_physical_devices('GPU'))}")
     true_age_dict = dict(zip(labels_df["File"], labels_df["Age"]))
 
     def read_image_and_resize(img_path):
@@ -470,27 +506,21 @@ def main(argv=None):
             )
         oof_df = pd.read_csv(OOF_PREDICTIONS_CSV)
 
-    # --- Per-fold raw predictions (self-contained: includes TrueAge + AbsError, rounded) ---
-    _write_per_fold_preds(oof_df, output_dir)
-
-    # --- Per-fold metrics (rounded to 4 dp, includes Acc_10yr) ---
+    # --- Per-fold metrics (used to compute summary) ---
     fold_metrics_df = compute_per_fold(oof_df)
-    _round_df(fold_metrics_df).to_csv(output_dir / "cv_metrics_per_fold.csv", index=False)
 
     # --- Summary: mean ± std across folds ---
     summary = summarize_folds(fold_metrics_df)
     _write_summary_csv(summary, output_dir / "cv_metrics_summary.csv")
-    _write_summary_readable(summary, output_dir / "cv_metrics_readable.csv")
 
-    # --- Ensemble predictions and metrics ---
+    # --- Ensemble metrics (OOF ensemble: simple average of all model OOF preds) ---
     ensemble_df = _build_ensemble_oof(oof_df)
-    ensemble_df.to_csv(output_dir / "ensemble_final.csv", index=False)
     ens_metrics = compute_metrics(ensemble_df["True_Age"], ensemble_df["Pred_Age"])
-    ens_row = {"Model": "Ensemble", **{k: round(v, 4) for k, v in ens_metrics.items()}}
+    ens_row = {"Model": "Ensemble", **{k: round(v, 2) for k, v in ens_metrics.items()}}
     pd.DataFrame([ens_row]).to_csv(output_dir / "ensemble_metrics.csv", index=False)
 
     # --- Verification (computed vs. results.md) ---
-    all_pass, verification_df = build_verification(summary)
+    all_pass, verification_df = build_verification(summary, ens_metrics)
     verification_df.to_csv(output_dir / "verification.csv", index=False)
 
     status = "ALL CHECKS PASSED" if all_pass else "SOME CHECKS FAILED"

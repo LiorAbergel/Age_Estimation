@@ -72,8 +72,8 @@ CONFIG = {
     "EVAL_BATCH_SIZE": 128,              # inference patch batch (no effect on results)
     "EPOCHS_PHASE1": 50,
     "EPOCHS_PHASE2": 10,
-    "LR_INIT": 1e-4,   # frozen-head LR (DiT needs ~10x lower than CNN/ViT to fine-tune stably)
-    "LR_FT": 1e-5,     # fine-tune LR (1e-4 catastrophically destabilizes the pretrained backbone)
+    "LR_INIT": 1e-3,   # frozen-head LR (same as CNN/ViT aligned pipeline)
+    "LR_FT": 1e-4,     # fine-tune LR (same as CNN/ViT aligned pipeline)
     "THR": 0.0054,
     "DATA_DIR": os.path.join(REPO_ROOT, "data"),
     "CSV_PATH": os.path.join(REPO_ROOT, "data", "NewAgeSplit.csv"),
@@ -88,9 +88,9 @@ CONFIG = {
 # (HuggingFace Model ID)
 MODELS_TO_TRAIN = [
     "microsoft/dit-base",
-    # "microsoft/dit-large",
-    # "microsoft/dit-base-finetuned-rvlcdip",
-    # "microsoft/dit-large-finetuned-rvlcdip",
+    "microsoft/dit-large",
+    "microsoft/dit-base-finetuned-rvlcdip",
+    "microsoft/dit-large-finetuned-rvlcdip",
 ]
 
 # --- Utils ---

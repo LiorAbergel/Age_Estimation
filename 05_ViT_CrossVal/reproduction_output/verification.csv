@@ -1,0 +1,41 @@
+Type,Name,Method,Metric,Computed_Mean,Computed_Std,Reported_Mean,Reported_Std,Status
+Model,SwinV2_Tiny,-,MAE,6.55,0.63,6.55,0.56,PASS
+Model,SwinV2_Tiny,-,RMSE,8.71,0.51,8.71,0.46,PASS
+Model,SwinV2_Tiny,-,R2,-0.02,0.02,-0.02,0.02,PASS
+Model,SwinV2_Tiny,-,MAPE,33.4,3.41,33.4,3.05,PASS
+Model,SwinV2_Tiny,-,Acc_2yr,10.9,4.8,10.9,4.29,PASS
+Model,SwinV2_Tiny,-,Acc_5yr,44.36,12.05,44.36,10.78,PASS
+Model,SwinV2_Tiny,-,Max_Error,32.74,8.65,32.74,7.74,PASS
+Model,SwinV2_Tiny,-,Median_Error,5.88,1.22,5.88,1.09,PASS
+Model,MobileViT_XXS,-,MAE,4.69,0.25,4.69,0.22,PASS
+Model,MobileViT_XXS,-,RMSE,7.82,0.65,7.82,0.58,PASS
+Model,MobileViT_XXS,-,R2,0.18,0.1,0.18,0.09,PASS
+Model,MobileViT_XXS,-,MAPE,21.0,2.29,21.0,2.05,PASS
+Model,MobileViT_XXS,-,Acc_2yr,40.75,6.66,40.75,5.96,PASS
+Model,MobileViT_XXS,-,Acc_5yr,72.23,4.73,72.23,4.23,PASS
+Model,MobileViT_XXS,-,Max_Error,34.16,7.48,34.16,6.69,PASS
+Model,MobileViT_XXS,-,Median_Error,2.8,0.81,2.8,0.72,PASS
+Model,ConvNeXtV2_Tiny,-,MAE,4.76,0.81,4.76,0.72,PASS
+Model,ConvNeXtV2_Tiny,-,RMSE,7.51,0.49,7.51,0.44,PASS
+Model,ConvNeXtV2_Tiny,-,R2,0.24,0.11,0.24,0.1,PASS
+Model,ConvNeXtV2_Tiny,-,MAPE,22.85,6.53,22.85,5.84,PASS
+Model,ConvNeXtV2_Tiny,-,Acc_2yr,37.35,15.94,37.35,14.26,PASS
+Model,ConvNeXtV2_Tiny,-,Acc_5yr,69.08,13.88,69.08,12.42,PASS
+Model,ConvNeXtV2_Tiny,-,Max_Error,30.43,7.51,30.43,6.72,PASS
+Model,ConvNeXtV2_Tiny,-,Median_Error,2.98,1.3,2.98,1.16,PASS
+Model,TinyViT_11M,-,MAE,5.6,0.79,5.6,0.71,PASS
+Model,TinyViT_11M,-,RMSE,7.85,0.85,7.85,0.76,PASS
+Model,TinyViT_11M,-,R2,0.17,0.1,0.17,0.09,PASS
+Model,TinyViT_11M,-,MAPE,27.39,2.79,27.39,2.49,PASS
+Model,TinyViT_11M,-,Acc_2yr,16.25,8.13,16.25,7.27,PASS
+Model,TinyViT_11M,-,Acc_5yr,59.87,11.5,59.87,10.28,PASS
+Model,TinyViT_11M,-,Max_Error,31.06,7.76,31.06,6.94,PASS
+Model,TinyViT_11M,-,Median_Error,4.33,0.85,4.33,0.76,PASS
+Ensemble,OOF Ensemble,-,MAE,5.1,,5.1,,PASS
+Ensemble,OOF Ensemble,-,RMSE,7.69,,7.69,,PASS
+Ensemble,OOF Ensemble,-,R2,0.22,,0.22,,PASS
+Ensemble,OOF Ensemble,-,MAPE,24.45,,24.46,,PASS
+Ensemble,OOF Ensemble,-,Acc_2yr,22.9,,22.9,,PASS
+Ensemble,OOF Ensemble,-,Acc_5yr,69.39,,69.39,,PASS
+Ensemble,OOF Ensemble,-,Max_Error,39.4,,39.4,,PASS
+Ensemble,OOF Ensemble,-,Median_Error,3.68,,3.68,,PASS

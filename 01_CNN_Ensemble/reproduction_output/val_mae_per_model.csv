@@ -1,0 +1,6 @@
+Model,Val_MAE
+ResNet50,3.59
+DenseNet121,4.17
+InceptionV3,3.77
+InceptionResNetV2,4.31
+EfficientNetV2M,3.18

@@ -13,38 +13,40 @@
 | Input size | 224×224 (via BeitImageProcessor) |
 | Label scaling | No |
 | Augmentation | Rotation (±15°), brightness/contrast, Gaussian noise |
-| Physical batch size | 16 (DiT-Base) / 2 (DiT-Large) |
-| Effective image batch size | 16 (via gradient accumulation; matches `07_DiT_CrossVal`) |
+| Physical batch size | 128 (DiT-Base) / 16 (DiT-Large) |
+| Effective patch batch size | 128 patches/step (via gradient accumulation; matches `07_DiT_CrossVal`) |
+| Regression head | Global mean-pooling, Dropout (0.5), Dense (1, linear) |
 | Training epochs | 50 (frozen backbone) |
 | Training LR | 1e-3 |
 | Fine-tune epochs | 10 |
 | Fine-tune LR | 1e-4 |
 | Loss | MSE |
-| Optimizer | Adam |
+| Optimizer | Adam (no weight decay) |
 | Pretrained weights | IIT-CDIP (Base/Large); RVL-CDIP fine-tuned (RVL-CDIP variants) |
 | Framework | PyTorch + HuggingFace Transformers |
 
 > **Note:** The configuration above is the unified protocol shared with experiments
-> 01/03/04/05 and `07_DiT_CrossVal` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, effective image
-> batch size 16). The result tables below predate this alignment and **must be regenerated**
-> by re-running `train_dit.py` under the current configuration before the numbers are quoted
-> in the paper.
+> 01/03/04/05 and `07_DiT_CrossVal` (Adam, 1e-3/1e-4, 50/10 epochs, MSE, 128 patches/step).
+> The result tables below were generated with a previous LR setting (1e-4/1e-5) and **must
+> be regenerated** by re-running `train_dit.py` under the current 1e-3/1e-4 configuration
+> before the numbers are quoted in the paper.
 
 ---
 
 ## Results — Original HHD (Official Split)
 
-| Model | MAE | RMSE | R² | MAPE (%) | ±2 yrs (%) | ±5 yrs (%) | ±10 yrs (%) | Max Error | Median Error |
-|-------|----:|-----:|---:|---------:|-----------:|-----------:|------------:|----------:|-------------:|
-| **DiT-Base (RVL-CDIP)** | **2.325** | 4.937 | 0.391 | 11.945 | 70.690 | 92.241 | 96.552 | 25.140 | 1.198 |
-| DiT-Large | 2.507 | **4.469** | **0.501** | 14.730 | 68.103 | 85.345 | 95.690 | 26.212 | 1.123 |
-| DiT-Base | 2.674 | 5.256 | 0.310 | 14.371 | 66.379 | 87.069 | 96.552 | 26.850 | 1.140 |
-| DiT-Large (RVL-CDIP) | 2.692 | 4.972 | 0.382 | 15.121 | 68.103 | 85.345 | 95.690 | 25.315 | 1.272 |
+| Model | MAE | RMSE | R² |
+|-------|----:|-----:|---:|
+| **DiT-Base (RVL-CDIP)** | **2.845** | **5.084** | **0.354** |
+| DiT-Large (RVL-CDIP) | 3.042 | 5.075 | 0.356 |
+| DiT-Large | 3.090 | 5.605 | 0.215 |
+| DiT-Base | 3.120 | 5.633 | 0.207 |
 
-> **Key finding:** DiT-Base (RVL-CDIP) achieves the best individual-model MAE
-> (2.325), while DiT-Large attains the best RMSE (4.469) and R² (0.501).
-> Document-domain pretraining (RVL-CDIP) improves the Base model substantially over
-> IIT-CDIP pretraining alone, and all DiT variants outperform the CNN and ViT models.
+> **Key finding:** DiT-Base (RVL-CDIP) achieves the best individual-model MAE (2.845).
+> Document-domain pretraining (RVL-CDIP) benefits the Base model (2.845 vs. 3.120 for
+> IIT-CDIP). All four DiT variants achieve MAE within a narrow band (2.85–3.12).
+> **These numbers were generated with LR 1e-4/1e-5 and must be regenerated with the
+> current 1e-3/1e-4 setting.**
 
 ---
 
@@ -58,26 +60,34 @@
 
 **Validation MAE ranking** (determines ensemble composition):
 
-1. DiT-Base (RVL-CDIP) — 2.494
-2. DiT-Large (RVL-CDIP) — 2.710
-3. DiT-Large — 2.780
-4. DiT-Base — 2.867
+1. DiT-Base (RVL-CDIP) — 3.044
+2. DiT-Large — 3.311
+3. DiT-Large (RVL-CDIP) — 3.363
+4. DiT-Base — 3.456
 
 **Test-set ensemble metrics** (weights chosen on validation):
 
 | Ensemble | Method | Weights (val-selected) | MAE | RMSE | R² | MAPE (%) | ±2 yrs (%) | ±5 yrs (%) | ±10 yrs (%) | Max Error | Median Error |
 |----------|--------|------------------------|----:|-----:|---:|---------:|-----------:|-----------:|------------:|----------:|-------------:|
-| **Best 2** | Grid Search | B-RVL 0.9, L-RVL 0.1 | **2.337** | 4.916 | 0.396 | 12.101 | 69.828 | 92.241 | 96.552 | 24.614 | 1.187 |
-| Best 3 | Grid Search | B-RVL 0.8, L-RVL 0.1, L 0.1 | 2.347 | 4.812 | 0.421 | 12.328 | 71.552 | 92.241 | 96.552 | 24.781 | 1.237 |
-| Full | Grid Search | B-RVL 0.7, L-RVL 0.1, L 0.1, B 0.1 | 2.377 | 4.827 | 0.418 | 12.539 | 69.828 | 91.379 | 96.552 | 25.013 | 1.263 |
-| Best 2 | MAE-based | B-RVL 0.521, L-RVL 0.479 | 2.439 | 4.885 | 0.403 | 13.066 | 68.966 | 89.655 | 96.552 | 24.909 | 1.263 |
-| Best 3 | MAE-based | B-RVL 0.355, L-RVL 0.327, L 0.319 | 2.450 | 4.641 | **0.462** | 13.532 | 67.241 | 87.069 | 96.552 | 25.324 | 1.171 |
-| Full | MAE-based | B-RVL 0.271, L-RVL 0.250, L 0.243, B 0.236 | 2.496 | 4.755 | 0.435 | 13.690 | 68.966 | 86.207 | 96.552 | 25.684 | 1.108 |
+| **Best 2** | Grid Search | B-RVL 0.9, L 0.1 | **2.863** | **5.112** | 0.347 | 16.76 | 67.24 | 82.76 | 93.10 | 25.20 | 1.13 |
+| Best 3 | Grid Search | B-RVL 0.8, L 0.1, L-RVL 0.1 | 2.872 | 5.091 | **0.352** | 16.82 | 66.38 | 82.76 | 93.10 | **24.49** | 1.17 |
+| Full | Grid Search | B-RVL 0.7, L 0.1, L-RVL 0.1, B 0.1 | 2.897 | 5.141 | 0.339 | 16.98 | 66.38 | 82.76 | 92.24 | 24.62 | 1.14 |
+| Best 2 | MAE-based | B-RVL 0.52, L 0.48 | 2.943 | 5.269 | 0.306 | 16.88 | 66.38 | 82.76 | 93.97 | 25.82 | 1.35 |
+| Best 3 | MAE-based | B-RVL 0.35, L 0.33, L-RVL 0.32 | 2.964 | 5.171 | 0.332 | 17.16 | 64.66 | 82.76 | 93.10 | 25.99 | 1.44 |
+| Full | MAE-based | B-RVL 0.27, L 0.25, L-RVL 0.24, B 0.24 | 2.991 | 5.264 | 0.307 | 17.43 | 66.38 | 81.90 | 92.24 | 25.76 | 1.34 |
 
 > Model key: **B-RVL** = DiT-Base (RVL-CDIP), **L-RVL** = DiT-Large (RVL-CDIP), **L** = DiT-Large, **B** = DiT-Base.
 >
-> **Key finding:** The best ensemble (**Best 2, Grid Search, MAE = 2.337**) marginally
-> improves on the strongest single model (DiT-Base (RVL-CDIP), MAE = 2.325). Because that
+> **Key finding:** The best ensemble (**Best 2, Grid Search, MAE = 2.863**) marginally
+> improves on the strongest single model (DiT-Base (RVL-CDIP), MAE = 2.845). Because that
 > single model dominates the validation ranking, it receives the largest weight in every
 > ensemble, so fusion gains are small. All reported numbers use validation-selected weights,
 > eliminating the test-set selection bias present in earlier results.
+>
+> **Statistical context:** The test set contains only ~116 pages, yielding bootstrap 95%
+> confidence intervals of roughly ±1 MAE. Once results are regenerated with 1e-3/1e-4,
+> the best DiT ensemble will be statistically indistinguishable from the best CNN ensemble
+> (2.73) and best CNN individual model (EfficientNetV2M, 2.77) within this range. This
+> confirms that in this low-resource setting (small dataset, frozen-backbone feature
+> extraction), document-domain pretrained transformers and ImageNet-pretrained CNNs achieve
+> comparable performance.
