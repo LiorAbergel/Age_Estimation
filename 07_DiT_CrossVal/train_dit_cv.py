@@ -97,6 +97,17 @@ def set_seed(seed):
 
 set_seed(CONFIG["SEED"])
 
+def seed_worker(worker_id):
+    """Seed each DataLoader worker's RNGs so augmentation is reproducible across runs."""
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+# Dedicated generator so worker base seeds are stable regardless of prior RNG use
+# (e.g. model initialization) in the main process.
+DATALOADER_GENERATOR = torch.Generator()
+DATALOADER_GENERATOR.manual_seed(CONFIG["SEED"])
+
 def get_batch_size(model_id):
     return CONFIG["BATCH_SIZE_LARGE"] if "large" in model_id else CONFIG["BATCH_SIZE_BASE"]
 
@@ -504,9 +515,13 @@ def run_full_cv():
             train_df, val_df = df.iloc[tr_idx], df.iloc[val_idx]
 
             train_loader = DataLoader(HHDPatchStream(train_df, CONFIG["DATA_DIR"], proc, True),
-                                      batch_size=batch_size, num_workers=2, collate_fn=collate_patches)
+                                      batch_size=batch_size, num_workers=2, persistent_workers=True,
+                                      pin_memory=True, worker_init_fn=seed_worker,
+                                      generator=DATALOADER_GENERATOR, collate_fn=collate_patches)
             val_loader = DataLoader(HHDPatchStream(val_df, CONFIG["DATA_DIR"], proc, False),
-                                    batch_size=CONFIG["EVAL_BATCH_SIZE"], num_workers=2, collate_fn=collate_patches)
+                                    batch_size=CONFIG["EVAL_BATCH_SIZE"], num_workers=2, persistent_workers=True,
+                                    pin_memory=True, worker_init_fn=seed_worker,
+                                    generator=DATALOADER_GENERATOR, collate_fn=collate_patches)
 
             # Skip training only when fully completed: the .done marker is written
             # after Phase 2.  A lone checkpoint (no .done) means a crashed run, so we

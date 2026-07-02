@@ -51,6 +51,17 @@ def set_seed(seed):
 
 set_seed(SEED)
 
+def seed_worker(worker_id):
+    """Seed each DataLoader worker's RNGs so augmentation is reproducible across runs."""
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+# Dedicated generator so worker base seeds are stable regardless of prior RNG use
+# (e.g. model initialization) in the main process.
+DATALOADER_GENERATOR = torch.Generator()
+DATALOADER_GENERATOR.manual_seed(SEED)
+
 import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -591,6 +602,10 @@ def main():
                 HHDPatchStream(ds_subset, CONFIG["DATA_DIR"], proc, augment=is_train),
                 batch_size=batch_size if is_train else CONFIG["EVAL_BATCH_SIZE"],
                 num_workers=2,
+                persistent_workers=True,  # reuse workers across epochs (no per-epoch respawn/teardown)
+                pin_memory=True,
+                worker_init_fn=seed_worker,
+                generator=DATALOADER_GENERATOR,
                 collate_fn=collate_patches
             )
 
@@ -655,6 +670,10 @@ def main():
                     HHDPatchStream(ds_subset, CONFIG["DATA_DIR"], proc, augment=False),
                     batch_size=CONFIG["EVAL_BATCH_SIZE"],
                     num_workers=2,
+                    persistent_workers=True,  # reuse workers across epochs (no per-epoch respawn/teardown)
+                    pin_memory=True,
+                    worker_init_fn=seed_worker,
+                    generator=DATALOADER_GENERATOR,
                     collate_fn=collate_patches
                 )
                 print(f"Generating {split} predictions for {MODEL_DISPLAY_NAMES.get(model_id, model_id)}...")
