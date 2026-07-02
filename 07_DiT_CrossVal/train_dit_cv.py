@@ -156,13 +156,11 @@ class HHDPatchStream(IterableDataset):
             transforms.RandomRotation(15),
             transforms.RandomResizedCrop(target_size, scale=(0.9, 1.1), ratio=(1.0, 1.0)),
             transforms.ColorJitter(brightness=0.1, contrast=0.25),
-            transforms.ToTensor(),
             transforms.Lambda(lambda x: torch.clamp(x + torch.randn_like(x) * 0.05, 0, 1)),
             normalize,
         ])
         self.val_transforms = transforms.Compose([
             transforms.Resize(target_size),
-            transforms.ToTensor(),
             normalize,
         ])
 
@@ -207,7 +205,7 @@ class HHDPatchStream(IterableDataset):
             label = torch.tensor(float(row["Age"]), dtype=torch.float32)
             fid = row["File"]
             for i in range(valid.size(0)):
-                yield {"pixel_values": tfm(transforms.ToPILImage()(valid[i])),
+                yield {"pixel_values": tfm(valid[i]),
                        "label": label, "id": fid}
 
 
