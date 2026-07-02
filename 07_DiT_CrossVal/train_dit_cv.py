@@ -97,6 +97,20 @@ def set_seed(seed):
 
 set_seed(CONFIG["SEED"])
 
+# --- Suppress harmless DataLoader worker teardown traceback on Colab ---
+# Colab's forked finalizer triggers "AssertionError: can only test a child
+# process" inside _MultiProcessingDataLoaderIter.__del__.  The error is
+# cosmetic (printed by Python's GC, not raised) and does not affect training.
+# Wrap __del__ to swallow it silently.
+import torch.utils.data.dataloader as _dl_mod
+_orig_dl_del = _dl_mod._MultiProcessingDataLoaderIter.__del__
+def _quiet_dl_del(self):
+    try:
+        _orig_dl_del(self)
+    except Exception:
+        pass
+_dl_mod._MultiProcessingDataLoaderIter.__del__ = _quiet_dl_del
+
 def get_batch_size(model_id):
     return CONFIG["BATCH_SIZE_LARGE"] if "large" in model_id else CONFIG["BATCH_SIZE_BASE"]
 
@@ -504,10 +518,10 @@ def run_full_cv():
             train_df, val_df = df.iloc[tr_idx], df.iloc[val_idx]
 
             train_loader = DataLoader(HHDPatchStream(train_df, CONFIG["DATA_DIR"], proc, True),
-                                      batch_size=batch_size, num_workers=0,
+                                      batch_size=batch_size, num_workers=2, persistent_workers=True,
                                       pin_memory=True, collate_fn=collate_patches)
             val_loader = DataLoader(HHDPatchStream(val_df, CONFIG["DATA_DIR"], proc, False),
-                                    batch_size=CONFIG["EVAL_BATCH_SIZE"], num_workers=0,
+                                    batch_size=CONFIG["EVAL_BATCH_SIZE"], num_workers=2, persistent_workers=True,
                                     pin_memory=True, collate_fn=collate_patches)
 
             # Skip training only when fully completed: the .done marker is written

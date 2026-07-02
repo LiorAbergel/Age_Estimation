@@ -51,6 +51,20 @@ def set_seed(seed):
 
 set_seed(SEED)
 
+# --- Suppress harmless DataLoader worker teardown traceback on Colab ---
+# Colab's forked finalizer triggers "AssertionError: can only test a child
+# process" inside _MultiProcessingDataLoaderIter.__del__.  The error is
+# cosmetic (printed by Python's GC, not raised) and does not affect training.
+# Wrap __del__ to swallow it silently.
+import torch.utils.data.dataloader as _dl_mod
+_orig_dl_del = _dl_mod._MultiProcessingDataLoaderIter.__del__
+def _quiet_dl_del(self):
+    try:
+        _orig_dl_del(self)
+    except Exception:
+        pass
+_dl_mod._MultiProcessingDataLoaderIter.__del__ = _quiet_dl_del
+
 import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -590,7 +604,8 @@ def main():
             loaders[split] = DataLoader(
                 HHDPatchStream(ds_subset, CONFIG["DATA_DIR"], proc, augment=is_train),
                 batch_size=batch_size if is_train else CONFIG["EVAL_BATCH_SIZE"],
-                num_workers=0,
+                num_workers=2,
+                persistent_workers=True,
                 pin_memory=True,
                 collate_fn=collate_patches
             )
@@ -655,7 +670,8 @@ def main():
                 loader = DataLoader(
                     HHDPatchStream(ds_subset, CONFIG["DATA_DIR"], proc, augment=False),
                     batch_size=CONFIG["EVAL_BATCH_SIZE"],
-                    num_workers=0,
+                    num_workers=2,
+                    persistent_workers=True,
                     pin_memory=True,
                     collate_fn=collate_patches
                 )
