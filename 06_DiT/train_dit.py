@@ -37,7 +37,7 @@ from collections import defaultdict
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from transformers import AutoModel, BeitImageProcessor
 from PIL import Image
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import itertools
 
 # Set seeds for reproducibility
@@ -265,7 +265,6 @@ def train_one_epoch(model, loader, opt, device, accum_steps):
         bs = lbl.size(0)
         total_loss += out["loss"].item() * bs
         total_samples += bs
-        pbar.set_postfix(loss=f"{out['loss'].item():.4f}")
 
     if pending_steps > 0:
         opt.step()
