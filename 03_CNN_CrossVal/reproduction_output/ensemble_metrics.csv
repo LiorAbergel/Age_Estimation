@@ -1,0 +1,2 @@
+Model,MAE,RMSE,R2,MAPE,Acc_2yr,Acc_5yr,Max_Error,Min_Error,Median_Error
+Ensemble,4.51,7.54,0.25,20.58,41.16,73.13,40.59,0.0,2.55

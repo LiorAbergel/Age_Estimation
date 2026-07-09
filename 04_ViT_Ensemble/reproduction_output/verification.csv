@@ -1,0 +1,81 @@
+Type,Name,Method,Metric,Computed,Reported,Status
+Model,SwinV2_Tiny,-,MAE,5.46,5.46,PASS
+Model,SwinV2_Tiny,-,RMSE,7.46,7.46,PASS
+Model,SwinV2_Tiny,-,R2,-0.39,-0.39,PASS
+Model,SwinV2_Tiny,-,MAPE (%),30.87,30.87,PASS
+Model,SwinV2_Tiny,-,Within ±2 Years (%),11.21,11.21,PASS
+Model,SwinV2_Tiny,-,Within ±5 Years (%),55.17,55.17,PASS
+Model,SwinV2_Tiny,-,Max Error,32.41,32.41,PASS
+Model,SwinV2_Tiny,-,Median Error,4.83,4.83,PASS
+Model,MobileViT_XXS,-,MAE,2.79,2.79,PASS
+Model,MobileViT_XXS,-,RMSE,6.13,6.13,PASS
+Model,MobileViT_XXS,-,R2,0.06,0.06,PASS
+Model,MobileViT_XXS,-,MAPE (%),13.59,13.59,PASS
+Model,MobileViT_XXS,-,Within ±2 Years (%),65.52,65.52,PASS
+Model,MobileViT_XXS,-,Within ±5 Years (%),93.97,93.97,PASS
+Model,MobileViT_XXS,-,Max Error,34.91,34.91,PASS
+Model,MobileViT_XXS,-,Median Error,1.35,1.35,PASS
+Model,ConvNeXtV2_Tiny,-,MAE,3.86,3.86,PASS
+Model,ConvNeXtV2_Tiny,-,RMSE,6.08,6.08,PASS
+Model,ConvNeXtV2_Tiny,-,R2,0.08,0.08,PASS
+Model,ConvNeXtV2_Tiny,-,MAPE (%),21.87,21.87,PASS
+Model,ConvNeXtV2_Tiny,-,Within ±2 Years (%),37.07,37.07,PASS
+Model,ConvNeXtV2_Tiny,-,Within ±5 Years (%),81.03,81.03,PASS
+Model,ConvNeXtV2_Tiny,-,Max Error,27.99,27.99,PASS
+Model,ConvNeXtV2_Tiny,-,Median Error,2.98,2.98,PASS
+Model,TinyViT_11M,-,MAE,4.69,4.69,PASS
+Model,TinyViT_11M,-,RMSE,6.23,6.23,PASS
+Model,TinyViT_11M,-,R2,0.03,0.03,PASS
+Model,TinyViT_11M,-,MAPE (%),28.95,28.95,PASS
+Model,TinyViT_11M,-,Within ±2 Years (%),18.97,18.97,PASS
+Model,TinyViT_11M,-,Within ±5 Years (%),70.69,70.69,PASS
+Model,TinyViT_11M,-,Max Error,25.95,25.95,PASS
+Model,TinyViT_11M,-,Median Error,3.68,3.68,PASS
+Ensemble,Best 3,Grid Search,MAE,2.77,2.77,PASS
+Ensemble,Best 3,Grid Search,RMSE,5.84,5.84,PASS
+Ensemble,Best 3,Grid Search,R2,0.15,0.15,PASS
+Ensemble,Best 3,Grid Search,MAPE (%),14.41,14.41,PASS
+Ensemble,Best 3,Grid Search,Within ±2 Years (%),66.38,66.38,PASS
+Ensemble,Best 3,Grid Search,Within ±5 Years (%),87.93,87.93,PASS
+Ensemble,Best 3,Grid Search,Max Error,32.42,32.42,PASS
+Ensemble,Best 3,Grid Search,Median Error,1.26,1.26,PASS
+Ensemble,Best 2,Grid Search,MAE,2.81,2.81,PASS
+Ensemble,Best 2,Grid Search,RMSE,6.06,6.06,PASS
+Ensemble,Best 2,Grid Search,R2,0.08,0.08,PASS
+Ensemble,Best 2,Grid Search,MAPE (%),13.87,13.87,PASS
+Ensemble,Best 2,Grid Search,Within ±2 Years (%),65.52,65.52,PASS
+Ensemble,Best 2,Grid Search,Within ±5 Years (%),93.1,93.1,PASS
+Ensemble,Best 2,Grid Search,Max Error,34.21,34.21,PASS
+Ensemble,Best 2,Grid Search,Median Error,1.44,1.44,PASS
+Ensemble,Full Ensemble,Grid Search,MAE,2.89,2.89,PASS
+Ensemble,Full Ensemble,Grid Search,RMSE,5.57,5.57,PASS
+Ensemble,Full Ensemble,Grid Search,R2,0.22,0.22,PASS
+Ensemble,Full Ensemble,Grid Search,MAPE (%),15.75,15.75,PASS
+Ensemble,Full Ensemble,Grid Search,Within ±2 Years (%),64.66,64.66,PASS
+Ensemble,Full Ensemble,Grid Search,Within ±5 Years (%),82.76,82.76,PASS
+Ensemble,Full Ensemble,Grid Search,Max Error,28.99,28.99,PASS
+Ensemble,Full Ensemble,Grid Search,Median Error,1.4,1.4,PASS
+Ensemble,Best 3,MAE-based,MAE,2.89,2.89,PASS
+Ensemble,Best 3,MAE-based,RMSE,5.68,5.68,PASS
+Ensemble,Best 3,MAE-based,R2,0.19,0.19,PASS
+Ensemble,Best 3,MAE-based,MAPE (%),15.78,15.78,PASS
+Ensemble,Best 3,MAE-based,Within ±2 Years (%),63.79,63.79,PASS
+Ensemble,Best 3,MAE-based,Within ±5 Years (%),81.9,81.9,PASS
+Ensemble,Best 3,MAE-based,Max Error,29.89,29.89,PASS
+Ensemble,Best 3,MAE-based,Median Error,1.24,1.24,PASS
+Ensemble,Full Ensemble,MAE-based,MAE,3.03,3.03,PASS
+Ensemble,Full Ensemble,MAE-based,RMSE,5.75,5.75,PASS
+Ensemble,Full Ensemble,MAE-based,R2,0.17,0.17,PASS
+Ensemble,Full Ensemble,MAE-based,MAPE (%),16.09,16.09,PASS
+Ensemble,Full Ensemble,MAE-based,Within ±2 Years (%),53.45,53.45,PASS
+Ensemble,Full Ensemble,MAE-based,Within ±5 Years (%),85.34,85.34,PASS
+Ensemble,Full Ensemble,MAE-based,Max Error,30.38,30.38,PASS
+Ensemble,Full Ensemble,MAE-based,Median Error,1.68,1.68,PASS
+Ensemble,Best 2,MAE-based,MAE,3.04,3.04,PASS
+Ensemble,Best 2,MAE-based,RMSE,5.93,5.93,PASS
+Ensemble,Best 2,MAE-based,R2,0.12,0.12,PASS
+Ensemble,Best 2,MAE-based,MAPE (%),15.8,15.8,PASS
+Ensemble,Best 2,MAE-based,Within ±2 Years (%),55.17,55.17,PASS
+Ensemble,Best 2,MAE-based,Within ±5 Years (%),86.21,86.21,PASS
+Ensemble,Best 2,MAE-based,Max Error,31.84,31.84,PASS
+Ensemble,Best 2,MAE-based,Median Error,1.77,1.77,PASS

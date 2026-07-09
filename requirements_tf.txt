@@ -1,0 +1,11 @@
+tensorflow>=2.13
+tf-keras
+keras-cv-attention-models
+numpy
+pandas
+scikit-learn
+Pillow
+matplotlib
+tqdm
+opencv-python
+openpyxl

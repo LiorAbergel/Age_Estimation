@@ -1,0 +1,105 @@
+Type,Name,Method,Metric,Computed,Reported,Status
+Model,ResNet50,-,MAE,3.12,3.12,PASS
+Model,ResNet50,-,RMSE,6.38,6.38,PASS
+Model,ResNet50,-,R2,-0.02,-0.02,PASS
+Model,ResNet50,-,MAPE (%),16.14,16.14,PASS
+Model,ResNet50,-,Within ±2 Years (%),50.86,50.86,PASS
+Model,ResNet50,-,Within ±5 Years (%),93.97,93.97,PASS
+Model,ResNet50,-,Max Error,34.55,34.55,PASS
+Model,ResNet50,-,Median Error,1.89,1.89,PASS
+Model,DenseNet121,-,MAE,3.8,3.8,PASS
+Model,DenseNet121,-,RMSE,6.45,6.45,PASS
+Model,DenseNet121,-,R2,-0.04,-0.04,PASS
+Model,DenseNet121,-,MAPE (%),20.7,20.7,PASS
+Model,DenseNet121,-,Within ±2 Years (%),38.79,38.79,PASS
+Model,DenseNet121,-,Within ±5 Years (%),86.21,86.21,PASS
+Model,DenseNet121,-,Max Error,29.61,29.61,PASS
+Model,DenseNet121,-,Median Error,2.82,2.82,PASS
+Model,InceptionV3,-,MAE,3.31,3.31,PASS
+Model,InceptionV3,-,RMSE,6.2,6.2,PASS
+Model,InceptionV3,-,R2,0.04,0.04,PASS
+Model,InceptionV3,-,MAPE (%),18.05,18.05,PASS
+Model,InceptionV3,-,Within ±2 Years (%),48.28,48.28,PASS
+Model,InceptionV3,-,Within ±5 Years (%),87.07,87.07,PASS
+Model,InceptionV3,-,Max Error,33.98,33.98,PASS
+Model,InceptionV3,-,Median Error,2.04,2.04,PASS
+Model,InceptionResNetV2,-,MAE,4.0,4.0,PASS
+Model,InceptionResNetV2,-,RMSE,6.5,6.5,PASS
+Model,InceptionResNetV2,-,R2,-0.06,-0.06,PASS
+Model,InceptionResNetV2,-,MAPE (%),22.59,22.59,PASS
+Model,InceptionResNetV2,-,Within ±2 Years (%),26.72,26.72,PASS
+Model,InceptionResNetV2,-,Within ±5 Years (%),81.9,81.9,PASS
+Model,InceptionResNetV2,-,Max Error,32.71,32.71,PASS
+Model,InceptionResNetV2,-,Median Error,2.69,2.69,PASS
+Model,EfficientNetV2M,-,MAE,2.77,2.77,PASS
+Model,EfficientNetV2M,-,RMSE,6.28,6.28,PASS
+Model,EfficientNetV2M,-,R2,0.01,0.01,PASS
+Model,EfficientNetV2M,-,MAPE (%),13.45,13.45,PASS
+Model,EfficientNetV2M,-,Within ±2 Years (%),66.38,66.38,PASS
+Model,EfficientNetV2M,-,Within ±5 Years (%),93.97,93.97,PASS
+Model,EfficientNetV2M,-,Max Error,34.36,34.36,PASS
+Model,EfficientNetV2M,-,Median Error,1.25,1.25,PASS
+Ensemble,Full Ensemble,Grid Search,MAE,2.73,2.73,PASS
+Ensemble,Full Ensemble,Grid Search,RMSE,6.09,6.09,PASS
+Ensemble,Full Ensemble,Grid Search,R2,0.07,0.07,PASS
+Ensemble,Full Ensemble,Grid Search,MAPE (%),13.93,13.93,PASS
+Ensemble,Full Ensemble,Grid Search,Within ±2 Years (%),72.41,72.41,PASS
+Ensemble,Full Ensemble,Grid Search,Within ±5 Years (%),88.79,88.79,PASS
+Ensemble,Full Ensemble,Grid Search,Max Error,32.42,32.42,PASS
+Ensemble,Full Ensemble,Grid Search,Median Error,1.22,1.22,PASS
+Ensemble,Best 4,Grid Search,MAE,2.73,2.73,PASS
+Ensemble,Best 4,Grid Search,RMSE,6.05,6.05,PASS
+Ensemble,Best 4,Grid Search,R2,0.08,0.08,PASS
+Ensemble,Best 4,Grid Search,MAPE (%),14.13,14.13,PASS
+Ensemble,Best 4,Grid Search,Within ±2 Years (%),71.55,71.55,PASS
+Ensemble,Best 4,Grid Search,Within ±5 Years (%),87.07,87.07,PASS
+Ensemble,Best 4,Grid Search,Max Error,31.78,31.78,PASS
+Ensemble,Best 4,Grid Search,Median Error,1.2,1.2,PASS
+Ensemble,Best 3,Grid Search,MAE,2.75,2.75,PASS
+Ensemble,Best 3,Grid Search,RMSE,6.05,6.05,PASS
+Ensemble,Best 3,Grid Search,R2,0.08,0.08,PASS
+Ensemble,Best 3,Grid Search,MAPE (%),14.12,14.12,PASS
+Ensemble,Best 3,Grid Search,Within ±2 Years (%),71.55,71.55,PASS
+Ensemble,Best 3,Grid Search,Within ±5 Years (%),87.07,87.07,PASS
+Ensemble,Best 3,Grid Search,Max Error,31.35,31.35,PASS
+Ensemble,Best 3,Grid Search,Median Error,1.15,1.15,PASS
+Ensemble,Best 3,MAE-based,MAE,2.76,2.76,PASS
+Ensemble,Best 3,MAE-based,RMSE,6.11,6.11,PASS
+Ensemble,Best 3,MAE-based,R2,0.07,0.07,PASS
+Ensemble,Best 3,MAE-based,MAPE (%),14.16,14.16,PASS
+Ensemble,Best 3,MAE-based,Within ±2 Years (%),70.69,70.69,PASS
+Ensemble,Best 3,MAE-based,Within ±5 Years (%),88.79,88.79,PASS
+Ensemble,Best 3,MAE-based,Max Error,32.34,32.34,PASS
+Ensemble,Best 3,MAE-based,Median Error,1.11,1.11,PASS
+Ensemble,Full Ensemble,MAE-based,MAE,2.76,2.76,PASS
+Ensemble,Full Ensemble,MAE-based,RMSE,6.13,6.13,PASS
+Ensemble,Full Ensemble,MAE-based,R2,0.06,0.06,PASS
+Ensemble,Full Ensemble,MAE-based,MAPE (%),14.12,14.12,PASS
+Ensemble,Full Ensemble,MAE-based,Within ±2 Years (%),67.24,67.24,PASS
+Ensemble,Full Ensemble,MAE-based,Within ±5 Years (%),89.66,89.66,PASS
+Ensemble,Full Ensemble,MAE-based,Max Error,33.08,33.08,PASS
+Ensemble,Full Ensemble,MAE-based,Median Error,1.12,1.12,PASS
+Ensemble,Best 4,MAE-based,MAE,2.82,2.82,PASS
+Ensemble,Best 4,MAE-based,RMSE,6.1,6.1,PASS
+Ensemble,Best 4,MAE-based,R2,0.07,0.07,PASS
+Ensemble,Best 4,MAE-based,MAPE (%),14.66,14.66,PASS
+Ensemble,Best 4,MAE-based,Within ±2 Years (%),59.48,59.48,PASS
+Ensemble,Best 4,MAE-based,Within ±5 Years (%),87.07,87.07,PASS
+Ensemble,Best 4,MAE-based,Max Error,32.75,32.75,PASS
+Ensemble,Best 4,MAE-based,Median Error,1.13,1.13,PASS
+Ensemble,Best 2,Grid Search,MAE,3.18,3.18,PASS
+Ensemble,Best 2,Grid Search,RMSE,6.38,6.38,PASS
+Ensemble,Best 2,Grid Search,R2,-0.02,-0.02,PASS
+Ensemble,Best 2,Grid Search,MAPE (%),16.6,16.6,PASS
+Ensemble,Best 2,Grid Search,Within ±2 Years (%),50.86,50.86,PASS
+Ensemble,Best 2,Grid Search,Within ±5 Years (%),93.1,93.1,PASS
+Ensemble,Best 2,Grid Search,Max Error,34.36,34.36,PASS
+Ensemble,Best 2,Grid Search,Median Error,1.91,1.91,PASS
+Ensemble,Best 2,MAE-based,MAE,3.45,3.45,PASS
+Ensemble,Best 2,MAE-based,RMSE,6.39,6.39,PASS
+Ensemble,Best 2,MAE-based,R2,-0.02,-0.02,PASS
+Ensemble,Best 2,MAE-based,MAPE (%),18.66,18.66,PASS
+Ensemble,Best 2,MAE-based,Within ±2 Years (%),44.83,44.83,PASS
+Ensemble,Best 2,MAE-based,Within ±5 Years (%),89.66,89.66,PASS
+Ensemble,Best 2,MAE-based,Max Error,33.71,33.71,PASS
+Ensemble,Best 2,MAE-based,Median Error,2.15,2.15,PASS

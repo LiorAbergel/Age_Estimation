@@ -1,0 +1,49 @@
+Type,Name,Method,Metric,Computed_Mean,Computed_Std,Reported_Mean,Reported_Std,Status
+Model,ResNet50,-,MAE,5.02,0.34,5.02,0.34,PASS
+Model,ResNet50,-,RMSE,7.56,0.56,7.56,0.56,PASS
+Model,ResNet50,-,R2,0.23,0.1,0.23,0.1,PASS
+Model,ResNet50,-,MAPE,25.01,3.78,25.01,3.78,PASS
+Model,ResNet50,-,Acc_2yr,27.04,7.96,27.04,7.96,PASS
+Model,ResNet50,-,Acc_5yr,69.6,5.94,69.6,5.94,PASS
+Model,ResNet50,-,Max_Error,31.23,8.18,31.23,8.18,PASS
+Model,ResNet50,-,Median_Error,3.29,0.57,3.29,0.57,PASS
+Model,DenseNet121,-,MAE,4.74,0.53,4.74,0.53,PASS
+Model,DenseNet121,-,RMSE,7.8,0.47,7.8,0.47,PASS
+Model,DenseNet121,-,R2,0.18,0.13,0.18,0.13,PASS
+Model,DenseNet121,-,MAPE,20.66,3.71,20.66,3.71,PASS
+Model,DenseNet121,-,Acc_2yr,35.77,14.41,35.77,14.41,PASS
+Model,DenseNet121,-,Acc_5yr,75.62,5.65,75.62,5.65,PASS
+Model,DenseNet121,-,Max_Error,32.05,8.55,32.05,8.55,PASS
+Model,DenseNet121,-,Median_Error,2.78,0.92,2.78,0.92,PASS
+Model,InceptionV3,-,MAE,4.67,0.48,4.67,0.48,PASS
+Model,InceptionV3,-,RMSE,7.69,0.64,7.69,0.64,PASS
+Model,InceptionV3,-,R2,0.2,0.12,0.2,0.12,PASS
+Model,InceptionV3,-,MAPE,21.78,5.89,21.78,5.89,PASS
+Model,InceptionV3,-,Acc_2yr,40.72,6.25,40.72,6.25,PASS
+Model,InceptionV3,-,Acc_5yr,74.27,6.1,74.27,6.1,PASS
+Model,InceptionV3,-,Max_Error,32.66,8.16,32.66,8.16,PASS
+Model,InceptionV3,-,Median_Error,2.63,0.49,2.63,0.49,PASS
+Model,InceptionResNetV2,-,MAE,4.99,0.48,4.99,0.48,PASS
+Model,InceptionResNetV2,-,RMSE,7.58,0.95,7.58,0.95,PASS
+Model,InceptionResNetV2,-,R2,0.21,0.2,0.21,0.2,PASS
+Model,InceptionResNetV2,-,MAPE,23.12,2.53,23.12,2.53,PASS
+Model,InceptionResNetV2,-,Acc_2yr,26.66,9.07,26.66,9.07,PASS
+Model,InceptionResNetV2,-,Acc_5yr,69.98,4.84,69.98,4.84,PASS
+Model,InceptionResNetV2,-,Max_Error,30.94,8.91,30.94,8.91,PASS
+Model,InceptionResNetV2,-,Median_Error,3.46,0.53,3.46,0.53,PASS
+Model,EfficientNetV2M,-,MAE,5.56,0.61,5.56,0.61,PASS
+Model,EfficientNetV2M,-,RMSE,8.43,0.86,8.43,0.86,PASS
+Model,EfficientNetV2M,-,R2,0.05,0.11,0.05,0.11,PASS
+Model,EfficientNetV2M,-,MAPE,26.11,3.29,26.11,3.29,PASS
+Model,EfficientNetV2M,-,Acc_2yr,22.91,6.5,22.91,6.5,PASS
+Model,EfficientNetV2M,-,Acc_5yr,61.38,11.44,61.38,11.44,PASS
+Model,EfficientNetV2M,-,Max_Error,34.73,9.33,34.73,9.33,PASS
+Model,EfficientNetV2M,-,Median_Error,4.07,0.87,4.07,0.87,PASS
+Ensemble,OOF Ensemble,-,MAE,4.51,,4.51,,PASS
+Ensemble,OOF Ensemble,-,RMSE,7.54,,7.54,,PASS
+Ensemble,OOF Ensemble,-,R2,0.25,,0.25,,PASS
+Ensemble,OOF Ensemble,-,MAPE,20.58,,20.58,,PASS
+Ensemble,OOF Ensemble,-,Acc_2yr,41.16,,41.16,,PASS
+Ensemble,OOF Ensemble,-,Acc_5yr,73.13,,73.13,,PASS
+Ensemble,OOF Ensemble,-,Max_Error,40.59,,40.59,,PASS
+Ensemble,OOF Ensemble,-,Median_Error,2.55,,2.55,,PASS

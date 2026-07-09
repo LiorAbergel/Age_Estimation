@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite the paper below."
+title: "Age Estimation from Offline Handwriting: A Case Study Using Regression-Based Modeling"
+type: software
+version: 1.0.0
+date-released: "2026-07-09"
+license: MIT
+repository-code: "https://github.com/LiorAbergel/Age_Estimation"
+authors:
+  - given-names: Lior
+    family-names: Abergel
+  - given-names: Maor
+    family-names: Merling
+  - given-names: Marina
+    family-names: Litvak
+  - given-names: Irina
+    family-names: Rabaev
+preferred-citation:
+  type: article
+  title: "Age Estimation from Offline Handwriting: A Case Study Using Regression-Based Modeling"
+  authors:
+    - given-names: Lior
+      family-names: Abergel
+    - given-names: Maor
+      family-names: Merling
+    - given-names: Marina
+      family-names: Litvak
+    - given-names: Irina
+      family-names: Rabaev

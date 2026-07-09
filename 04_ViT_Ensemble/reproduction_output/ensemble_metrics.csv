@@ -1,0 +1,7 @@
+Ensemble Group,Method,Val_MAE,Weights,MAE,RMSE,R2,MAPE (%),Within ±2 Years (%),Within ±5 Years (%),Max Error,Min Error,Median Error
+Best 3,Grid Search,3.16,"{""MobileViT_XXS"": 0.7, ""ConvNeXtV2_Tiny"": 0.1, ""TinyViT_11M"": 0.2}",2.77,5.84,0.15,14.41,66.38,87.93,32.42,0.03,1.26
+Best 2,Grid Search,3.26,"{""MobileViT_XXS"": 0.9, ""ConvNeXtV2_Tiny"": 0.1}",2.81,6.06,0.08,13.87,65.52,93.1,34.21,0.03,1.44
+Full Ensemble,Grid Search,3.03,"{""MobileViT_XXS"": 0.1, ""ConvNeXtV2_Tiny"": 0.1, ""TinyViT_11M"": 0.5, ""SwinV2_Tiny"": 0.3}",2.89,5.57,0.22,15.75,64.66,82.76,28.99,0.06,1.4
+Best 3,MAE-based,3.2,"{""MobileViT_XXS"": 0.37, ""ConvNeXtV2_Tiny"": 0.33, ""TinyViT_11M"": 0.3}",2.89,5.68,0.19,15.78,63.79,81.9,29.89,0.01,1.24
+Full Ensemble,MAE-based,3.28,"{""MobileViT_XXS"": 0.27, ""ConvNeXtV2_Tiny"": 0.26, ""TinyViT_11M"": 0.24, ""SwinV2_Tiny"": 0.23}",3.03,5.75,0.17,16.09,53.45,85.34,30.38,0.0,1.68
+Best 2,MAE-based,3.41,"{""MobileViT_XXS"": 0.56, ""ConvNeXtV2_Tiny"": 0.44}",3.04,5.93,0.12,15.8,55.17,86.21,31.84,0.01,1.77

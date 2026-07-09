@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Dataset (download via download_dataset.py)
+/data/
+
+# Model weights
+*.keras
+*.pt
+*.h5
+models/
+
+# Training logs / dumps
+training output.txt
+Training_output/
+/results/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

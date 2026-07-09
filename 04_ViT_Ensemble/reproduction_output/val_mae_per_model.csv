@@ -1,0 +1,5 @@
+Model,Val_MAE
+SwinV2_Tiny,5.63
+MobileViT_XXS,3.26
+ConvNeXtV2_Tiny,4.1
+TinyViT_11M,4.75

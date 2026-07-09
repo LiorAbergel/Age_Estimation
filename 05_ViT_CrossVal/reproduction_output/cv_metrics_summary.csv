@@ -1,0 +1,5 @@
+Model,MAE_mean,MAE_std,RMSE_mean,RMSE_std,R2_mean,R2_std,MAPE_mean,MAPE_std,Acc_2yr_mean,Acc_2yr_std,Acc_5yr_mean,Acc_5yr_std,Max_Error_mean,Max_Error_std,Min_Error_mean,Min_Error_std,Median_Error_mean,Median_Error_std
+SwinV2_Tiny,6.55,0.56,8.71,0.46,-0.02,0.02,33.4,3.05,10.9,4.29,44.36,10.78,32.74,7.74,0.32,0.3,5.88,1.09
+MobileViT_XXS,4.69,0.22,7.82,0.58,0.18,0.09,21.0,2.05,40.75,5.96,72.23,4.23,34.16,6.69,0.02,0.02,2.8,0.72
+ConvNeXtV2_Tiny,4.76,0.72,7.51,0.44,0.24,0.1,22.85,5.84,37.35,14.26,69.08,12.42,30.43,6.72,0.04,0.07,2.98,1.16
+TinyViT_11M,5.6,0.71,7.85,0.76,0.17,0.09,27.39,2.49,16.25,7.27,59.87,10.28,31.06,6.94,0.11,0.16,4.33,0.76

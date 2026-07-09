@@ -1,0 +1,5 @@
+Model,MAE,RMSE,R2,MAPE (%),Within ±2 Years (%),Within ±5 Years (%),Max Error,Min Error,Median Error
+SwinV2_Tiny,5.46,7.46,-0.39,30.87,11.21,55.17,32.41,0.16,4.83
+MobileViT_XXS,2.79,6.13,0.06,13.59,65.52,93.97,34.91,0.05,1.35
+ConvNeXtV2_Tiny,3.86,6.08,0.08,21.87,37.07,81.03,27.99,0.13,2.98
+TinyViT_11M,4.69,6.23,0.03,28.95,18.97,70.69,25.95,0.06,3.68

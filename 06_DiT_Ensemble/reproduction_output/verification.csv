@@ -1,0 +1,61 @@
+Type,Name,Method,Metric,Computed,Reported,Status
+Model,DiT-Base,-,MAE,4.11,4.11,PASS
+Model,DiT-Base,-,RMSE,6.32,6.32,PASS
+Model,DiT-Base,-,R2,0.0,0.0,PASS
+Model,DiT-Large,-,MAE,4.37,4.37,PASS
+Model,DiT-Large,-,RMSE,6.33,6.33,PASS
+Model,DiT-Large,-,R2,-0.0,0.0,PASS
+Model,DiT-Base (RVL-CDIP),-,MAE,3.29,3.3,PASS
+Model,DiT-Base (RVL-CDIP),-,RMSE,5.84,5.84,PASS
+Model,DiT-Base (RVL-CDIP),-,R2,0.15,0.15,PASS
+Model,DiT-Large (RVL-CDIP),-,MAE,3.52,3.52,PASS
+Model,DiT-Large (RVL-CDIP),-,RMSE,5.88,5.88,PASS
+Model,DiT-Large (RVL-CDIP),-,R2,0.14,0.14,PASS
+Ensemble,Best 2,Grid Search,MAE,3.17,3.18,PASS
+Ensemble,Best 2,Grid Search,RMSE,5.77,5.77,PASS
+Ensemble,Best 2,Grid Search,R2,0.17,0.17,PASS
+Ensemble,Best 2,Grid Search,MAPE,17.85,17.85,PASS
+Ensemble,Best 2,Grid Search,Acc_2yr,56.03,56.03,PASS
+Ensemble,Best 2,Grid Search,Acc_5yr,83.62,83.62,PASS
+Ensemble,Best 2,Grid Search,Max_Error,27.68,27.68,PASS
+Ensemble,Best 2,Grid Search,Median_Error,1.7,1.7,PASS
+Ensemble,Best 3,Grid Search,MAE,3.18,3.18,PASS
+Ensemble,Best 3,Grid Search,RMSE,5.77,5.77,PASS
+Ensemble,Best 3,Grid Search,R2,0.17,0.17,PASS
+Ensemble,Best 3,Grid Search,MAPE,18.05,18.05,PASS
+Ensemble,Best 3,Grid Search,Acc_2yr,56.9,56.9,PASS
+Ensemble,Best 3,Grid Search,Acc_5yr,82.76,82.76,PASS
+Ensemble,Best 3,Grid Search,Max_Error,27.35,27.35,PASS
+Ensemble,Best 3,Grid Search,Median_Error,1.53,1.53,PASS
+Ensemble,Full Ensemble,Grid Search,MAE,3.2,3.2,PASS
+Ensemble,Full Ensemble,Grid Search,RMSE,5.78,5.78,PASS
+Ensemble,Full Ensemble,Grid Search,R2,0.16,0.17,PASS
+Ensemble,Full Ensemble,Grid Search,MAPE,18.27,18.27,PASS
+Ensemble,Full Ensemble,Grid Search,Acc_2yr,57.76,57.76,PASS
+Ensemble,Full Ensemble,Grid Search,Acc_5yr,82.76,82.76,PASS
+Ensemble,Full Ensemble,Grid Search,Max_Error,27.07,27.07,PASS
+Ensemble,Full Ensemble,Grid Search,Median_Error,1.53,1.53,PASS
+Ensemble,Best 2,MAE-based,MAE,3.21,3.21,PASS
+Ensemble,Best 2,MAE-based,RMSE,5.76,5.76,PASS
+Ensemble,Best 2,MAE-based,R2,0.17,0.17,PASS
+Ensemble,Best 2,MAE-based,MAPE,18.11,18.11,PASS
+Ensemble,Best 2,MAE-based,Acc_2yr,56.03,56.03,PASS
+Ensemble,Best 2,MAE-based,Acc_5yr,83.62,83.62,PASS
+Ensemble,Best 2,MAE-based,Max_Error,26.93,26.93,PASS
+Ensemble,Best 2,MAE-based,Median_Error,1.75,1.75,PASS
+Ensemble,Best 3,MAE-based,MAE,3.24,3.24,PASS
+Ensemble,Best 3,MAE-based,RMSE,5.81,5.81,PASS
+Ensemble,Best 3,MAE-based,R2,0.16,0.16,PASS
+Ensemble,Best 3,MAE-based,MAPE,18.67,18.67,PASS
+Ensemble,Best 3,MAE-based,Acc_2yr,57.76,57.76,PASS
+Ensemble,Best 3,MAE-based,Acc_5yr,81.03,81.03,PASS
+Ensemble,Best 3,MAE-based,Max_Error,26.56,26.56,PASS
+Ensemble,Best 3,MAE-based,Median_Error,1.54,1.54,PASS
+Ensemble,Full Ensemble,MAE-based,MAE,3.35,3.35,PASS
+Ensemble,Full Ensemble,MAE-based,RMSE,5.87,5.87,PASS
+Ensemble,Full Ensemble,MAE-based,R2,0.14,0.14,PASS
+Ensemble,Full Ensemble,MAE-based,MAPE,19.54,19.54,PASS
+Ensemble,Full Ensemble,MAE-based,Acc_2yr,56.9,56.9,PASS
+Ensemble,Full Ensemble,MAE-based,Acc_5yr,77.59,77.59,PASS
+Ensemble,Full Ensemble,MAE-based,Max_Error,26.47,26.47,PASS
+Ensemble,Full Ensemble,MAE-based,Median_Error,1.55,1.55,PASS

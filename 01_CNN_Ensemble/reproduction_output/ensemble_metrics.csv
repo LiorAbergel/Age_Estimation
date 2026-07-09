@@ -1,0 +1,9 @@
+Ensemble Group,Method,Val_MAE,Weights,MAE,RMSE,R2,MAPE (%),Within ±2 Years (%),Within ±5 Years (%),Max Error,Min Error,Median Error
+Full Ensemble,Grid Search,3.14,"{""ResNet50"": 0.1, ""InceptionV3"": 0.1, ""InceptionResNetV2"": 0.3, ""DenseNet121"": 0.3, ""EfficientNetV2M"": 0.2}",2.73,6.09,0.07,13.93,72.41,88.79,32.42,0.04,1.22
+Best 4,Grid Search,3.15,"{""ResNet50"": 0.1, ""InceptionResNetV2"": 0.4, ""DenseNet121"": 0.4, ""InceptionV3"": 0.1}",2.73,6.05,0.08,14.13,71.55,87.07,31.78,0.01,1.2
+Best 3,Grid Search,3.14,"{""ResNet50"": 0.1, ""InceptionResNetV2"": 0.4, ""DenseNet121"": 0.5}",2.75,6.05,0.08,14.12,71.55,87.07,31.35,0.02,1.15
+Best 3,MAE-based,3.18,"{""ResNet50"": 0.35, ""InceptionResNetV2"": 0.32, ""DenseNet121"": 0.33}",2.76,6.11,0.07,14.16,70.69,88.79,32.34,0.01,1.11
+Full Ensemble,MAE-based,3.2,"{""ResNet50"": 0.2, ""InceptionV3"": 0.2, ""InceptionResNetV2"": 0.19, ""DenseNet121"": 0.2, ""EfficientNetV2M"": 0.21}",2.76,6.13,0.06,14.12,67.24,89.66,33.08,0.0,1.12
+Best 4,MAE-based,3.27,"{""ResNet50"": 0.26, ""InceptionResNetV2"": 0.24, ""DenseNet121"": 0.25, ""InceptionV3"": 0.25}",2.82,6.1,0.07,14.66,59.48,87.07,32.75,0.01,1.13
+Best 2,Grid Search,3.63,"{""ResNet50"": 0.9, ""InceptionResNetV2"": 0.1}",3.18,6.38,-0.02,16.6,50.86,93.1,34.36,0.07,1.91
+Best 2,MAE-based,3.85,"{""ResNet50"": 0.55, ""InceptionResNetV2"": 0.45}",3.45,6.39,-0.02,18.66,44.83,89.66,33.71,0.05,2.15

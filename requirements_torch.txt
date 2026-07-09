@@ -1,0 +1,9 @@
+torch>=2.0
+torchvision
+transformers
+numpy
+pandas
+scikit-learn
+Pillow
+tqdm
+openpyxl

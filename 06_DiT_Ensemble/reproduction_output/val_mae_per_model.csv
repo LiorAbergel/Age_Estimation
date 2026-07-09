@@ -1,0 +1,5 @@
+Model,Val_MAE
+DiT-Base,4.33
+DiT-Large,4.48
+DiT-Base (RVL-CDIP),3.34
+DiT-Large (RVL-CDIP),3.62
